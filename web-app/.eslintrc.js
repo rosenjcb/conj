@@ -12,7 +12,7 @@ module.exports = {
             "jsx": true
         },
         "ecmaVersion": 13,
-        "sourceType": "module"
+        // "sourceType": "module"
     },
     "plugins": [
         "react"

@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { ThemeProvider } from 'styled-components';
-import { SubmitBox } from './components/SubmitBox/index';
+import { SubmitBox } from './components/SubmitBox';
 
 const theme = {
   primary: 'black',
