@@ -3,7 +3,8 @@ import './App.css';
 import { ThemeProvider } from 'styled-components';
 import { SubmitBox } from './components/SubmitBox';
 
-const theme = {
+export const theme = {
+  name: 'Main Theme',
   primary: 'black',
   secondary: 'white',
   post : {

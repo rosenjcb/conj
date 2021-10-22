@@ -1,6 +1,7 @@
 import styled from 'styled-components'
+import { Field, Textarea } from 'formik'
 
-export const Root = styled.div`
+export const Root = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -28,7 +29,7 @@ export const FieldName = styled.span`
   vertical-align: center;
 `
 
-export const FieldInput = styled.input`
+export const FieldInput = styled(Field)`
   margin: 0;
   width: 244px;
   margin-right: 2px;
@@ -44,19 +45,19 @@ export const FieldInput = styled.input`
     }
 `;
 
-export const FieldInputArea = styled.textarea`
-  margin: 0;
-  width: 292px;
-  margin-right: 2px;
-  padding: 2px 4px 3px;
-  font-family: aria, helvetica, sans-serif;
-  font-size: 10pt;
-  -webkit-appearance: none;
+// export const FieldInputArea = styled(Field)`
+//   margin: 0;
+//   width: 292px;
+//   margin-right: 2px;
+//   padding: 2px 4px 3px;
+//   font-family: aria, helvetica, sans-serif;
+//   font-size: 10pt;
+//   -webkit-appearance: none;
 
-  &:focus {
-        outline: none;
-    }
-`;
+//   &:focus {
+//         outline: none;
+//     }
+// `;
 
 export const FieldInputFile = styled.input`
   margin: 0;

@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
-import { useEffect } from 'react';
 import { Root, FieldRoot, FieldName, FieldInput, FieldInputArea, FieldInputFile } from './styles';
+import { Formik, Form, Field } from 'formik';
 
-const Field = (props) => {
+const SubmitField = (props) => {
   const { title, input, isSubmit } = props;
 
   return(
     <FieldRoot>
       <FieldName>{title}</FieldName>
       {input}
-      { isSubmit ? <button>Post</button> : null}
+      { isSubmit ? <button type="submit">Post</button> : null}
     </FieldRoot>
   )
 }
@@ -17,11 +17,23 @@ const Field = (props) => {
 export const SubmitBox = (props) => {
 
   return(
-    <Root>
-      <Field title={"Name"} input={<FieldInput type="text" placeholder="Anonymous"/>}/>
-      <Field title={"Subject"} input={<FieldInput type="text" />} isSubmit/>
-      <Field title={"Comment"} input={<FieldInputArea type="text-area"/>}/>
-      <Field title={"Image"} input={<FieldInputFile type="file"/>}/>
-    </Root>
+    <Formik
+      initialValues={{
+        name: 'Anonymous',
+        subject: '',
+        comment: '',
+        image: ''
+      }}
+      onSubmit={(values) => alert(JSON.stringify(values, null, 2))}>
+        {(props) => (
+          <Form>
+            <SubmitField title={"Name"} input={<FieldInput name="name" as="input" placeholder="Anonymous" onChange={props.handleChange}/>}/>
+            <SubmitField title={"Subject"} input={<FieldInput name="subject" as="input" onChange={props.handleChange}/>} isSubmit/>
+            <SubmitField title={"Comment"} input={<FieldInput name="comment" as="textarea" onChange={props.handleChange}/>}/>
+            <SubmitField title={"Image"} input={<FieldInputFile name="image" type="file" onChange={props.handleChange}/>}/>
+          </Form>
+        )}
+      </Formik>
+
   )
 }
