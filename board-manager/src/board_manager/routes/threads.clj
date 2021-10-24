@@ -11,9 +11,8 @@
 (defn hello-world [req]
   (response {:key "Hello World"}))
 
-
 (def thread-routes
-  ["threads"
+  ["/threads"
    ["/test" {:get hello-world :post print-req}]])
 
 ;; (defroutes thread-routes
