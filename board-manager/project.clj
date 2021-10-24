@@ -3,10 +3,13 @@
   :url "http://example.com/FIXME"
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.10.0"]
+                 [org.clojure/tools.logging "1.1.0"]
                  [compojure "1.6.1"]
                  [ring/ring-defaults "0.3.2"]
                  [ring/ring-jetty-adapter "1.9.4"]
-                 [com.taoensso/carmine "3.1.0"]]
+                 [ring/ring-json "0.5.1"]
+                 [com.taoensso/carmine "3.1.0"]
+                 [metosin/reitit "0.5.15"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler board-manager.handler/app}
   :profiles
