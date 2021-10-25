@@ -5,7 +5,10 @@
             [ring.adapter.jetty :as ring-jetty]
             [ring.middleware.json :as middleware]
             [reitit.ring :as ring]
-            [board-manager.routes.thread :as thread]))
+            [board-manager.routes.thread :as thread]
+            [ring.middleware.content-type :as content-type]
+            [reitit.ring.coercion :as coercion]
+            [reitit.ring.middleware.muuntaja :as muuntaja]))
 
 ;; (defroutes app-routes
 ;;   (GET "/dog" [] "Hello Dog"))
@@ -19,8 +22,9 @@
     (ring/router 
      [thread/thread-routes]
      {:data {:middleware
-             [middleware/wrap-json-body
-              middleware/wrap-json-response]}})
+             [muuntaja/format-middleware
+              coercion/coerce-response-middleware
+              coercion/coerce-exceptions-middleware]}})
     (ring/create-default-handler)))
 
 ;; (def app

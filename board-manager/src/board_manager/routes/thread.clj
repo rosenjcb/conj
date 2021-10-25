@@ -4,20 +4,23 @@
     [compojure.core :refer :all]
     [clojure.tools.logging :as log] 
     [compojure.route :as route]
-    [ring.util.response :refer [response]]))
+    [ring.util.response :as response]))
 
 (defn print-req [req]
   (log/infof (str req))
-  (response {:key "value"}))
+  (response/response {:key "value"}))
 
-(defn hello-world [req]
-  (response {:key "Hello World"}))
+;; (defn hello-world [req]
+;;   (response {:key "Hello World"}))
 
 
 (def thread-routes
   ["/threads"
-   ["/" {:post query.thread/create-thread!}] 
-   ["/test" {:get hello-world :post print-req}]])
+    {:get print-req
+     :put print-req
+     :post {:summary "Create a Thread" 
+            :handler (fn [{{:keys [body]} :parameters}] (response/created "google.com" (query.thread/create-thread! body)))}}])
+  ;;  ["/test" {:get hello-world :post print-req}]])
 
 ;; (defroutes thread-routes
 ;;   (context "/threads" []
