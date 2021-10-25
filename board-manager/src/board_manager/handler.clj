@@ -5,8 +5,7 @@
             [ring.adapter.jetty :as ring-jetty]
             [ring.middleware.json :as middleware]
             [reitit.ring :as ring]
-            [ring.adapter.jetty :as jetty]
-            [board-manager.routes.threads :as threads]))
+            [board-manager.routes.thread :as thread]))
 
 ;; (defroutes app-routes
 ;;   (GET "/dog" [] "Hello Dog"))
@@ -15,21 +14,18 @@
 ;;   (routes 
 ;;    app-routes threads/thread-routes))
 
-(def app
+(def app 
   (ring/ring-handler
     (ring/router 
-     [threads/thread-routes]
+     [thread/thread-routes]
      {:data {:middleware
              [middleware/wrap-json-body
               middleware/wrap-json-response]}})
     (ring/create-default-handler)))
 
 ;; (def app
-;;   (app-routes))
+;;   (wrap-defaults api-defaults app-routes))
 
-(defn start []
-  (jetty/run-jetty #'app {:port 3000, :join? false})
-  (println "server running in port 3000"))
 ;; (def app
 ;;   app-routes)
 
@@ -41,9 +37,7 @@
 
 
 (comment
-  (start))
-  ;; (ring-jetty/run-jetty app {:port 3000}))
-  
+  (ring-jetty/run-jetty app {:port 3000}))
 
 
 
