@@ -8,7 +8,10 @@
             [board-manager.routes.thread :as thread]
             [ring.middleware.content-type :as content-type]
             [reitit.ring.coercion :as coercion]
-            [reitit.ring.middleware.muuntaja :as muuntaja]))
+            [reitit.ring.middleware.muuntaja :as muuntaja]
+            [muuntaja.core :as m]
+            [reitit.coercion.spec :as spec]
+            [ring.middleware.cors :refer [wrap-cors]]))
 
 ;; (defroutes app-routes
 ;;   (GET "/dog" [] "Hello Dog"))
@@ -16,15 +19,22 @@
 ;; (def all-routes
 ;;   (routes 
 ;;    app-routes threads/thread-routes))
+(def cors {"Access-Control-Allow-Origin" "*"
+           "Access-Control-Allow-Headers" "Origin, Accept, Access-Control-Request-Method, Access-Control-Allow-Headers, Content-Type, *"})
 
 (def app 
   (ring/ring-handler
     (ring/router 
      [thread/thread-routes]
-     {:data {:middleware
+     {:data {:muuntaja m/instance
+             :coercion spec/coercion
+             :middleware
              [muuntaja/format-middleware
+              coercion/coerce-exceptions-middleware
+              coercion/coerce-request-middleware
               coercion/coerce-response-middleware
-              coercion/coerce-exceptions-middleware]}})
+              [wrap-cors :access-control-allow-origin [#".*"]
+                                    :access-control-allow-methods [:get :put :post :patch :delete]]]}})
     (ring/create-default-handler)))
 
 ;; (def app

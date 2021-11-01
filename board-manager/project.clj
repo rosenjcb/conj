@@ -11,7 +11,7 @@
                  [com.taoensso/carmine "3.1.0"]
                  [metosin/reitit "0.5.15"]]
   :plugins [[lein-ring "0.12.5"]]
-  :ring {:handler board-manager.handler/app}
+  :ring {:handler board-manager.handler/app :port 8080}
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]}})
