@@ -51,7 +51,10 @@
 
 
 (comment
-  (ring-jetty/run-jetty app {:port 3000}))
+  (ring-jetty/run-jetty app {:port 8080}))
+  
+
+
 
 
 
