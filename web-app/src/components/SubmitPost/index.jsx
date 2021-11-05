@@ -17,10 +17,7 @@ const SubmitField = (props) => {
 
 export const SubmitPost = (props) => {
 
-  const submitPost = async(post) => {
-    await axios.post('localhost:3000/threads', post);
-    alert("Done");
-  }
+  const { handleSubmit } = props;
 
   return(
     <Formik
@@ -30,7 +27,7 @@ export const SubmitPost = (props) => {
         comment: '',
         image: ''
       }}
-      onSubmit={submitPost}>
+      onSubmit={handleSubmit}>
         {(props) => (
           <Form>
             <SubmitField title={"Name"} input={<FieldInput name="name" as="input" placeholder="Anonymous" onChange={props.handleChange}/>}/>

@@ -19,10 +19,10 @@
 ;; (def all-routes
 ;;   (routes 
 ;;    app-routes threads/thread-routes))
-(def cors {"Access-Control-Allow-Origin" "*"
-           "Access-Control-Allow-Headers" "Origin, Accept, Access-Control-Request-Method, Access-Control-Allow-Headers, Content-Type, *"})
+;; (def cors {"Access-Control-Allow-Origin" "*"
+;;            "Access-Control-Allow-Headers" "Origin, Accept, Access-Control-Request-Method, Access-Control-Allow-Headers, Content-Type, *"})
 
-(def app 
+(def app
   (ring/ring-handler
     (ring/router 
      [thread/thread-routes]
@@ -32,13 +32,11 @@
              [muuntaja/format-middleware
               coercion/coerce-exceptions-middleware
               coercion/coerce-request-middleware
-              coercion/coerce-response-middleware
-              [wrap-cors :access-control-allow-origin [#".*"]
-                                    :access-control-allow-methods [:get :put :post :patch :delete]]]}})
+              coercion/coerce-response-middleware]}})
     (ring/create-default-handler)))
 
 ;; (def app
-;;   (wrap-defaults api-defaults app-routes))
+;;   (wrap-cors app-routes :access-control-allow-origin ["*"] :access-control-allow-methods [:get :put :post :delete]))
 
 ;; (def app
 ;;   app-routes)
@@ -52,13 +50,3 @@
 
 (comment
   (ring-jetty/run-jetty app {:port 8080}))
-  
-
-
-
-
-
-
-
-
-

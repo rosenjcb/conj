@@ -18,7 +18,7 @@ export const FieldRoot = styled.div`
 export const FieldName = styled.span`
   display: inline-flex;
   align-items: center;
-  background-color: ${props => props.theme.post.primary};
+  background-color: ${props => props.theme.submitPost.primary};
   width: 100px;
   text-align: left;
   color: #000;

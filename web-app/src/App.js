@@ -4,14 +4,27 @@ import './App.css';
 import { ThemeProvider } from 'styled-components';
 import { SubmitPost } from './components/SubmitPost';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
-import { Post } from './components/SubmitPost/Post';
+import { ThreadPage } from './pages/Thread';
+import axios from 'axios';
 
 export const theme = {
   name: 'Main Theme',
   primary: 'black',
   secondary: 'white',
-  post : {
+  submitPost: {
     primary: '#98e'
+  },
+  post: {
+    fontSize: "10pt",
+    fontFamily: "arial,helvetica,sans-serif",
+    backgroundColor: '#d6daf0',
+    border: '#b7c5d9',
+    subject: {
+      color: '#0f0c5d'
+    },
+    name: { 
+      color: '#117743',
+    }
   }
 }
 
@@ -24,7 +37,7 @@ function App() {
           <Home/>
         </Route>
         <Route path="/threads/:id">
-          <Post/>
+          <ThreadPage/>
         </Route>
       </Switch>
     </Router>
@@ -33,12 +46,18 @@ function App() {
 }
 
 function Home() {
+
+  const handleSubmit = async(post) => {
+    await axios.post('/threads', post);
+    alert("Done");
+  }
+
   return (
     <div>
       <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <SubmitPost/>
+        <SubmitPost handleSubmit={handleSubmit}/>
         <p>
           Edit <code>src/App.js</code> and save to reload.
         </p>

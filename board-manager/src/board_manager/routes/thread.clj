@@ -1,6 +1,7 @@
 (ns board-manager.routes.thread
   (:require 
     [board-manager.query.thread :as query.thread]
+    [board-manager.model.thread :as model.thread]
     [compojure.core :refer :all]
     [clojure.tools.logging :as log] 
     [compojure.route :as route]
@@ -17,14 +18,24 @@
 (defn create-thread! [req]
   (let [body-params (:body-params req)]
     (->> body-params
-         (query.thread/create-thread!)
-         (response/response))))
+         query.thread/create-thread!
+         response/response)))
 
 (defn get-thread! [req]
   (let [path-params (:path-params req)
         id (:id path-params)]
     (->> id
+         query.thread/find-thread-by-id!
+         response/response)))
+
+(defn put-thread! [req]
+  (let [body-params (:body-params req)
+        path-params (:path-params req)
+        id (:id path-params)]
+    (query.thread/add-post! id body-params)
+    (->> id
          (query.thread/find-thread-by-id!)
+         (query.thread/update! id)
          (response/response))))
 
 (def thread-routes
@@ -35,8 +46,10 @@
            :handler create-thread!}}]
     ["/threads/:id"
     ;; {:get print-req}]])
-     {:get {:summary "Get a thread by Id"
-            :handler get-thread!}}]])
+     {:get {:summary "Get a thread by id"
+            :handler get-thread!}
+      :put {:summary "Inserts a post into a thread by id"
+            :handler put-thread! }}]])
 
 ;; (defroutes thread-routes
 ;;   (context "/threads" []
