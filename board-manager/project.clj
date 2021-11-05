@@ -9,7 +9,9 @@
                  [ring/ring-jetty-adapter "1.9.4"]
                  [ring/ring-json "0.5.1"]
                  [com.taoensso/carmine "3.1.0"]
-                 [metosin/reitit "0.5.15"]]
+                 [metosin/reitit "0.5.15"]
+                 [com.taoensso/carmine "3.1.0"]
+                 [ring-cors/ring-cors "0.1.13"]]
   :plugins [[lein-ring "0.12.5"]]
   :ring {:handler board-manager.handler/app :port 8080}
   :profiles

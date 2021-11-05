@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Root, FieldRoot, FieldName, FieldInput, FieldInputArea, FieldInputFile } from './styles';
 import { Formik, Form, Field } from 'formik';
+import axios from 'axios';
 
 const SubmitField = (props) => {
   const { title, input, isSubmit } = props;
@@ -16,6 +17,11 @@ const SubmitField = (props) => {
 
 export const SubmitPost = (props) => {
 
+  const submitPost = async(post) => {
+    await axios.post('localhost:3000/threads', post);
+    alert("Done");
+  }
+
   return(
     <Formik
       initialValues={{
@@ -24,7 +30,7 @@ export const SubmitPost = (props) => {
         comment: '',
         image: ''
       }}
-      onSubmit={(values) => alert(JSON.stringify(values, null, 2))}>
+      onSubmit={submitPost}>
         {(props) => (
           <Form>
             <SubmitField title={"Name"} input={<FieldInput name="name" as="input" placeholder="Anonymous" onChange={props.handleChange}/>}/>
