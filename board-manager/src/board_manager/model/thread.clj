@@ -1,22 +1,24 @@
 (ns board-manager.model.thread
-  (:require [clojure.tools.logging :as log]))
+  (:require 
+    [clojure.tools.logging :as log]
+    [board-manager.model.post :as m.post]))
 
 (def schema 
   [:vector
-   [:map
-    [:name {:optional true} string?] 
-    [:subject {:optional true} string?]
-    [:comment string?]]])
+   [:map m.post/schema]])
 
-(defn model->data [t])
-(defn data->model [d])
+;; (defn model->data [t])
+;; (defn data->model [d])
 
-(defn req->thread
+(defn req&id->thread
   "Takes a given API request and generates a new thread"
-  [req]
-    (log/infof (str req)) 
+  [req id]
+    ;; (log/infof (str req)) 
     (let [{:keys [name subject comment]} req]
-      [{:id 1 :name name :subject subject :comment comment}]))
+      [{:id id :name name :subject subject :comment comment}]))
+
+(defn add-post [post thread]
+  (conj thread post))
 
 (def id :id)
 

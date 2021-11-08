@@ -32,11 +32,9 @@
   (let [body-params (:body-params req)
         path-params (:path-params req)
         id (:id path-params)]
-    (query.thread/add-post! id body-params)
-    (->> id
-         (query.thread/find-thread-by-id!)
-         (query.thread/update! id)
-         (response/response))))
+    (->> body-params
+         (query.thread/add-post! id)
+         response/response)))
 
 (def thread-routes
   [["/threads"

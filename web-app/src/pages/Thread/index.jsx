@@ -13,13 +13,14 @@ export function ThreadPage(props) {
   useEffect(() => {
     axios.get(`/threads/${id}`)
         .then((resp) => {
-            // console.log(resp);
+            console.log(resp);
             setThread(resp.data);
         });
   },[]);
 
-  const handleSubmit = (post) => {
-    axios.put(`/threads/${id}`, post);
+  const handleSubmit = async (post) => {
+    const res = await axios.put(`/threads/${id}`, post);
+    setThread(res.data);
   }
 
   return(
