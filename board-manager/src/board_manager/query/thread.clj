@@ -14,6 +14,13 @@
 (defn inc-thread-counter []
   (swap! counter inc))
 
+(defn peek-threads! 
+  []
+  (let [thread-ids (wcar* (car/keys "*"))]
+    (->> thread-ids
+         (map #(wcar* (car/get %)))
+         (map #(take 6 %)))))
+
 (defn create-thread! 
   [req]
   (let [thread (m.thread/req&id->thread req @counter)
@@ -39,9 +46,3 @@
     (update-thread! thread-id updated-thread)
     (inc-thread-counter)
     updated-thread))
-
-
-(comment
-  (wcar* (car/set "1" "set"))
-  (wcar* (car/get "1"))
-  (wcar* (car/get "1382091")))

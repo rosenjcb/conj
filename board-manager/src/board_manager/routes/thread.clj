@@ -8,12 +8,9 @@
     [ring.util.response :as response]
     [reitit.ring :as ring]))
 
-(defn print-req [req]
-  (log/infof (str req))
-  (response/response {:hi "value"}))
 
-;; (defn hello-world [req]
-;;   (response {:key "Hello World"}))
+(defn peek-threads! [_]
+  (response/response (query.thread/peek-threads!)))
 
 (defn create-thread! [req]
   (let [body-params (:body-params req)]
@@ -38,22 +35,11 @@
 
 (def thread-routes
   [["/threads"
-   {:get print-req
-    :put print-req
+   {:get peek-threads! 
     :post {:summary "Create a Thread" 
            :handler create-thread!}}]
     ["/threads/:id"
-    ;; {:get print-req}]])
      {:get {:summary "Get a thread by id"
             :handler get-thread!}
       :put {:summary "Inserts a post into a thread by id"
             :handler put-thread! }}]])
-
-;; (defroutes thread-routes
-;;   (context "/threads" []
-;;     (GET "/test" [req] (response {:key "Hello World"}))
-;;     (POST "/test" [req] print-req)
-;;     (route/not-found "Not Found")))
-
-(comment
-  (response/response {:key "value"}))

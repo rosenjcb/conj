@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { ThemeProvider } from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { SubmitPost } from './components/SubmitPost';
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import { ThreadPage } from './pages/Thread';
+import { Thread } from './components/Thread';
 import axios from 'axios';
 
 export const theme = {
@@ -47,32 +48,44 @@ function App() {
 
 function Home() {
 
+  const [threads, setThreads] = useState([]);
+
+  useEffect(async() => {
+    const res = await axios.get('/threads');
+    console.log(res);
+    setThreads(res.data)
+  },[])
+
   const handleSubmit = async(post) => {
-    await axios.post('/threads', post);
-    alert("Done");
+    const res = await axios.post('/threads', post);
+    alert(JSON.stringify(res.data, null, 2));
   }
 
   return (
-    <div>
-      <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <SubmitPost handleSubmit={handleSubmit}/>
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-      </div>
-    </div>
+    <HomeRoot>
+      <SubmitPost handleSubmit={handleSubmit}/>
+      <ThreadsContainer>
+        { threads.map((thread, key) => <div key={key}><Thread thread={thread}/><hr/></div>)}
+      </ThreadsContainer>
+    </HomeRoot>
   );
 }
+
+const HomeRoot = styled.div`
+  background-color: #eef2ff; 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+`;
+
+const ThreadsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+`;
+
+const ThreadContainer = styled.div`
+
+`;
 
 export default App;
