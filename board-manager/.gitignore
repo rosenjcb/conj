@@ -11,4 +11,4 @@ pom.xml.asc
 /.lsp
 /.clj-kondo
 /.calva
-/node_modules
+/logs

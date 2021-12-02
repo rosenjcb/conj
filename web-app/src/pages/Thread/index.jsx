@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Redirect } from 'react-router';
 import { Thread } from '../../components/Thread';
 import { SubmitPost } from '../../components/SubmitPost';
 import { useParams } from 'react-router'
 import axios from 'axios'
+import { Root } from './styles';
 
 export function ThreadPage(props) {
 
@@ -13,7 +15,10 @@ export function ThreadPage(props) {
   useEffect(() => {
     axios.get(`/threads/${id}`)
         .then((resp) => {
-            console.log(resp);
+            if(resp.data == "") {
+              window.location = "/";
+              // return (<Redirect to="/thread/1"/>);
+            }
             setThread(resp.data);
         });
   },[]);
@@ -24,9 +29,9 @@ export function ThreadPage(props) {
   }
 
   return(
-    <div>
+    <Root>
       <SubmitPost handleSubmit={handleSubmit}/>
       <Thread thread={thread}/>
-    </div>
+    </Root>
   )
 }

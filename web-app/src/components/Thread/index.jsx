@@ -8,8 +8,6 @@ export function Thread(props) {
 
   const { thread } = props;
 
-  // console.log(thread)
-
   return(
     <div>
       { thread && thread.length > 0 

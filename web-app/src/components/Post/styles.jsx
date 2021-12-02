@@ -19,6 +19,19 @@ export const PostInfo = styled.div`
     align-items: center;
 `;
 
+export const PostContent = styled.div`
+    display: block;
+    align-items: center;
+`;
+
+export const ThumbnailLink = styled.a`
+    float: left;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 3px;
+    margin-bottom: 5px;
+`;
+
 export const Name = styled.span`
     font-weight: 700;
     color: ${props => props.theme.post.name.color};

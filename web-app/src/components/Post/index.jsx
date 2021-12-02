@@ -1,15 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import { useParams } from 'react-router';
-import { Root, PostInfo, Name, Subject, PostMenuArrow } from './styles';
-// import { Formik, Form, Field } from 'formik';
-// import axios from 'axios';
+import { Root, PostInfo, PostContent, ThumbnailLink, Name, Subject, PostMenuArrow } from './styles';
+
+const Thumbnail = (props) => {
+    return(
+        <ThumbnailLink>
+            { props.image ? <img src={props.image} width={50} height={50}/> : null }
+        </ThumbnailLink>
+    )
+}
 
 export const Post = (props) => {
 
     const { post, isOriginalPost } = props;
 
-    const { name, subject, id, comment } = post;
+    const { name, subject, id, comment, image } = post;
 
     return (
         <Root>
@@ -20,10 +26,10 @@ export const Post = (props) => {
                 { `No.${id}` } 
                 <PostMenuArrow/>
             </PostInfo>
-            <blockquote>{comment}</blockquote>
-            {/* { JSON.stringify(post, null, 2) } */}
+            <PostContent>
+                <Thumbnail image={image}/>
+                <blockquote>{comment}</blockquote>
+            </PostContent>
         </Root>
     );
 }
-
-

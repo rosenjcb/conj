@@ -7,11 +7,13 @@ import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import { ThreadPage } from './pages/Thread';
 import { Thread } from './components/Thread';
 import axios from 'axios';
+import { ModalProvider } from 'styled-react-modal'
 
 export const theme = {
   name: 'Main Theme',
   primary: 'black',
   secondary: 'white',
+  background: 'linear-gradient(180deg, rgba(209,213,238,1) 0%, rgba(238,242,255,1) 35%);',
   submitPost: {
     primary: '#98e'
   },
@@ -32,16 +34,18 @@ export const theme = {
 function App() {
   return (
     <ThemeProvider theme={theme}>    
+    <ModalProvider>
     <Router>
       <Switch>
         <Route exact path="/">
           <Home/>
         </Route>
-        <Route path="/threads/:id">
+        <Route path="/thread/:id">
           <ThreadPage/>
         </Route>
       </Switch>
     </Router>
+    </ModalProvider>
     </ThemeProvider>
   );
 }
@@ -52,13 +56,13 @@ function Home() {
 
   useEffect(async() => {
     const res = await axios.get('/threads');
-    console.log(res);
-    setThreads(res.data)
+    setThreads(res.data);
   },[])
 
   const handleSubmit = async(post) => {
     const res = await axios.post('/threads', post);
     alert(JSON.stringify(res.data, null, 2));
+    setThreads([...threads, res.data]);
   }
 
   return (

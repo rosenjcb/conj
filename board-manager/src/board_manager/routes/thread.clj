@@ -6,31 +6,49 @@
     [clojure.tools.logging :as log] 
     [compojure.route :as route]
     [ring.util.response :as response]
-    [reitit.ring :as ring]))
+    [reitit.ring :as ring]
+    [next.jdbc :as jdbc]))
 
 
-(defn peek-threads! [_]
-  (response/response (query.thread/peek-threads!)))
+(defn peek-threads! [req]
+  ;; (log/info "hello world")
+  (let [redis-conn (get-in req [:components :redis-conn])]
+    ;; (log/infof "Query res %s" (jdbc/execute! (db-conn) ["SELECT *
+    ;;                           FROM pg_catalog.pg_tables
+    ;;                           WHERE schemaname != 'pg_catalog' AND 
+    ;;                           schemaname != 'information_schema';"]))
+    ;; (log/infof "Req is %s" req)
+    ;; (log/infof "Your connection looks like %s" db-conn)
+    (response/response (query.thread/peek-threads! redis-conn))))
 
 (defn create-thread! [req]
-  (let [body-params (:body-params req)]
-    (->> body-params
-         query.thread/create-thread!
-         response/response)))
+  (let [redis-conn (get-in req [:components :redis-conn])
+        body-params (:body-params req)]
+    (try 
+      (->> body-params
+          (query.thread/create-thread! redis-conn)
+          response/response)
+      (catch Exception e
+        (log/info (assoc {} :error (str (.getMessage e))))
+        (->> (str (.getMessage e))
+             (assoc {} :error)
+             response/bad-request)))))
 
 (defn get-thread! [req]
-  (let [path-params (:path-params req)
+  (let [redis-conn (get-in req [:components :redis-conn])
+        path-params (:path-params req)
         id (:id path-params)]
     (->> id
-         query.thread/find-thread-by-id!
+         (query.thread/find-thread-by-id! redis-conn)
          response/response)))
 
 (defn put-thread! [req]
-  (let [body-params (:body-params req)
+  (let [redis-conn (get-in req [:components :redis-conn])
+        body-params (:body-params req)
         path-params (:path-params req)
         id (:id path-params)]
     (->> body-params
-         (query.thread/add-post! id)
+         (query.thread/add-post! redis-conn id)
          response/response)))
 
 (def thread-routes

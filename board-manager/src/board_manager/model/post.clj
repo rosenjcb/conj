@@ -12,7 +12,7 @@
 (defn req&id->post
   "Takes a given API request and generates a new thread"
   [req id]
-    (let [{:keys [name subject comment]} req]
-      {:id id :name name :subject subject :comment comment}))
+    (let [{:keys [name subject comment image]} req]
+      {:id id :name name :subject subject :comment comment :image image}))
 
 (def id :id)

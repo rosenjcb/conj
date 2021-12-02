@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { Field, Textarea } from 'formik'
+import Modal from 'styled-react-modal';
 
 export const Root = styled.form`
   display: flex;
@@ -72,3 +73,30 @@ export const FieldInputFile = styled.input`
         outline: none;
     }
 `;
+
+export const FieldFilePicker = styled.div`
+  margin: 0;
+  width: 292px;
+  appearance: none;
+  border: 0 none;
+  outline: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start
+  font-family: aria, helvetica, sans-serif;
+  font-size: 10pt;
+
+  &:focus {
+        outline: none;
+    }
+`;
+
+export const ImagePickerModal = Modal.styled`
+  width: 20rem;
+  height: 20rem;
+  display: flex;
+  gap: 20px;
+  padding: 1rem;
+  justify-content: flex-start;
+  background-color: white;
+`
