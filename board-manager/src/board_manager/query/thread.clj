@@ -2,14 +2,9 @@
   (:require
    [board-manager.model.thread :as m.thread]
    [board-manager.model.post :as m.post]
-   [taoensso.carmine :as car]
    [clojure.tools.logging :as log]
+   [board-manager.query.counter :as q.counter]
    [board-manager.query.db.redis :as db.redis]))
-
-(def counter (atom 0))
-
-(defn inc-thread-counter []
-  (swap! counter inc))
 
 (defn peek-threads! 
   [redis-conn]
@@ -19,14 +14,15 @@
          (map #(take 6 %)))))
 
 (defn create-thread! 
-  [redis-conn req]
-  (let [thread (m.thread/req&id->thread req @counter)
+  [db-conn redis-conn req]
+  (let [post-count (q.counter/get-count! db-conn)
+        thread (m.thread/req&id->thread req post-count)
         id (m.thread/id (first thread))
         image (m.thread/image (first thread))]
     (if image 
       (do
         (db.redis/set redis-conn id thread)
-        (inc-thread-counter)
+        (q.counter/increment-counter db-conn)
         thread)
       (throw (Exception. "No image provided")))))
 
@@ -40,10 +36,11 @@
 
 (defn add-post!
   "Grabs a thread by its id, adds a post to it, and saves it to the database"  
-  [redis-conn thread-id post-body]
-  (let [post (m.post/req&id->post post-body @counter)
+  [db-conn redis-conn thread-id post-body]
+  (let [post-count (q.counter/get-count! db-conn)
+        post (m.post/req&id->post post-body post-count)
         old-thread (find-thread-by-id! redis-conn thread-id)
         updated-thread (m.thread/add-post post old-thread)]
     (update-thread! redis-conn thread-id updated-thread)
-    (inc-thread-counter)
+    (q.counter/increment-counter db-conn)
     updated-thread))

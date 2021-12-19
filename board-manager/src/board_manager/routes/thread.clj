@@ -23,10 +23,11 @@
 
 (defn create-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
+        db-conn (get-in req [:components :db-conn])
         body-params (:body-params req)]
     (try 
       (->> body-params
-          (query.thread/create-thread! redis-conn)
+          (query.thread/create-thread! db-conn redis-conn)
           response/response)
       (catch Exception e
         (log/info (assoc {} :error (str (.getMessage e))))
@@ -44,11 +45,12 @@
 
 (defn put-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
+        db-conn (get-in req [:components :db-conn])
         body-params (:body-params req)
         path-params (:path-params req)
         id (:id path-params)]
     (->> body-params
-         (query.thread/add-post! redis-conn id)
+         (query.thread/add-post! db-conn redis-conn id)
          response/response)))
 
 (def thread-routes
