@@ -30,7 +30,6 @@ export function ThreadPage(props) {
 
   return(
     <Root>
-      <SubmitPost handleSubmit={handleSubmit}/>
       <Thread thread={thread}/>
     </Root>
   )

@@ -18,7 +18,7 @@ const SubmitField = (props) => {
 
 export const SubmitPost = (props) => {
 
-  const { handleSubmit } = props;
+  const { handleSubmit, className } = props;
 
   return(
     <Formik
@@ -30,7 +30,7 @@ export const SubmitPost = (props) => {
       }}
       onSubmit={handleSubmit}>
         {(props) => (
-          <Form>
+          <Form className={className}>
             <SubmitField title={"Name"} input={<FieldInput name="name" as="input" placeholder="Anonymous" onChange={props.handleChange}/>}/>
             <SubmitField title={"Subject"} input={<FieldInput name="subject" as="input" onChange={props.handleChange}/>} isSubmit/>
             <SubmitField title={"Comment"} input={<FieldInput name="comment" as="textarea" fill onChange={props.handleChange}/>}/>

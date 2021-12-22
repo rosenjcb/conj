@@ -1,13 +1,15 @@
 import styled from 'styled-components';
 
 export const Root = styled.div`
-    background-color: ${props => props.theme.post.backgroundColor};
-    border: 1px solid ${props => props.theme.post.border};
+    background-color: ${props => props.isOriginalPost ? "inherit" : props.theme.post.backgroundColor};
+    border: 1px solid ${props => props.isOriginalPost ? "none" : props.theme.post.border};
     font-size: ${props => props.theme.post.fontSize};
     font-family: ${props => props.theme.post.fontFamily};
     border-left: none;
     border-top: none;
-    display: table;
+    display: ${props => props.isOriginalPost ? "block" : "table"};
+    margin-top: 2px;
+    margin-bottom: 4px;
     padding: 2px;
 `;
 
@@ -55,9 +57,25 @@ const ArrowRoot = styled.span`
     color: #34345c;
 `;
 
+export const SideArrowRoot = styled.div`
+    color: #b7c5d9;
+    float: left;
+    margin-right: 2px;
+    margin-top: 0;
+    margin-left: 2px;
+    font-family: ${props => props.theme.fontFamily };
+    font-size: ${props => props.theme.fontSize};
+`
+
 
 export function PostMenuArrow(props) {
-    return(
+    return (
         <ArrowRoot>▶</ArrowRoot>
+    )
+}
+
+export function SideArrow(props) {
+    return (
+        <SideArrowRoot>{'>>'}</SideArrowRoot>
     )
 }

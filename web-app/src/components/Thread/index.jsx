@@ -11,7 +11,7 @@ export function Thread(props) {
   return(
     <div>
       { thread && thread.length > 0 
-          ? thread.map(post => <Post key={post.id} post={post}/>) 
+          ? thread.map((post, index) => <Post isOriginalPost={index === 0 ? true : false} key={post.id} post={post}/>) 
           : null }
     </div>
   )
