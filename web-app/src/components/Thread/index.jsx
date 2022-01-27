@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { } from './style';
-import axios from 'axios'
-import { useParams } from 'react-router'
 import { Post } from '../Post'
 
 export function Thread(props) {

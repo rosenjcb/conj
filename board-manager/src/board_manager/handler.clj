@@ -12,7 +12,8 @@
             [next.jdbc.connection :as connection]
             [clojure.tools.logging :as log]
             [clojure.tools.logging.impl :as log-impl]
-            [board-manager.routes.image :as image])
+            [board-manager.routes.image :as image]
+            [board-manager.routes.account :as account])
   (:import (com.zaxxer.hikari HikariDataSource)))
 
 (defn config-from-env []
@@ -20,6 +21,7 @@
    :db-user (env :db-user)
    :db-pass (env :db-pass)
    :db-port (env :db-port)
+   :db-name (env :db-name)
    :port (env :port)
    :redis-host (env :redis-host)
    :redis-port (env :redis-port)})
@@ -31,7 +33,9 @@
 (def api-config
   (ring/ring-handler
    (ring/router
-    [thread/thread-routes image/image-routes]
+    [thread/thread-routes 
+     image/image-routes
+     account/account-routes]
     {:data {:muuntaja m/instance
             :coercion spec/coercion
             :middleware
@@ -44,7 +48,6 @@
 (defrecord Api [handler db-conn redis-conn]
   component/Lifecycle
   (start [this]
-    (log/infof "Here's what this looks like %s" api-config)
     (let [wrapped-app (app-middleware api-config {:db-conn db-conn :redis-conn redis-conn})] 
       (assoc this :handler wrapped-app)))
 
@@ -58,7 +61,6 @@
   component/Lifecycle
   (start [component]
     (log/infof "Starting HTTP server on port %s" port)
-    (log/infof "Type of handler is %s" (:handler api))
     (let [handler (:handler api)
           server (jetty/run-jetty handler {:port port})]
       (assoc component :server server)))
@@ -72,8 +74,8 @@
   (map->JettyServer {:port port}))
 
 (defn system [config]
-  (let [{:keys [db-host db-port db-user db-pass port redis-host redis-port]} config
-        db-spec {:dbtype "postgresql" :host db-host :port db-port :username db-user :password db-pass}
+  (let [{:keys [db-host db-port db-name db-user db-pass port redis-host redis-port]} config
+        db-spec {:dbtype "postgresql" :host db-host :port db-port :dbname db-name :user db-user :pass db-pass}
         redis-conn {:pool {} :spec {:uri (str "redis://" redis-host ":" redis-port)}}]
     (component/system-map
      :db-conn (connection/component HikariDataSource db-spec)
@@ -94,27 +96,9 @@
   (.addShutDownHook (Runtime/getRuntime)
                     (Thread. ^Runnable (shutdown-system-fn system))))
 
-(def sys nil)
-
-(defn init []
-  (alter-var-root 
-   #'sys 
-   (constantly (system (config-from-env)))))
-
-(defn start []
-  (alter-var-root #'sys component/start))
-
-(defn stop []
-  (alter-var-root #'sys (fn [s] (when s (component/stop s)))))
-
-(defn go []
-  (init)
-  (start))
-
 (defn -main [& args]
   (let [logger (log-impl/get-logger log/*logger-factory* *ns*)]
-  (println logger)
-  (log/infof "Starting program")
+  (log/infof "Starting main application (not HTTP Server)")
   (let [config (config-from-env)
         system (component/start (system config))]
     (add-shutdown-hook! system))))

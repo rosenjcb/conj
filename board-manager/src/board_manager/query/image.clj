@@ -1,7 +1,11 @@
 (ns board-manager.query.image
   (:require
-   [next.jdbc :as jdbc]
-   [next.jdbc.result-set :as rs]))
+   [honey.sql :as sql.helper]
+   [board-manager.query.db.postgres :as sql]))
+
+(def image-map 
+  {:select :*
+   :from [:image]})
 
 (defn get-images! [db-conn]
-  (jdbc/execute! (db-conn) ["SELECT * FROM images"] {:builder-fn rs/as-unqualified-lower-maps}))
+  (sql/execute! (db-conn) (sql.helper/format image-map)))

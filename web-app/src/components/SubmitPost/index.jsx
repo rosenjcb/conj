@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import { Root, FieldRoot, FieldName, FieldInput, FieldInputArea, FieldInputFile, ImagePickerModal, FieldFilePicker } from './styles';
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import Modal from 'styled-react-modal';
 import { useImages } from '../../hooks/useImages';
 import { Formik, Form, Field } from 'formik';
-import axios from 'axios';
 
 const SubmitField = (props) => {
   const { title, input, isSubmit } = props;
@@ -77,3 +77,91 @@ const ImagePicker = (props) => {
     </div>
   )
 }
+
+
+
+const Root = styled.form`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: auto;
+`
+
+const FieldRoot = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 1px;
+`;
+
+const FieldName = styled.span`
+  display: inline-flex;
+  align-items: center;
+  background-color: ${props => props.theme.submitPost.primary};
+  width: 100px;
+  text-align: left;
+  color: #000;
+  font-weight: 700;
+  border: 1px solid #000;
+  padding: 0 5px;
+  font-size: 10pt;
+  vertical-align: center;
+`
+
+const FieldInput = styled(Field)`
+  margin: 0;
+  width: ${props => props.fill ? '292px' : '244px'};
+  margin-right: 2px;
+  padding: 2px 4px 3px;
+  border: 1px solid #aaa;
+  outline: none;
+  font-family: aria, helvetica, sans-serif;
+  font-size: 10pt;
+  -webkit-appearance: none;
+
+  &:focus {
+        outline: none;
+    }
+`;
+
+const FieldInputFile = styled.input`
+  margin: 0;
+  width: 292px;
+  appearance: none;
+  border: 0 none;
+  outline: none;
+  font-family: aria, helvetica, sans-serif;
+  font-size: 10pt;
+
+  &:focus {
+        outline: none;
+    }
+`;
+
+const FieldFilePicker = styled.div`
+  margin: 0;
+  width: 292px;
+  appearance: none;
+  border: 0 none;
+  outline: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start
+  font-family: aria, helvetica, sans-serif;
+  font-size: 10pt;
+
+  &:focus {
+        outline: none;
+    }
+`;
+
+const ImagePickerModal = Modal.styled`
+  width: 20rem;
+  height: 20rem;
+  display: flex;
+  gap: 20px;
+  padding: 1rem;
+  justify-content: flex-start;
+  background-color: white;
+`
+

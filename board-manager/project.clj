@@ -17,19 +17,30 @@
                  [com.stuartsierra/component "1.0.0"]
                  [org.postgresql/postgresql "42.2.10"]
                  [com.zaxxer/HikariCP "4.0.3"]
-                 [ch.qos.logback/logback-classic "1.1.3"]]
+                 [ch.qos.logback/logback-classic "1.1.3"]
+                 [migratus "1.3.5"]
+                 [com.github.seancorfield/honeysql "2.2.858"]]
   :plugins [[lein-ring "0.12.5"]
-            [lein-environ "1.2.0"]]
+            [lein-environ "1.2.0"]
+            [migratus-lein "0.7.3"]]
   ;; :ring {:handler board-manager.handler/app :port 8080}
   :main board-manager.handler
+  :migratus {:store :database
+              :migration-dir "migrations"
+              :db {:classname "org.postgresql"
+                    :subprotocol "postgres"
+                    :subname "//localhost/postgres"
+                    :user "admin"
+                    :password "pass"}}
   :source-paths ["src" "config"]
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]
          :env {:db-host "localhost"
-               :db-user "postgres"
+               :db-user "admin"
                :db-pass "pass"
                :db-port 5432
+               :db-name "postgres"
                :redis-host "localhost"
                :redis-port 6379
                :port 8080}}})
