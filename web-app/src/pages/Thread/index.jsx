@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Redirect } from 'react-router';
+import styled from 'styled-components';
 import { Thread } from '../../components/Thread';
-import { SubmitPost } from '../../components/SubmitPost';
 import { useParams } from 'react-router'
 import axios from 'axios'
-import { Root } from './styles';
 
 export function ThreadPage(props) {
 
@@ -15,18 +13,12 @@ export function ThreadPage(props) {
   useEffect(() => {
     axios.get(`/threads/${id}`)
         .then((resp) => {
-            if(resp.data == "") {
+            if(resp.data === "") {
               window.location = "/";
-              // return (<Redirect to="/thread/1"/>);
             }
             setThread(resp.data);
         });
   },[]);
-
-  const handleSubmit = async (post) => {
-    const res = await axios.put(`/threads/${id}`, post);
-    setThread(res.data);
-  }
 
   return(
     <Root>
@@ -34,3 +26,10 @@ export function ThreadPage(props) {
     </Root>
   )
 }
+
+const Root = styled.div`
+  // min-height: 100vh;
+  // min-width: 100%;
+  // min-width: 100vw;
+  // background: ${props => props.theme.background};
+`;

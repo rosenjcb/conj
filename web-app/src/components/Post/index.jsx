@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import styled from 'styled-components';
 
 const Thumbnail = (props) => {
     return(
         <ThumbnailLink>
-            { props.image ? <img src={props.image} width={150} height={150}/> : null }
+            { props.image ? <img alt="" src={props.image} width={150} height={150}/> : null }
         </ThumbnailLink>
     )
 }
@@ -25,7 +25,7 @@ export const Post = (props) => {
                         <input type="checkbox"/>
                         <Subject>{subject}</Subject>
                         <Name>{name}</Name>
-                        { `No.${id}` } 
+                        {isOriginalPost ? <PostLink href={`/thread/${id}`}>{` No.${id} `}</PostLink> : ` No.${id} `}
                         <PostMenuArrow/>
                     </PostInfo>
                     {!isOriginalPost ? <Thumbnail image={image}/> : null}
@@ -105,3 +105,12 @@ const SideArrowRoot = styled.div`
 const PostMenuArrow = () => <ArrowRoot>▶</ArrowRoot>;
 
 const SideArrow = () => <SideArrowRoot>{'>>'}</SideArrowRoot>;
+
+const PostLink = styled.a`
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+        color: red;
+    }
+`

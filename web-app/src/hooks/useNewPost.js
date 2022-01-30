@@ -9,21 +9,21 @@ export const useNewPost = (post) => {
     const [loading, setloading] = useState(true);
 
     const fetchData = () => {
-        axios
-            .post('/threads', post)
-            .then((res) => {
-                setResponse(res.data);
-            })
-            .catch((err) => {
-                setError(err);
-            })
-            .finally(() => {
-                setloading(false);
-            });
+    axios
+      .post('/threads', post)
+      .then((res) => {
+          setResponse(res.data);
+      })
+      .catch((err) => {
+          setError(err);
+      })
+      .finally(() => {
+          setloading(false);
+      });
     };
 
     useEffect(() => {
-        fetchData()
+      fetchData()
     }, []);
 
     return { response, error, loading };

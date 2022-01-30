@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { SubmitPost } from './components/SubmitPost';
-import { BrowserRouter as Router, Switch, Route, Link, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, useLocation, useHistory } from 'react-router-dom'
 import { ThreadPage } from './pages/Thread';
 import { Thread } from './components/Thread';
 import axios from 'axios';
@@ -66,17 +66,19 @@ function App() {
   );
 }
 
-function NavBar(props) {
+function NavBar() {
   const location = useLocation();
+  const history = useHistory(); 
 
   const handleSubmit = async(post) => {
-    const res = await upsertThread(post, location.pathname)
-    alert(JSON.stringify(res.data, null, 2));
+    const res = await upsertThread(post, location.pathname);
+    history.push(`/thread/${res.data[0].id}`);
+    history.go()
   }
 
   return (
     <NavRoot>
-      <Title>/b/ - Random</Title>
+      <Title href="/">/b/ - Random</Title>
       <HR width="90%"/>
       <AccountDetails/>
       <HR width="50%"/>
@@ -94,8 +96,6 @@ function Home() {
     const res = await axios.get('/threads');
     setThreads(res.data);
   },[])
-
-
 
   return (
     <HomeRoot>
@@ -130,11 +130,6 @@ const NavRoot = styled.div`
 `
 
 const HomeRoot = styled.div`
-  // background-color: #eef2ff; 
-  // display: flex;
-  // flex-direction: column;
-  // justify-content: flex-start;
-  // min-height: calc(100vh - 13px);
 `;
 
 const ThreadsContainer = styled.div`
@@ -143,16 +138,14 @@ const ThreadsContainer = styled.div`
   justify-content: flex-start;
 `;
 
-const ThreadContainer = styled.div`
-`;
-
-const Title = styled.div`
+const Title = styled.a`
   font-family: ${props => props.theme.title.fontFamily};
   font-size: ${props => props.theme.title.fontSize};
   font-weight: ${props => props.theme.title.fontWeight};
   letter-spacing: ${props => props.theme.title.letterSpacing};
   text-align: center;
   color: ${props => props.theme.title.color};
+  text-decoration: none;
 `;
 
 export default App;

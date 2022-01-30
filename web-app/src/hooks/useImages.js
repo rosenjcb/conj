@@ -5,15 +5,15 @@ export const useImages = (post) => {
     const [images, setImages] = useState([]);
 
     const fetchData = () => {
-        axios
-            .get('/images', post)
-            .then((res) => {
-                setImages(res.data);
-            })
+      axios
+        .get('/images', post)
+        .then((res) => {
+          setImages(res.data);
+        })
     };
 
     useEffect(() => {
-        fetchData()
+      fetchData()
     }, []);
 
     return { images };

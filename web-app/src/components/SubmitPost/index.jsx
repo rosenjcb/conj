@@ -34,7 +34,6 @@ export const SubmitPost = (props) => {
             <SubmitField title={"Name"} input={<FieldInput name="name" as="input" placeholder="Anonymous" onChange={props.handleChange}/>}/>
             <SubmitField title={"Subject"} input={<FieldInput name="subject" as="input" onChange={props.handleChange}/>} isSubmit/>
             <SubmitField title={"Comment"} input={<FieldInput name="comment" as="textarea" fill onChange={props.handleChange}/>}/>
-            {/* <SubmitField title={"Image"} input={<FieldInputFile name="image" type="file" onChange={props.handleChange}/>}/> */}
             <SubmitField title={"Image"} input={<ImagePicker handleChange={props.handleChange}/>}/>
           </Form>
         )}
@@ -72,20 +71,11 @@ const ImagePicker = (props) => {
         { pickedImage ? <span>{pickedImage}</span> : null }
       </FieldFilePicker>
       <ImagePickerModal isOpen={isOpen} onBackgroundClick={toggleOpen} onEscapeKeyDown={toggleOpen}>
-        {images.map(image => <img onClick={(e) => handlePick(image)} key={image.id} width={50} height={50} src={image.location}/>)}
+        {images.map(image => <img alt="" onClick={(e) => handlePick(image)} key={image.id} width={50} height={50} src={image.location}/>)}
       </ImagePickerModal>
     </div>
   )
 }
-
-
-
-const Root = styled.form`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  height: auto;
-`
 
 const FieldRoot = styled.div`
   display: flex;
@@ -118,20 +108,6 @@ const FieldInput = styled(Field)`
   font-family: aria, helvetica, sans-serif;
   font-size: 10pt;
   -webkit-appearance: none;
-
-  &:focus {
-        outline: none;
-    }
-`;
-
-const FieldInputFile = styled.input`
-  margin: 0;
-  width: 292px;
-  appearance: none;
-  border: 0 none;
-  outline: none;
-  font-family: aria, helvetica, sans-serif;
-  font-size: 10pt;
 
   &:focus {
         outline: none;
