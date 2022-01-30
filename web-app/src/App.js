@@ -130,14 +130,11 @@ const NavRoot = styled.div`
 `
 
 const HomeRoot = styled.div`
-<<<<<<< HEAD
-=======
   // background-color: #eef2ff; 
   // display: flex;
   // flex-direction: column;
   // justify-content: flex-start;
   // min-height: calc(100vh - 13px);
->>>>>>> origin/master
 `;
 
 const ThreadsContainer = styled.div`
@@ -146,12 +143,9 @@ const ThreadsContainer = styled.div`
   justify-content: flex-start;
 `;
 
-<<<<<<< HEAD
-=======
 const ThreadContainer = styled.div`
 `;
 
->>>>>>> origin/master
 const Title = styled.div`
   font-family: ${props => props.theme.title.fontFamily};
   font-size: ${props => props.theme.title.fontSize};
