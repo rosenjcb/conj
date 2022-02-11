@@ -23,8 +23,9 @@
   :plugins [[lein-ring "0.12.5"]
             [lein-environ "1.2.0"]
             [migratus-lein "0.7.3"]]
-  ;; :ring {:handler board-manager.handler/app :port 8080}
-  :main board-manager.handler
+  :ring {:handler board-manager.handler/app}
+  :main ^:skip-aot board-manager.handler
+  :repl-options {:host "0.0.0.0"}
   :migratus {:store :database
               :migration-dir "migrations"
               :db {:classname "org.postgresql"
@@ -36,6 +37,7 @@
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]
+         :source-paths ["dev"]
          :env {:db-host "localhost"
                :db-user "admin"
                :db-pass "pass"

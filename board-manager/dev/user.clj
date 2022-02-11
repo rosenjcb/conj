@@ -1,6 +1,7 @@
 (ns user
   (:require [board-manager.handler :as handler]
             [com.stuartsierra.component :as component]))
+            ;; [clojure.tools.namespace.repl :refer [refresh]]))
 
 (def sys nil)
 
@@ -17,9 +18,8 @@
 
 (defn go []
   (init)
-  (start)
-  nil)
+  (start))
 
 ;; (defn reset []
-;;   (stop)
-;;   (refresh :after `user/go))
+  ;; (stop)
+  ;; (refresh :after `user/go))

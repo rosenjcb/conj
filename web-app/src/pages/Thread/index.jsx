@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { Thread } from '../../components/Thread';
 import { useParams } from 'react-router'
 import axios from 'axios'
+import { swapThread } from '../../slices/threadSlice';
+import { useSelector, useDispatch } from 'react-redux';
 
-export function ThreadPage(props) {
+export function ThreadPage() {
 
-  const [thread, setThread] = useState([]);
+  const thread = useSelector(state => state.thread);
+  const dispatch = useDispatch();
 
   const { id } = useParams();
 
@@ -16,13 +19,13 @@ export function ThreadPage(props) {
             if(resp.data === "") {
               window.location = "/";
             }
-            setThread(resp.data);
+            dispatch(swapThread(resp.data))
         });
   },[]);
 
   return(
     <Root>
-      <Thread thread={thread}/>
+      <Thread thread={thread.current}/>
     </Root>
   )
 }

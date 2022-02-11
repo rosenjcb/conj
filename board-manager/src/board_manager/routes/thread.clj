@@ -20,7 +20,6 @@
       (catch Exception e
         (log/info (str (.getMessage e)))
         (->> (str (.getMessage e))
-             (format "Sorry but we couldn't create a thread because %s")
              response/bad-request)))))
 
 (defn get-thread! [req]
@@ -32,16 +31,18 @@
       (response/response thread)
       (response/not-found (format "No thread found with the id %s" id)))))
 
-
 (defn put-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
         db-conn (get-in req [:components :db-conn])
         body-params (:body-params req)
         path-params (:path-params req)
         id (:id path-params)]
-    (->> body-params
-         (query.thread/add-post! db-conn redis-conn id)
-         response/response)))
+    (try 
+      (->> body-params
+          (query.thread/add-post! db-conn redis-conn id)
+          response/response)
+      (catch Exception e
+        (response/bad-request (.getMessage e))))))
 
 (def thread-routes
   [["/threads"

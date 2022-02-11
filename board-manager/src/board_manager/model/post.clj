@@ -16,3 +16,4 @@
       {:id id :name name :subject subject :comment comment :image image}))
 
 (def id :id)
+(def image :image)

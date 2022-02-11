@@ -5,9 +5,12 @@ import styled from 'styled-components';
 
 export const AccountDetails = (props) => {
 
-  useEffect(async () => {
-    const res = await axios.get("/accounts/4")
-    setUser(res.data)
+  useEffect(() => {
+    async function fetchUser() {
+      const res = await axios.get("/accounts/4")
+      setUser(res.data)
+    }
+    fetchUser();
   },[])
 
   const [user, setUser] = useState({})

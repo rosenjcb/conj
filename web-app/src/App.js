@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { SubmitPost } from './components/SubmitPost';
-import { BrowserRouter as Router, Switch, Route, useLocation, useHistory } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import { ThreadPage } from './pages/Thread';
-import { Thread } from './components/Thread';
-import axios from 'axios';
 import { ModalProvider } from 'styled-react-modal';
-import { HR } from './components';
-import { AccountDetails } from './components/AccountDetails';
-import { upsertThread } from './api/thread';
+import { useSelector } from 'react-redux';
+import { NavBar } from './components/NavBar';
+import { Home } from './pages/Home'
 
 export const theme = {
   name: 'Main Theme',
@@ -45,20 +42,22 @@ export const theme = {
 }
 
 function App() {
+  const thread = useSelector(state => state.thread);
+
   return (
     <ThemeProvider theme={theme}>    
     <ModalProvider>
       <AppRoot>
         <Router>
           <NavBar/>
-          <Switch>
-            <Route exact path="/">
-              <Home/>
-            </Route>
-            <Route path="/thread/:id">
-              <ThreadPage/>
-            </Route>
-          </Switch>
+            <Switch>
+              <Route exact path="/">
+                <Home/>
+              </Route>
+              <Route path="/thread/:id">
+                <ThreadPage thread={thread}/>
+              </Route>
+            </Switch>
         </Router>
       </AppRoot>
     </ModalProvider>
@@ -66,49 +65,6 @@ function App() {
   );
 }
 
-function NavBar() {
-  const location = useLocation();
-  const history = useHistory(); 
-
-  const handleSubmit = async(post) => {
-    const res = await upsertThread(post, location.pathname);
-    history.push(`/thread/${res.data[0].id}`);
-    history.go()
-  }
-
-  return (
-    <NavRoot>
-      <Title href="/">/b/ - Random</Title>
-      <HR width="90%"/>
-      <AccountDetails/>
-      <HR width="50%"/>
-      <CenteredSubmitPost handleSubmit={handleSubmit}/>
-      <HR/>
-    </NavRoot>
-  )
-}
-
-function Home() {
-
-  const [threads, setThreads] = useState([]);
-
-  useEffect(async() => {
-    const res = await axios.get('/threads');
-    setThreads(res.data);
-  },[])
-
-  return (
-    <HomeRoot>
-      <ThreadsContainer>
-        { threads.map((thread, index) => <div key={index}><Thread thread={thread}/><HR/></div>)}
-      </ThreadsContainer>
-    </HomeRoot>
-  );
-}
-
-const CenteredSubmitPost = styled(SubmitPost)`
-  margin: 0 auto;
-`;
 
 const AppRoot = styled.div`
   background-color: #eef2ff; 
@@ -120,32 +76,5 @@ const AppRoot = styled.div`
   padding-bottom: 8px;
   padding-left: 5px;
   padding-right: 5px;
-`
-
-const NavRoot = styled.div`
-  background-color: #eef2ff; 
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-`
-
-const HomeRoot = styled.div`
 `;
-
-const ThreadsContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-`;
-
-const Title = styled.a`
-  font-family: ${props => props.theme.title.fontFamily};
-  font-size: ${props => props.theme.title.fontSize};
-  font-weight: ${props => props.theme.title.fontWeight};
-  letter-spacing: ${props => props.theme.title.letterSpacing};
-  text-align: center;
-  color: ${props => props.theme.title.color};
-  text-decoration: none;
-`;
-
 export default App;

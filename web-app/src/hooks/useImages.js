@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-export const useImages = (post) => {
+export const useImages = () => {
     const [images, setImages] = useState([]);
+
+    const [groupedImages, setGroupedImages] = useState([]);
 
     const fetchData = () => {
       axios
-        .get('/images', post)
+        .get('/accounts/4/inventory')
         .then((res) => {
-          setImages(res.data);
+          const images = res.data;
+          setGroupedImages(groupedImages);
+          setImages(images);
         })
     };
 

@@ -2,7 +2,8 @@
   (:require
    [board-manager.query.account :as q.account]
    [ring.util.response :as response]
-   [reitit.coercion.malli :as malli]))
+   [reitit.coercion.malli :as malli]
+   [board-manager.query.accountinventory :as q.accountinventory]))
 
 (defn get-account-by-id! [req]
   (let [db-conn (get-in req [:components :db-conn])
@@ -12,10 +13,22 @@
       (response/response account)
       (response/not-found (format "No account with the id %s was found" user-id)))))
 
-(def account-routes 
+(defn get-inventory-by-account-id! [req]
+  (let [db-conn (get-in req [:components :db-conn])
+      user-id (get-in req [:parameters :path :id])
+      inventory (q.accountinventory/get-inventory-by-account-id! db-conn user-id)]
+    (response/response inventory)))
+
+(def account-routes
   [["/accounts/:id"
     {:get {:name ::account-by-id
            :summary "Grab an account by id"
            :coercion malli/coercion
            :parameters {:path [:map [:id integer?]]}
-           :handler get-account-by-id!}}]])
+           :handler get-account-by-id!}}]
+   ["/accounts/:id/inventory"
+    {:get {:name ::inventory-by-account-id
+           :summary "Grab an account's inventory by account-id"
+           :coercion malli/coercion
+           :parameters {:path [:map [:id integer?]]}
+           :handler get-inventory-by-account-id!}}]])

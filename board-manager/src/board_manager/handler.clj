@@ -62,7 +62,7 @@
   (start [component]
     (log/infof "Starting HTTP server on port %s" port)
     (let [handler (:handler api)
-          server (jetty/run-jetty handler {:port port})]
+          server (jetty/run-jetty handler {:port port :join? false})]
       (assoc component :server server)))
   (stop [component]
     (log/infof "Starting HTTP server on port %s" port)
@@ -89,7 +89,7 @@
   (fn []
     (log/info "System is stopping")
     (component/stop system)
-    (log/info "System is stopping")))
+    (log/info "System stopped")))
 
 (defn add-shutdown-hook!
   [system]

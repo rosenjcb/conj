@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import Modal from 'styled-react-modal';
 import { useImages } from '../../hooks/useImages';
 import { Formik, Form, Field } from 'formik';
+import * as _ from 'lodash';
+import { BoldTitle } from '..';
 
 const SubmitField = (props) => {
   const { title, input, isSubmit } = props;
@@ -18,23 +20,33 @@ const SubmitField = (props) => {
 
 export const SubmitPost = (props) => {
 
+  let randomString = Math.random().toString(36);
+
   const { handleSubmit, className } = props;
+
+  const initialValues = {
+    name: 'Anonymous',
+    subject: '',
+    comment: '',
+    image: ''
+  };
+
+  const submitAndReset = async(values, actions) => {
+    const payload = _.omit(values, ['values']);
+    await handleSubmit(payload);
+    actions.resetForm();
+  }
 
   return(
     <Formik
-      initialValues={{
-        name: 'Anonymous',
-        subject: '',
-        comment: '',
-        image: ''
-      }}
-      onSubmit={handleSubmit}>
+      initialValues={initialValues}
+      onSubmit={submitAndReset}>
         {(props) => (
           <Form className={className}>
-            <SubmitField title={"Name"} input={<FieldInput name="name" as="input" placeholder="Anonymous" onChange={props.handleChange}/>}/>
-            <SubmitField title={"Subject"} input={<FieldInput name="subject" as="input" onChange={props.handleChange}/>} isSubmit/>
-            <SubmitField title={"Comment"} input={<FieldInput name="comment" as="textarea" fill onChange={props.handleChange}/>}/>
-            <SubmitField title={"Image"} input={<ImagePicker handleChange={props.handleChange}/>}/>
+            <SubmitField title={"Name"} input={<FieldInput name="name" as="input" value={props.values.name} placeholder="Anonymous" onChange={props.handleChange}/>}/>
+            <SubmitField title={"Subject"} input={<FieldInput name="subject" as="input" value={props.values.subject} onChange={props.handleChange}/>} isSubmit/>
+            <SubmitField title={"Comment"} input={<FieldInput name="comment" as="textarea" value={props.values.comment} onChange={props.handleChange}/>}/>
+            <SubmitField title={"Image"} input={<ImagePicker key={randomString} handleChange={props.handleChange}/>}/>
           </Form>
         )}
       </Formik>
@@ -50,6 +62,19 @@ const ImagePicker = (props) => {
   const [pickedImage, setPickedImage] = useState(null);
 
   const { images } = useImages();
+
+  const [groupedImages, setGroupedImages] = useState({})
+
+  useEffect(() => {
+    const uniqueImages = _.uniqBy(images, (e) => e.name);
+
+    let res = {}
+    for(let image of uniqueImages) {
+      const count = _.sumBy(images, (img) => img.name === image.name);
+      res[image.name] = {...image, count: count > 1 ? count : 1}
+    }
+    setGroupedImages(res);
+  },[images])
 
   const toggleOpen = (e) => {
     if(e) { e.preventDefault(); }
@@ -70,12 +95,40 @@ const ImagePicker = (props) => {
         <button onClick={(e) => toggleOpen(e)}>Choose File</button>
         { pickedImage ? <span>{pickedImage}</span> : null }
       </FieldFilePicker>
-      <ImagePickerModal isOpen={isOpen} onBackgroundClick={toggleOpen} onEscapeKeyDown={toggleOpen}>
-        {images.map(image => <img alt="" onClick={(e) => handlePick(image)} key={image.id} width={50} height={50} src={image.location}/>)}
+      <ImagePickerModal isOpen={isOpen} onBackgroundClick={toggleOpen} onEscapeKeydown={toggleOpen}>
+        <Header>
+          <ImageGalleryTitle>Select an Image</ImageGalleryTitle>
+          <CloseButton onClick={() => setIsOpen(false)}>X</CloseButton>
+        </Header>
+        <ImageGallery>{_.values(groupedImages).map((value, index) => <Item image={value} key={`${value.name}${index}`} badgeText={value.count} alt="" handleClick={(e) => handlePick(value)}/>)}</ImageGallery>
       </ImagePickerModal>
     </div>
   )
 }
+
+const Item = (props) => {
+
+  const { image, badgeText, handleClick } = props;
+
+  return(
+    <div>
+      <img alt="" onClick={handleClick} width={50} height={50} src={image.location}/>
+      <Badge>{badgeText}</Badge>
+    </div>
+  )
+}
+
+const Badge = styled.div`
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  position: relative; 
+  text-align: center;
+  color: white;
+  top: -15px;
+  left: 35px;
+`
 
 const FieldRoot = styled.div`
   display: flex;
@@ -136,8 +189,35 @@ const ImagePickerModal = Modal.styled`
   height: 20rem;
   display: flex;
   gap: 20px;
-  padding: 1rem;
   justify-content: flex-start;
-  background-color: white;
+  flex-direction: column;
+  border: 1px solid ${props => props.theme.post.border};
+  background-color: ${props => props.theme.post.backgroundColor}
 `
 
+const ImageGallery = styled.div`
+    display: flex;
+    justify-content: flex-start;
+    padding: 10px;
+    flex-direction: row;
+    gap: 10px;
+`
+
+const Header = styled.div`
+    height: 10%;
+    text-align: center; 
+    display: flex;
+    justify-content: center; 
+    flex-direction: row; 
+    background-color: ${props => props.theme.submitPost.primary};
+`
+const ImageGalleryTitle = styled(BoldTitle)`
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 90%;
+`
+
+const CloseButton = styled.button`
+    width: 10%;
+`
