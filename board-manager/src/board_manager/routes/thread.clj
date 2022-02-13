@@ -1,6 +1,7 @@
 (ns board-manager.routes.thread
   (:require 
     [board-manager.query.thread :as query.thread]
+    [board-manager.services.item-generation :as item-generation.service]
     [clojure.tools.logging :as log] 
     [ring.util.response :as response]))
 
@@ -34,14 +35,20 @@
 (defn put-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
         db-conn (get-in req [:components :db-conn])
+        item-gen (get-in req [:components :item-generation-service])
         body-params (:body-params req)
         path-params (:path-params req)
         id (:id path-params)]
-    (try 
-      (->> body-params
-          (query.thread/add-post! db-conn redis-conn id)
-          response/response)
+    (try
+      (let [added-post (->> body-params
+                            (query.thread/add-post! db-conn redis-conn id)
+                            response/response)
+            random-pick (item-generation.service/draw-item! item-gen 4)]
+        (log/infof "Post added to thread %s" id)
+        (log/infof "Lucky draw was a %s" random-pick)
+        added-post) 
       (catch Exception e
+        (log/infof "%s" (.getMessage e))
         (response/bad-request (.getMessage e))))))
 
 (def thread-routes

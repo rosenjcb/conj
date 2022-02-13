@@ -28,7 +28,7 @@
         item-id (m.accountinventory/id item)]
     (if (some? item) 
       (do
-        (q.accountinventory/delete-inventory-item-by-id db-conn item-id)
+        (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
         (db.redis/set redis-conn id thread)
         (q.counter/increment-counter db-conn)
         thread)
@@ -56,8 +56,8 @@
         old-thread (find-thread-by-id! redis-conn thread-id)
         updated-thread (m.thread/add-post post old-thread)]
     (when (not-empty? image-url)
-      (if item-id  
-        (q.accountinventory/delete-inventory-item-by-id db-conn item-id)
+      (if item-id
+        (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
         (throw (Exception. "Couldn't find the image in your inventory."))))
     (update-thread! redis-conn thread-id updated-thread)
     (q.counter/increment-counter db-conn)

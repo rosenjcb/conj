@@ -5,7 +5,7 @@
    [board-manager.model.image :as m.image]))
 
 (def image-map 
-  {:select :*
+  {:select [:*]
    :from [:image]})
 
 (defn- q-image-by-id [id]

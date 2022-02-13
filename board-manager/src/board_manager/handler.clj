@@ -13,7 +13,8 @@
             [clojure.tools.logging :as log]
             [clojure.tools.logging.impl :as log-impl]
             [board-manager.routes.image :as image]
-            [board-manager.routes.account :as account])
+            [board-manager.routes.account :as account]
+            [board-manager.services.item-generation :as item-generation-service])
   (:import (com.zaxxer.hikari HikariDataSource)))
 
 (defn config-from-env []
@@ -45,10 +46,10 @@
              coercion/coerce-response-middleware]}})
    (ring/create-default-handler)))
 
-(defrecord Api [handler db-conn redis-conn]
+(defrecord Api [handler db-conn redis-conn item-generation-service]
   component/Lifecycle
   (start [this]
-    (let [wrapped-app (app-middleware api-config {:db-conn db-conn :redis-conn redis-conn})] 
+    (let [wrapped-app (app-middleware api-config {:db-conn db-conn :redis-conn redis-conn :item-generation-service item-generation-service})] 
       (assoc this :handler wrapped-app)))
 
   (stop [this]
@@ -80,7 +81,8 @@
     (component/system-map
      :db-conn (connection/component HikariDataSource db-spec)
      :redis-conn redis-conn 
-     :api (component/using (new-api api-config) [:db-conn :redis-conn])
+     :api (component/using (new-api api-config) [:db-conn :redis-conn :item-generation-service])
+     :item-generation-service (component/using (item-generation-service/new-service {:seed "TBD"}) [:db-conn])
      :server (component/using
               (new-server (Integer/parseInt port))
               [:api]))))
