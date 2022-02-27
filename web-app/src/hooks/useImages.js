@@ -8,8 +8,9 @@ export const useImages = () => {
 
     const fetchData = () => {
       axios
-        .get('/accounts/4/inventory')
+        .get('/inventory')
         .then((res) => {
+          console.log(res);
           const images = res.data;
           setGroupedImages(groupedImages);
           setImages(images);

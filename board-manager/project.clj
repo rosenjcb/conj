@@ -19,7 +19,10 @@
                  [com.zaxxer/HikariCP "4.0.3"]
                  [ch.qos.logback/logback-classic "1.1.3"]
                  [migratus "1.3.5"]
-                 [com.github.seancorfield/honeysql "2.2.858"]]
+                 [com.github.seancorfield/honeysql "2.2.858"]
+                 [buddy/buddy-sign "3.4.333"]
+                 [buddy/buddy-hashers "1.8.158"]
+                 [clojure.java-time "0.3.3"]]
   :plugins [[lein-ring "0.12.5"]
             [lein-environ "1.2.0"]
             [migratus-lein "0.7.3"]]
@@ -38,7 +41,8 @@
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]
          :source-paths ["dev"]
-         :env {:db-host "localhost"
+         :env {:passphrase "Frameshare8*8"
+               :db-host "localhost"
                :db-user "admin"
                :db-pass "pass"
                :db-port 5432

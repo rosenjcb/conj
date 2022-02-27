@@ -3,8 +3,7 @@
    [board-manager.query.db.postgres :as sql]
    [honey.sql :as sql.helper]
    [board-manager.model.accountinventory :as m.accountinventory]
-   [board-manager.query.image :as q.image]
-   [clojure.tools.logging :as log]))
+   [board-manager.query.image :as q.image]))
 
 (defn- q-inventory-by-account-id [id]
   {:select :*

@@ -1,17 +1,22 @@
 
 import React, { useEffect, useState } from 'react'
-import axios from 'axios';
 import styled from 'styled-components';
+import { me, logout } from '../../api/account';
 
 export const AccountDetails = (props) => {
 
   useEffect(() => {
     async function fetchUser() {
-      const res = await axios.get("/accounts/4")
+      const res = await me(); 
       setUser(res.data)
     }
     fetchUser();
   },[])
+
+  const handleLogout = async() => {
+    await logout();
+    window.location.reload();
+  }
 
   const [user, setUser] = useState({})
   
@@ -21,15 +26,16 @@ export const AccountDetails = (props) => {
   return (
       <Root>
           <Info>Welcome Back {email}</Info>
+          <TextButton type="button" onClick={handleLogout}>[Logout?]</TextButton>
       </Root>
   );
 }
 
 const Info = styled.h1`
-  width: 80%;
+  font-size: 2rem;
   margin: 0 auto;
   text-align: center;
-`
+`;
 
 const Root = styled.div`
   width: 50%;
@@ -40,4 +46,18 @@ const Root = styled.div`
   justify-content: center;
   margin: 0 auto;
   border: 1px solid black;
-`
+  gap: 2rem;
+`;
+
+const TextButton = styled.button`
+  color: blue;
+  font-size: 1.3rem;
+  border: none;
+  background: none;
+  padding: 0;
+  text-decoration: underline;
+
+  :on-hover {
+
+  }
+`;

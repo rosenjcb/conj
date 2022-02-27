@@ -14,7 +14,11 @@
             [clojure.tools.logging.impl :as log-impl]
             [board-manager.routes.image :as image]
             [board-manager.routes.account :as account]
-            [board-manager.services.item-generation :as item-generation-service])
+            [board-manager.services.auth :as auth.service]
+            [board-manager.services.item-generation :as item-generation-service]
+            [ring.util.response :as response]
+            [ring.middleware.cookies :as cookies]
+            [board-manager.query.refresh-token :as q.refresh-token])
   (:import (com.zaxxer.hikari HikariDataSource)))
 
 (defn config-from-env []
@@ -23,6 +27,7 @@
    :db-pass (env :db-pass)
    :db-port (env :db-port)
    :db-name (env :db-name)
+   :passphrase (env :passphrase)
    :port (env :port)
    :redis-host (env :redis-host)
    :redis-port (env :redis-port)})
@@ -41,15 +46,16 @@
             :coercion spec/coercion
             :middleware
              [muuntaja/format-middleware
-             coercion/coerce-exceptions-middleware
-             coercion/coerce-request-middleware
-             coercion/coerce-response-middleware]}})
+              cookies/wrap-cookies
+              coercion/coerce-exceptions-middleware
+              coercion/coerce-request-middleware
+              coercion/coerce-response-middleware]}})
    (ring/create-default-handler)))
 
-(defrecord Api [handler db-conn redis-conn item-generation-service]
+(defrecord Api [handler db-conn redis-conn item-generation-service auth-service]
   component/Lifecycle
   (start [this]
-    (let [wrapped-app (app-middleware api-config {:db-conn db-conn :redis-conn redis-conn :item-generation-service item-generation-service})] 
+    (let [wrapped-app (app-middleware api-config {:db-conn db-conn :redis-conn redis-conn :item-generation-service item-generation-service :auth-service auth-service})] 
       (assoc this :handler wrapped-app)))
 
   (stop [this]
@@ -75,14 +81,16 @@
   (map->JettyServer {:port port}))
 
 (defn system [config]
-  (let [{:keys [db-host db-port db-name db-user db-pass port redis-host redis-port]} config
+  (let [{:keys [db-host db-port db-name db-user db-pass port redis-host redis-port passphrase]} config
         db-spec {:dbtype "postgresql" :host db-host :port db-port :dbname db-name :user db-user :pass db-pass}
         redis-conn {:pool {} :spec {:uri (str "redis://" redis-host ":" redis-port)}}]
     (component/system-map
+     :auth-conf {:privkey "auth_privkey.pem" :passphrase passphrase}
      :db-conn (connection/component HikariDataSource db-spec)
-     :redis-conn redis-conn 
-     :api (component/using (new-api api-config) [:db-conn :redis-conn :item-generation-service])
+     :redis-conn redis-conn
+     :api (component/using (new-api api-config) [:db-conn :redis-conn :item-generation-service :auth-service])
      :item-generation-service (component/using (item-generation-service/new-service {:seed "TBD"}) [:db-conn])
+     :auth-service (component/using (auth.service/new-service {:salt "1234" :auth-conf {:privkey "auth_privkey.pem" :pubkey "auth_pubkey.pem" :passphrase passphrase}}) [:db-conn])
      :server (component/using
               (new-server (Integer/parseInt port))
               [:api]))))

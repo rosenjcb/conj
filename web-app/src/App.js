@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 import { ThreadPage } from './pages/Thread';
 import { ModalProvider } from 'styled-react-modal';
 import { useSelector } from 'react-redux';
 import { NavBar } from './components/NavBar';
 import { Home } from './pages/Home'
+import { AboutPage } from './pages/About';
 
 export const theme = {
   name: 'Main Theme',
@@ -38,7 +39,27 @@ export const theme = {
     name: { 
       color: '#117743',
     }
+  },
+  login: {
+    header: {
+      backgroundColor: '#9c6',
+      color: '#060',
+    },
+    body: {
+      backgroundColor: '#efe'
+    }
   }
+}
+
+const WithNavBar = (props) => {
+  const { component, ...rest } = props;
+
+  return(
+    <div>
+      <NavBar/>
+      {React.cloneElement(props.component(), {...rest})}
+    </div>
+  )
 }
 
 function App() {
@@ -49,15 +70,17 @@ function App() {
     <ModalProvider>
       <AppRoot>
         <Router>
-          <NavBar/>
-            <Switch>
-              <Route exact path="/">
-                <Home/>
-              </Route>
-              <Route path="/thread/:id">
-                <ThreadPage thread={thread}/>
-              </Route>
-            </Switch>
+          <Switch>
+            <Route exact path="/">
+              <WithNavBar component={Home}/>
+            </Route>
+            <Route path="/thread/:id">
+              <WithNavBar component={ThreadPage} thread={thread}/>
+            </Route>
+            <Route exact path ="/about">
+              <AboutPage/>
+            </Route>
+          </Switch>
         </Router>
       </AppRoot>
     </ModalProvider>
