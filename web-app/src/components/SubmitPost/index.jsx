@@ -4,7 +4,7 @@ import Modal from 'styled-react-modal';
 import { useImages } from '../../hooks/useImages';
 import { Formik, Form, Field } from 'formik';
 import * as _ from 'lodash';
-import { BoldTitle } from '..';
+import { BoldTitle, RarityImage } from '../index';
 
 const SubmitField = (props) => {
   const { title, input, isSubmit } = props;
@@ -53,6 +53,30 @@ export const SubmitPost = (props) => {
   )
 }
 
+const sortImages = (images) => {
+  const compare = (a, b) => {
+    const tiers = {
+      'common': 0,
+      'uncommon': 1,
+      'rare': 2,
+      'epic': 3
+    }
+    if(tiers[a.rarity] < tiers[b.rarity]) return -1;
+    if(tiers[a.rarity] > tiers[b.rarity]) return 1;
+    return 0;
+  }
+
+  const uniqueImages = _.uniqBy(images, (e) => e.name);
+
+  let res = {}
+  for(let image of uniqueImages) {
+    const count = _.sumBy(images, (img) => img.name === image.name);
+    res[image.name] = {...image, count: count > 1 ? count : 1}
+  }
+
+  return Object.values(res).sort(compare);
+}
+
 const ImagePicker = (props) => {
 
   const { handleChange } = props;
@@ -63,17 +87,11 @@ const ImagePicker = (props) => {
 
   const { images } = useImages();
 
-  const [groupedImages, setGroupedImages] = useState({})
+  const [groupedImages, setGroupedImages] = useState({});
 
   useEffect(() => {
-    const uniqueImages = _.uniqBy(images, (e) => e.name);
-
-    let res = {}
-    for(let image of uniqueImages) {
-      const count = _.sumBy(images, (img) => img.name === image.name);
-      res[image.name] = {...image, count: count > 1 ? count : 1}
-    }
-    setGroupedImages(res);
+    const sortedImages = sortImages(images).map((value, index) => <Item image={value} key={`${value.name}${index}`} badgeText={value.count} rarity={value.rarity} alt="" handleClick={(e) => handlePick(value)}/>);
+    setGroupedImages(sortedImages);
   },[images])
 
   const toggleOpen = (e) => {
@@ -83,7 +101,7 @@ const ImagePicker = (props) => {
 
   const handlePick = (image) => {
     const { location, name } = image;
-    const event = { 'target': { 'name': 'image', value: location}}
+    const event = { 'target': { 'name': 'image', value: name}}
     setPickedImage(name);
     setIsOpen(false);
     handleChange(event);
@@ -100,7 +118,7 @@ const ImagePicker = (props) => {
           <ImageGalleryTitle>Select an Image</ImageGalleryTitle>
           <CloseButton onClick={() => setIsOpen(false)}>X</CloseButton>
         </Header>
-        <ImageGallery>{_.values(groupedImages).map((value, index) => <Item image={value} key={`${value.name}${index}`} badgeText={value.count} alt="" handleClick={(e) => handlePick(value)}/>)}</ImageGallery>
+        <ImageGallery>{groupedImages}</ImageGallery>
       </ImagePickerModal>
     </div>
   )
@@ -108,11 +126,11 @@ const ImagePicker = (props) => {
 
 const Item = (props) => {
 
-  const { image, badgeText, handleClick } = props;
+  const { image, badgeText, handleClick, rarity } = props;
 
   return(
     <div>
-      <img alt="" onClick={handleClick} width={50} height={50} src={image.location}/>
+      <RarityImage alt="" onClick={handleClick} width={50} height={50} src={image.location} rarity={rarity}/>
       <Badge>{badgeText}</Badge>
     </div>
   )
@@ -127,7 +145,7 @@ const Badge = styled.div`
   text-align: center;
   color: white;
   top: -15px;
-  left: 35px;
+  left: 43px;
 `
 
 const FieldRoot = styled.div`
@@ -197,10 +215,12 @@ const ImagePickerModal = Modal.styled`
 
 const ImageGallery = styled.div`
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-start;
-    padding: 10px;
     flex-direction: row;
+    padding: 10px;
     gap: 10px;
+    overflow-y: scroll;
 `
 
 const Header = styled.div`

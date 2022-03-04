@@ -7,7 +7,10 @@
 (defn- create-image-prizes [image]
   (let [rarity (:rarity image)
         copy-count (condp = rarity
-                      "common" 10
+                      "common" 30
+                      "uncommon" 15
+                      "rare" 5
+                      "epic" 1
                       0)]
     (repeat copy-count image)))
 

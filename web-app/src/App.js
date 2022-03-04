@@ -57,7 +57,7 @@ const WithNavBar = (props) => {
   return(
     <div>
       <NavBar/>
-      {React.cloneElement(props.component(), {...rest})}
+      {component} 
     </div>
   )
 }
@@ -72,10 +72,10 @@ function App() {
         <Router>
           <Switch>
             <Route exact path="/">
-              <WithNavBar component={Home}/>
+              <WithNavBar component={<Home/>}/>
             </Route>
             <Route path="/thread/:id">
-              <WithNavBar component={ThreadPage} thread={thread}/>
+              <WithNavBar component={<ThreadPage thread={thread}/>}/>
             </Route>
             <Route exact path ="/about">
               <AboutPage/>

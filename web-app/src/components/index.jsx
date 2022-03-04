@@ -13,3 +13,18 @@ export const BoldTitle = styled.span`
   font-family: ${props => props.theme.fontFamily};
   font-weight: 700;
 `
+
+const pickColor = (rarity) => {
+    const colorMap = {
+        "common": "grey",
+        "uncommon": "green",
+        "rare": "blue",
+        "epic": "purple"
+    }
+    return colorMap[rarity] ?? 'white';
+}
+
+
+export const RarityImage = styled.img`
+    border: 6px ridge ${props => pickColor(props.rarity)};
+`

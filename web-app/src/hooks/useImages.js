@@ -10,7 +10,7 @@ export const useImages = () => {
       axios
         .get('/inventory')
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           const images = res.data;
           setGroupedImages(groupedImages);
           setImages(images);

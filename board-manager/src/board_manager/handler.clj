@@ -103,7 +103,7 @@
 
 (defn add-shutdown-hook!
   [system]
-  (.addShutDownHook (Runtime/getRuntime)
+  (.addShutdownHook (Runtime/getRuntime)
                     (Thread. ^Runnable (shutdown-system-fn system))))
 
 (defn -main [& args]

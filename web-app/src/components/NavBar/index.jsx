@@ -21,7 +21,6 @@ export function NavBar() {
     try { 
       const res = await callMe();
       setMe(res);
-      console.log(res)
     } catch(e) {
       setMe(null);
     }
@@ -84,4 +83,8 @@ const Title = styled.a`
   text-align: center;
   color: ${props => props.theme.title.color};
   text-decoration: none;
+
+  &:hover {
+    cursor: pointer;  
+  }
 `;

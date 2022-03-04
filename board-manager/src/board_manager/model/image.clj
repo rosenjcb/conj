@@ -5,10 +5,13 @@
   [:map
    [:id number?]
    [:name string?]
-   [:location uri?]])
+   [:location uri?]
+   [:rarity string?]])
 
 (def id :id)
 
 (def name :name)
 
 (def location :location)
+
+(def rarity :rarity)

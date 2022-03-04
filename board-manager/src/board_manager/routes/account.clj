@@ -44,7 +44,7 @@
           (set-cookies pepetoken))
       (response/bad-request "Wrong username or password. Please try again."))))
 
-(defn logout! []
+(defn logout! [_]
  (let [resp (response/status 200)] 
    (assoc resp :cookies {:access_token {:value nil} :refresh_token {:value nil}})))
 

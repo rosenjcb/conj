@@ -1,13 +1,14 @@
 import React from 'react'
 import styled from 'styled-components';
+import { RarityImage } from '../index';
 
-const Thumbnail = (props) => {
+const Thumbnail = ({rarity, location}) => {
     return(
         <ThumbnailLink>
-            { props.image ? <img alt="" src={props.image} width={150} height={150}/> : null }
+            { location ? <RarityImage alt="" src={location} rarity={rarity} width={150} height={150}/> : null }
         </ThumbnailLink>
     )
-}
+};
 
 export const Post = (props) => {
 
@@ -20,7 +21,7 @@ export const Post = (props) => {
             {!isOriginalPost ? <SideArrow/> : null }
             <Root isOriginalPost={isOriginalPost}>
                 <PostContent>
-                    {isOriginalPost ? <Thumbnail image={image}/> : null}
+                    {isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
                     <PostInfo>
                         <input type="checkbox"/>
                         <Subject>{subject}</Subject>
@@ -28,7 +29,7 @@ export const Post = (props) => {
                         {isOriginalPost ? <PostLink href={`/thread/${id}`}>{` No.${id} `}</PostLink> : ` No.${id} `}
                         <PostMenuArrow/>
                     </PostInfo>
-                    {!isOriginalPost ? <Thumbnail image={image}/> : null}
+                    {!isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
                     <blockquote>{comment}</blockquote>
                 </PostContent>
             </Root>
