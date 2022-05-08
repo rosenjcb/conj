@@ -118,7 +118,7 @@ const ImagePicker = (props) => {
           <ImageGalleryTitle>Select an Image</ImageGalleryTitle>
           <CloseButton onClick={() => setIsOpen(false)}>X</CloseButton>
         </Header>
-        <ImageGallery>{groupedImages}</ImageGallery>
+        {groupedImages.length > 0 ? <ImageGallery>{groupedImages}</ImageGallery> : null }
       </ImagePickerModal>
     </div>
   )

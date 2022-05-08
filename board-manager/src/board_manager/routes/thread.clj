@@ -37,6 +37,7 @@
 (defn put-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
         account (:account req)
+        account-id (:id account)
         db-conn (get-in req [:components :db-conn])
         item-gen (get-in req [:components :item-generation-service])
         body-params (:body-params req)
@@ -46,7 +47,7 @@
       (let [added-post (->> body-params
                             (query.thread/add-post! db-conn redis-conn account id)
                             response/response)
-            random-pick (item-generation.service/draw-item! item-gen 4)]
+            random-pick (item-generation.service/draw-item! item-gen account-id)]
         (log/infof "Post added to thread %s" id)
         (log/infof "Lucky draw was a %s" random-pick)
         added-post) 

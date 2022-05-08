@@ -26,27 +26,47 @@
   :plugins [[lein-ring "0.12.5"]
             [lein-environ "1.2.0"]
             [migratus-lein "0.7.3"]]
-  :ring {:handler board-manager.handler/app}
-  :main ^:skip-aot board-manager.handler
+  :main board-manager.handler
   :repl-options {:host "0.0.0.0"}
-  :migratus {:store :database
-              :migration-dir "migrations"
-              :db {:classname "org.postgresql"
-                    :subprotocol "postgres"
-                    :subname "//localhost/postgres"
-                    :user "admin"
-                    :password "pass"}}
+  ;; :migratus {:store :database
+  ;;             :migration-dir "migrations"
+  ;;             :db "postgres://pepechan-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com:5432/postgres?user=postgres&password=Frameshare8*8"}
+            ;;   :db {:classname "org.postgresql"
+            ;;         :subprotocol "postgres"
+            ;;         :subname "//localhost/postgres"
+            ;;         :user "admin"
+            ;;         :password "pass"}}
   :source-paths ["src" "config"]
   :profiles
-  {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
+  {:local {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]
+           :migratus {:store :database
+                      :migration-dir "migrations"
+                      :db "postgres://localhost:5432/postgres?user=admin&password=pass"}
+           :source-paths ["dev"]
+           :env {:passphrase "Frameshare8*8"
+                 :db-host "localhost"
+                 :db-user "admin"
+                 :db-pass "pass"
+                 :db-port 5432
+                 :db-name "postgres"
+                 :redis-host "localhost"
+                 :redis-port 6379
+                 :host "0.0.0.0"
+                 :port 8080}}
+   :dev {:dependencies [[javax.servlet/servlet-api "2.5"]
+                        [ring/ring-mock "0.3.2"]]
+            :migratus {:store :database
+                        :migration-dir "migrations"
+                        :db "postgres://pepechan-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com:5432/postgres?user=postgres&password=Frameshare8*8"}
          :source-paths ["dev"]
          :env {:passphrase "Frameshare8*8"
-               :db-host "localhost"
-               :db-user "admin"
-               :db-pass "pass"
+               :db-host "pepechan-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com"
+               :db-user "postgres"
+               :db-pass "Frameshare8*8"
                :db-port 5432
                :db-name "postgres"
-               :redis-host "localhost"
+               :redis-host "35.167.219.188"
                :redis-port 6379
+               :host "0.0.0.0"
                :port 8080}}})

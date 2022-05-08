@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { Formik, Field} from 'formik';
 import { useEffect } from 'react';
 import { login, signup } from '../api/account';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 const InputField = (props) => {
   const { label, field, form, secret } = props;
@@ -10,10 +11,6 @@ const InputField = (props) => {
     e.preventDefault();
     form.setFieldValue(field.name, e.target.value);
   }
-
-  useEffect(() => {
-    console.log(props);
-  },[])
 
   return (
     <InputFieldRoot>
@@ -24,6 +21,8 @@ const InputField = (props) => {
 }
 
 export function Login() {
+
+  const history = useHistory();
 
   const onHandleSignup = async(values) => {
     const res = await signup(values);
@@ -41,9 +40,10 @@ export function Login() {
         onSubmit={async(values, actions) => {
           actions.setSubmitting(false);
           console.log(values);
-          const res = await login(values);
-          console.log(JSON.stringify(res, null, 2));
-          window.location.href = 'http://localhost:3000/';
+          await login(values);
+          // window.location.href = 'http://localhost:3000/';
+          history.push('/');
+          history.go();
         }}
       >
         {(props) => (
@@ -55,7 +55,7 @@ export function Login() {
               <button type="submit">Login</button> 
               <button type="button" onClick={() => onHandleSignup(props.values)}>Signup</button> 
             </SubmitOptions>
-            <a href="http://localhost:3000/about">Why do I need an account?</a>
+            <a href="/about">Why do I need an account?</a>
           </StyledForm>
       )}
       </Formik>

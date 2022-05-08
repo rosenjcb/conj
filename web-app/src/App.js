@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Helmet from 'react-helmet';
 import { ThreadPage } from './pages/Thread';
 import { ModalProvider } from 'styled-react-modal';
 import { useSelector } from 'react-redux';
@@ -69,6 +70,9 @@ function App() {
     <ThemeProvider theme={theme}>    
     <ModalProvider>
       <AppRoot>
+        <Helmet>
+          <title>/b/ - Random</title>
+        </Helmet>
         <Router>
           <Switch>
             <Route exact path="/">

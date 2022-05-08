@@ -68,8 +68,8 @@
   (let [db-conn (:db-conn auth-service)
         password (m.account/pass account)
         encrypted-password (encrypt auth-service password)]
-    (q.account/create-account! db-conn (assoc account :pass encrypted-password))
-    (create-auth-token! auth-service (select-keys account [:email :pass]))))
+    (-> (q.account/create-account! db-conn (assoc account :pass encrypted-password))
+        (assoc :refresh-token (create-auth-token! auth-service (select-keys account [:email :pass]))))))
 
 (defrecord Service [salt auth-conf db-conn]
   component/Lifecycle

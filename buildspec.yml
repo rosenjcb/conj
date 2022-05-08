@@ -1,0 +1,43 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      # Upgrade AWS CLI to the latest version; Install Leiningen; Install Clojure CLI tools
+      - cd $HOME
+      - pip install --upgrade awscli
+      - wget https://raw.github.com/technomancy/leiningen/stable/bin/lein; chmod +x lein; mv lein /bin;
+      - LEIN_ROOT=true lein
+      - mkdir clj_tools_install; cd clj_tools_install
+      - curl -O https://download.clojure.org/install/linux-install-1.10.0.411.sh; chmod +x linux-install-1.10.0.411.sh; ./linux-install-1.10.0.411.sh
+      - cd $CODEBUILD_SRC_DIR
+  pre_build:
+    commands:
+      - echo "\nContents of the base directory:\n"
+      - ls -al
+      - echo
+      - echo Test started on `date`
+  build:
+    commands:
+      - echo Entering build phase...
+      - echo Build started on `date`
+      - LEIN_ROOT=true 
+      - mkdir ./board-manager/resources/public
+      - cd ./web-app
+      - yarn build &&  && mv build/* ../board-manager/resources/public
+      - cd ../board-manager 
+      - lein uberjar
+      - mv ./target/board-manager-0.1.0-SNAPSHOT-standalone.jar .
+      - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 267892765183.dkr.ecr.us-west-2.amazonaws.com
+      # - aws ecr get-login-password --region us-west-2 | docker login --username rosenjcb --password-stdin 9bpTSniiUbgC6Cz
+      - docker build -t pepechan .
+      - docker tag pepechan:latest 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest 
+      - docker push 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest
+      - printf '[{"name":"%s","imageUri":"%s"}]' pepechan-service 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest > imagedefinitions.json
+
+artifacts:
+  files:
+    - 'imagedefinitions.json'
+    - 'appspec.yml'
+    - 'taskdef.json'
+  base-directory: './board-manager/'

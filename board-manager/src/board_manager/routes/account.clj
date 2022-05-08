@@ -2,10 +2,12 @@
   (:require
    [board-manager.query.account :as q.account]
    [board-manager.services.auth :as s.auth]
+   [board-manager.services.item-generation :as item-generation.service]
+   [board-manager.model.account :as m.account]
+   [clojure.tools.logging :as log]
    [ring.util.response :as response]
    [reitit.coercion.malli :as malli]
    [board-manager.query.accountinventory :as q.accountinventory]
-   [clojure.tools.logging :as log]
    [board-manager.middleware :as middleware]))
 
 (defn get-my-account! [req]
@@ -31,8 +33,12 @@
 
 (defn create-account! [req]
   (let [auth-service (get-in req [:components :auth-service])
-        account-req (get-in req [:parameters :body])]
-    (->> (s.auth/add-account! auth-service account-req)
+        item-gen-service (get-in req [:components :item-generation-service])
+        account-req (get-in req [:parameters :body])
+        account (s.auth/add-account! auth-service account-req)
+        account-id (m.account/id account)]
+    (dotimes [_ 3] (item-generation.service/draw-item! item-gen-service account-id))
+    (->> (:refresh-token account)
          (set-cookies (response/status 200)))))
 
 (defn authenticate-account! [req]
@@ -55,6 +61,10 @@
             :coercion malli/coercion
             :parameters {:body [:map [:email string?] [:pass string?]]}
             :handler create-account!}}]
+   ["/ping"
+    {:get {:name ::ping
+           ::summary "A testing endpoint that returns a simple message"
+           :handler (fn [req] (response/response "Ok"))}}]
    ["/me"
     {:get {:name ::account-by-id
            :summary "Grab an account by id"

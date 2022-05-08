@@ -57,7 +57,7 @@ const TextButton = styled.button`
   padding: 0;
   text-decoration: underline;
 
-  :on-hover {
-
+  &:hover {
+    cursor: pointer;
   }
 `;

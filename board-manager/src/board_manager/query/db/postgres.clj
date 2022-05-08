@@ -4,7 +4,7 @@
     [next.jdbc.result-set :as rs]))
 
 (defn execute! [db-conn query]
-  (jdbc/execute! db-conn query {:builder-fn rs/as-unqualified-lower-maps}))
+  (jdbc/execute! db-conn query {:builder-fn rs/as-unqualified-lower-maps :return-keys true}))
 
 (defn execute-one! [db-conn query]
-  (jdbc/execute-one! db-conn query {:builder-fn rs/as-unqualified-lower-maps}))
+  (jdbc/execute-one! db-conn query {:builder-fn rs/as-unqualified-lower-maps :return-keys true}))
