@@ -39,7 +39,7 @@
   :source-paths ["src" "config"]
   :profiles
   {:local {:dependencies [[javax.servlet/servlet-api "2.5"]
-                        [ring/ring-mock "0.3.2"]]
+                          [ring/ring-mock "0.3.2"]]
            :migratus {:store :database
                       :migration-dir "migrations"
                       :db "postgres://localhost:5432/postgres?user=admin&password=pass"}

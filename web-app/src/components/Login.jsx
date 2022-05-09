@@ -24,9 +24,17 @@ export function Login() {
 
   const history = useHistory();
 
-  const onHandleSignup = async(values) => {
-    const res = await signup(values);
-    alert(JSON.stringify(res, null, 2));
+  const handleSignup = async(values) => {
+    await signup(values);
+    history.push('/');
+    history.go();
+  }
+
+  const handleLogin = async(values, actions) => {
+    actions.setSubmitting(false);
+    await login(values);
+    history.push('/')
+    history.go();
   }
   
   return (
@@ -37,14 +45,7 @@ export function Login() {
           email: '',
           pass: ''
         }}
-        onSubmit={async(values, actions) => {
-          actions.setSubmitting(false);
-          console.log(values);
-          await login(values);
-          // window.location.href = 'http://localhost:3000/';
-          history.push('/');
-          history.go();
-        }}
+        onSubmit={handleLogin}
       >
         {(props) => (
           <StyledForm onSubmit={props.handleSubmit}>
@@ -53,7 +54,7 @@ export function Login() {
             <Field label="Password" name="pass" secret={true} component={InputField}/>
             <SubmitOptions>
               <button type="submit">Login</button> 
-              <button type="button" onClick={() => onHandleSignup(props.values)}>Signup</button> 
+              <button type="button" onClick={() => handleSignup(props.values)}>Signup</button> 
             </SubmitOptions>
             <a href="/about">Why do I need an account?</a>
           </StyledForm>
