@@ -1,5 +1,6 @@
 import React from 'react';
 import { Post } from '../Post'
+import * as _ from 'lodash';
 
 export function Thread(props) {
 
@@ -10,11 +11,10 @@ export function Thread(props) {
   if(preview) {
     return (
       <div>
-        {thread.slice(0, 5).map((post) => <Post preview={true} opNo={op.id} post={post} key={post.id} debug={false}/>)}
+        {thread.map((post) => <Post preview={true} opNo={op.id} post={post} key={post.id}/>)}
       </div>
     )
   }
-
 
   return(
     <div>

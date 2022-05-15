@@ -9,7 +9,7 @@ VALUES
 ('crying-pepe', 'https://ia904501.us.archive.org/3/items/rarepepes_202108/003%20-%20UXrhQDs.png', 'common'),
 ('poopootree-pepe', 'https://ia804501.us.archive.org/3/items/rarepepes_202108/0012%20-%20TEcHltD.jpg', 'uncommon'),
 ('compton-pepe', 'https://ia804501.us.archive.org/3/items/rarepepes_202108/0017%20-%2063Ys8qp.png', 'uncommon'),
-('penn-pepe', 'https://ia904501.us.archive.org/3/items/rarepepes_202108/003%20-%20UXrhQDs.png', 'uncommon'),
+('penn-pepe', 'https://https://ia904501.us.archive.org/3/items/rarepepes_202108/0030%20-%20pUAG96a.jpg', 'uncommon'),
 ('sanic-pepe', 'https://ia804501.us.archive.org/3/items/rarepepes_202108/0035%20-%20HAHvjzM.png', 'uncommon'),
 ('megaman-pepe', 'https://ia804501.us.archive.org/3/items/rarepepes_202108/0019%20-%20sPd50zY.png', 'rare'),
 ('isis-pepe', 'https://ia904501.us.archive.org/3/items/rarepepes_202108/0006%20-%20Osf4Mjk.jpg', 'rare'),

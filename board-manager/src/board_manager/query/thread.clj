@@ -10,12 +10,17 @@
    [board-manager.model.accountinventory :as m.accountinventory]
    [clojure.tools.logging :as log]))
 
+
+(defn- trim-preview [t]
+  (let [no-op (drop 1 t)]
+  (conj (take-last 4 no-op) (first t))))
+
 (defn peek-threads! 
   [redis-conn]
   (let [thread-ids (db.redis/get-keys redis-conn "*")]
     (->> thread-ids
          (map #(db.redis/get redis-conn %))
-         (map #(take 6 %)))))
+         (map trim-preview))))
 
 (defn create-thread! 
   [db-conn redis-conn account req]

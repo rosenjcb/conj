@@ -39,16 +39,13 @@ export const SubmitPost = (props) => {
 
   const handleChange = (formikHandler, e, key) => {
     formikHandler(e);
-    console.log(e.target.value);
     dispatch(updateText(e.target.value));
   }
 
   const submitAndReset = async(values, actions) => {
     const payload = _.omit(values, ['values']);
-    // console.log(`Here's your comment: ${post.content}`);
     handleSubmit({...payload, comment: post.content});
     dispatch(resetComment());
-    // actions.resetForm();
   }
 
   return(

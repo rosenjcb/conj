@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import * as _ from 'lodash';
 import { Thread } from '../../components/Thread';
 import { HR } from '../../components';
 
@@ -15,10 +16,12 @@ export function Home() {
     fetchThreads();
   },[])
 
+  console.log(JSON.stringify(threads.map(t => t.length)))
+
   return (
     <HomeRoot>
       <ThreadsContainer>
-        { threads.map((thread, index) => <div key={index}><Thread preview={true} thread={thread}/><HR/></div>)}
+        { _.orderBy(threads, o => o[o.length - 1].id, ["desc"]).map((thread, index) => <div key={index}><Thread preview={true} thread={thread}/><HR/></div>)}
       </ThreadsContainer>
     </HomeRoot>
   );
