@@ -18,7 +18,7 @@ export function Home() {
   return (
     <HomeRoot>
       <ThreadsContainer>
-        { threads.map((thread, index) => <div key={index}><Thread thread={thread}/><HR/></div>)}
+        { threads.map((thread, index) => <div key={index}><Thread preview={true} thread={thread}/><HR/></div>)}
       </ThreadsContainer>
     </HomeRoot>
   );

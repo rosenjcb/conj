@@ -24,11 +24,12 @@ phases:
       - LEIN_ROOT=true 
       - mkdir ./board-manager/resources/public
       - cd ./web-app
-      - yarn build &&  && mv build/* ../board-manager/resources/public
+      - yarn build && cp -R ./build/* ../board-manager/resources/public
       - cd ../board-manager 
       - lein uberjar
       - mv ./target/board-manager-0.1.0-SNAPSHOT-standalone.jar .
       - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 267892765183.dkr.ecr.us-west-2.amazonaws.com
+      # - aws ecr get-login-password --region us-west-2 --profile rosenjcb | docker login --username AWS --password-stdin 267892765183.dkr.ecr.us-west-2.amazonaws.com
       # - aws ecr get-login-password --region us-west-2 | docker login --username rosenjcb --password-stdin 9bpTSniiUbgC6Cz
       - docker build -t pepechan .
       - docker tag pepechan:latest 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest 

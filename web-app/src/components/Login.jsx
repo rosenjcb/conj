@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { Formik, Field} from 'formik';
-import { useEffect } from 'react';
 import { login, signup } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 

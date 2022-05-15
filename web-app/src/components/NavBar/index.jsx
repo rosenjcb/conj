@@ -27,6 +27,7 @@ export function NavBar() {
   },[])
 
   const handleSubmit = async(post) => {
+    console.log(post);
     const res = await upsertThread(post, location.pathname);
     const thread = res.data;
     const newThread = thread.length === 1;

@@ -1,6 +1,10 @@
 import React from 'react'
 import styled from 'styled-components';
 import { RarityImage } from '../index';
+import { processPostText } from '../../util/post';
+import { useDispatch } from 'react-redux';
+import { insertPostLink } from '../../slices/postSlice';
+import { useHistory } from 'react-router-dom';
 
 const Thumbnail = ({rarity, location}) => {
     return(
@@ -12,33 +16,58 @@ const Thumbnail = ({rarity, location}) => {
 
 export const Post = (props) => {
 
-    const { post, isOriginalPost } = props;
+    const { post, opNo, handleRef, highlight, preview } = props;
 
     const { name, subject, id, comment, image } = post;
 
+    const history = useHistory();
+
+    const isOriginalPost = opNo === id;
+
+    const dispatch = useDispatch();
+
+    const handleClick = (_) => {
+        if(preview && isOriginalPost) {
+          history.push(`/thread/${opNo}`);
+          history.go();
+        } else {
+          dispatch(insertPostLink(id));
+        }
+    }
+
     return (
-        <div>
+        <div ref={handleRef}>
             {!isOriginalPost ? <SideArrow/> : null }
-            <Root isOriginalPost={isOriginalPost}>
+            <Root isOriginalPost={isOriginalPost} highlight={highlight}>
                 <PostContent>
                     {isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
                     <PostInfo>
                         <input type="checkbox"/>
                         <Subject>{subject}</Subject>
                         <Name>{name}</Name>
-                        {isOriginalPost ? <PostLink href={`/thread/${id}`}>{` No.${id} `}</PostLink> : ` No.${id} `}
+                        {/* {isOriginalPost ? <PostLink href={`/thread/${id}`}>{` No.${id} `}</PostLink> : ` No.${id} `} */}
+                        <PostLink onClick={handleClick}>{` No.${id} `}</PostLink>
                         <PostMenuArrow/>
                     </PostInfo>
                     {!isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
-                    <blockquote>{comment}</blockquote>
+                    <blockquote>{processPostText(opNo, comment)}</blockquote>
                 </PostContent>
             </Root>
         </div>
     );
 }
 
+const postColor = (styleProps) => {
+    if(styleProps.isOriginalPost) return "inherit";
+    if(styleProps.highlight) {
+        return styleProps.theme.post.selected;
+    } else {
+        return styleProps.theme.post.border;
+    }
+}
+
 const Root = styled.div`
-    background-color: ${props => props.isOriginalPost ? "inherit" : props.theme.post.backgroundColor};
+    background-color: ${props => postColor(props)};
     border: 1px solid ${props => props.isOriginalPost ? "none" : props.theme.post.border};
     font-size: ${props => props.theme.post.fontSize};
     font-family: ${props => props.theme.post.fontFamily};

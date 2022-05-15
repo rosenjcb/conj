@@ -6,20 +6,19 @@ export const useImages = () => {
 
     const [groupedImages, setGroupedImages] = useState([]);
 
-    const fetchData = () => {
-      axios
-        .get('/inventory')
-        .then((res) => {
-          // console.log(res);
-          const images = res.data;
-          setGroupedImages(groupedImages);
-          setImages(images);
-        })
-    };
-
     useEffect(() => {
-      fetchData()
-    }, []);
+      const fetchData = () => {
+        axios
+          .get('/inventory')
+          .then((res) => {
+            // console.log(res);
+            const images = res.data;
+            setGroupedImages(groupedImages);
+            setImages(images);
+          })
+      };
+      fetchData();
+    }, [groupedImages]);
 
     return { images };
 }

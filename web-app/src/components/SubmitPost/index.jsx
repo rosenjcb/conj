@@ -5,6 +5,8 @@ import { useImages } from '../../hooks/useImages';
 import { Formik, Form, Field } from 'formik';
 import * as _ from 'lodash';
 import { BoldTitle, RarityImage } from '../index';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateText, resetComment } from '../../slices/postSlice';
 
 const SubmitField = (props) => {
   const { title, input, isSubmit } = props;
@@ -23,6 +25,10 @@ export const SubmitPost = (props) => {
   let randomString = Math.random().toString(36);
 
   const { handleSubmit, className } = props;
+  
+  const post = useSelector(state => state.post);
+  
+  const dispatch = useDispatch();
 
   const initialValues = {
     name: 'Anonymous',
@@ -31,10 +37,18 @@ export const SubmitPost = (props) => {
     image: ''
   };
 
+  const handleChange = (formikHandler, e, key) => {
+    formikHandler(e);
+    console.log(e.target.value);
+    dispatch(updateText(e.target.value));
+  }
+
   const submitAndReset = async(values, actions) => {
     const payload = _.omit(values, ['values']);
-    await handleSubmit(payload);
-    actions.resetForm();
+    // console.log(`Here's your comment: ${post.content}`);
+    handleSubmit({...payload, comment: post.content});
+    dispatch(resetComment());
+    // actions.resetForm();
   }
 
   return(
@@ -45,7 +59,7 @@ export const SubmitPost = (props) => {
           <Form className={className}>
             <SubmitField title={"Name"} input={<FieldInput name="name" as="input" value={props.values.name} placeholder="Anonymous" onChange={props.handleChange}/>}/>
             <SubmitField title={"Subject"} input={<FieldInput name="subject" as="input" value={props.values.subject} onChange={props.handleChange}/>} isSubmit/>
-            <SubmitField title={"Comment"} input={<FieldInput name="comment" as="textarea" value={props.values.comment} onChange={props.handleChange}/>}/>
+            <SubmitField title={"Comment"} input={<FieldInput name="comment" as="textarea" value={post.content} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>}/>
             <SubmitField title={"Image"} input={<ImagePicker key={randomString} handleChange={props.handleChange}/>}/>
           </Form>
         )}
@@ -90,21 +104,21 @@ const ImagePicker = (props) => {
   const [groupedImages, setGroupedImages] = useState({});
 
   useEffect(() => {
+    const handlePick = (image) => {
+      const { name } = image;
+      const event = { 'target': { 'name': 'image', value: name}}
+      setPickedImage(name);
+      setIsOpen(false);
+      handleChange(event);
+    };
+
     const sortedImages = sortImages(images).map((value, index) => <Item image={value} key={`${value.name}${index}`} badgeText={value.count} rarity={value.rarity} alt="" handleClick={(e) => handlePick(value)}/>);
     setGroupedImages(sortedImages);
-  },[images])
+  },[images, handleChange])
 
   const toggleOpen = (e) => {
     if(e) { e.preventDefault(); }
     setIsOpen(!isOpen);
-  }
-
-  const handlePick = (image) => {
-    const { location, name } = image;
-    const event = { 'target': { 'name': 'image', value: name}}
-    setPickedImage(name);
-    setIsOpen(false);
-    handleChange(event);
   }
 
   return(

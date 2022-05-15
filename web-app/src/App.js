@@ -34,6 +34,7 @@ export const theme = {
     fontFamily: "arial,helvetica,sans-serif",
     backgroundColor: '#d6daf0',
     border: '#b7c5d9',
+    selected: '#d6bad0',
     subject: {
       color: '#0f0c5d'
     },
@@ -53,7 +54,7 @@ export const theme = {
 }
 
 const WithNavBar = (props) => {
-  const { component, ...rest } = props;
+  const { component } = props;
 
   return(
     <div>
@@ -73,13 +74,13 @@ function App() {
         <Helmet>
           <title>/b/ - Random</title>
         </Helmet>
-        <Router>
+        <Router forceRefresh>
           <Switch>
             <Route exact path="/">
               <WithNavBar component={<Home/>}/>
             </Route>
             <Route path="/thread/:id">
-              <WithNavBar component={<ThreadPage thread={thread}/>}/>
+              <WithNavBar component={<ThreadPage preview={false} thread={thread}/>}/>
             </Route>
             <Route exact path ="/about">
               <AboutPage/>
@@ -91,7 +92,6 @@ function App() {
     </ThemeProvider>
   );
 }
-
 
 const AppRoot = styled.div`
   background-color: #eef2ff; 

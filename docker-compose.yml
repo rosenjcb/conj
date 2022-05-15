@@ -1,21 +1,15 @@
-# version: '3.0'
-# services:
-#   postgres:
-#     restart: 'always'
-#     environment:
-#       - "POSTGRES_USER=filmuser"
-#       - "POSTGRES_DB=filmdb"
-#       - "POSTGRES_PASSWORD=${DB_PASSWORD}"
-#     volumes:
-#       - /tmp/postgresdata:/var/lib/postgresql/data
-#     image: 'postgres:alpine'
-#   filmapp:
-#     restart: 'always'
-#     ports:
-#       - '8080:8080'
-#     environment:
-#       - "DB_PASSWORD=${DB_PASSWORD}"
-#       - "DB_HOST=postgres"
-#     build:
-#       context: .
-#       dockerfile: Dockerfile
+version: '3.0'
+services:
+  redis:
+    image: redis:alpine
+    container_name: redis
+  pepechan:
+    depends_on:
+      - redis
+    build: ./board-manager/
+    container_name: pepechan 
+    image: 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan
+    environment:
+      REDIS_HOST: redis
+    ports:
+      - "8080:8080"

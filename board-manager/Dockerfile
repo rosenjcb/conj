@@ -12,7 +12,17 @@ ENV DB_PASS "Frameshare8*8"
 ENV DB_PORT 5432
 ENV DB_NAME "postgres"
 ENV REDIS_PORT 6379
-ENV REDIS_HOST "35.166.217.156" 
+ENV REDIS_HOST "redis-elasticache-1.ghplor.ng.0001.usw2.cache.amazonaws.com" 
 ENV PASSPHRASE "Frameshare8*8"
+
+# ENV PORT 8080
+# ENV DB_HOST "0.0.0.0"
+# ENV DB_USER "admin"
+# ENV DB_PASS "pass"
+# ENV DB_PORT 5432
+# ENV DB_NAME "postgres"
+# ENV REDIS_PORT 6379
+# ENV REDIS_HOST "0.0.0.0" 
+# ENV PASSPHRASE "Frameshare8*8"
 
 CMD ["java", "-jar", "board-manager-0.1.0-SNAPSHOT-standalone.jar"]

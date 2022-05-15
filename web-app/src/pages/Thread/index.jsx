@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Thread } from '../../components/Thread';
 import { useParams } from 'react-router'
 import axios from 'axios'
 import { swapThread } from '../../slices/threadSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 
 export function ThreadPage() {
 
@@ -12,6 +13,20 @@ export function ThreadPage() {
   const dispatch = useDispatch();
 
   const { id } = useParams();
+
+  const location = useLocation();
+
+  const hash = Number(location.hash.substr(1)) ?? -1;
+
+  const threadRef = useRef([]);
+
+  const hashedIndex = thread.current.findIndex((p) => p.id === hash);
+
+  useEffect(() => {
+    if(hashedIndex !== undefined && threadRef.current[hashedIndex]) {
+      threadRef.current[hashedIndex].scrollIntoView();
+    }
+  },[hashedIndex])
 
   useEffect(() => {
     axios.get(`/threads/${id}`)
@@ -21,11 +36,11 @@ export function ThreadPage() {
             }
             dispatch(swapThread(resp.data))
         });
-  },[]);
+  },[id, dispatch]);
 
   return(
     <Root>
-      <Thread thread={thread.current}/>
+      <Thread hashedIndex={hashedIndex} threadRef={threadRef} thread={thread.current}/>
     </Root>
   )
 }
