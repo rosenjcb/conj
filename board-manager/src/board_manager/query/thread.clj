@@ -11,6 +11,12 @@
    [clojure.tools.logging :as log]))
 
 
+(def min-character-count 15)
+(def max-character-count 5000)
+
+(def max-name-count 30)
+(def max-subject-count 50)
+
 (defn- trim-preview [t]
   (let [no-op (drop 1 t)]
   (conj (take-last 4 no-op) (first t))))
@@ -22,12 +28,55 @@
          (map #(db.redis/get redis-conn %))
          (map trim-preview))))
 
+(defn- validate-subject
+  [subject]
+  (when (> (count subject) max-subject-count)
+    (throw (Exception. (format "Subject is above character limit %s/%s." (count subject) max-subject-count)))))
+
+(defn- validate-name
+  [name]
+  (when (> (count name) max-name-count)
+    (throw (Exception. (format "Name is above character limit %s/%s." (count name) max-name-count)))))
+
+(defn ^:private ^:test validate-add-post 
+  [post]
+  (let [_ (validate-name (m.post/name post))
+        _ (validate-subject (m.post/subject post))
+        comment (m.post/comment post)
+        image (m.post/image post)]
+    (cond
+      (> (count comment) max-character-count)
+      (throw (Exception. (format "Comment is above character limit %s/%s." (count comment) max-character-count)))
+
+      (and (= (count comment) 0) (= image ""))
+      (throw (Exception. "Either a non-empty comment or image is required for replies."))
+
+      :else nil)))
+
+(defn ^:private ^:test validate-create-thread [post]
+  (let [_ (validate-name (m.post/name post))
+        _ (validate-subject (m.post/subject post))
+        comment (m.post/comment post)
+        image (m.post/image post)]
+    (cond
+      (> (count comment) max-character-count)
+      (throw (Exception. (format "Comment is above character limit %s/%s." (count comment) max-character-count)))
+
+      (< (count comment) min-character-count)
+      (throw (Exception. (format "Comment is below %s characters." min-character-count)))
+
+      (= image "")
+      (throw (Exception. "An image is required for posting threads. Try replying to a thread to collect pepes."))
+
+      :else nil)))
+
 (defn create-thread! 
   [db-conn redis-conn account req]
   (let [account-id (:id account)
         post-count (q.counter/get-count! db-conn)
         thread (m.thread/req&id->thread req post-count)
         op (first thread)
+        _ (validate-create-thread op)
         id (m.thread/id op)
         image-name (m.thread/image op)
         image (q.image/get-image-by-name! db-conn image-name)
@@ -41,7 +90,7 @@
         (db.redis/set redis-conn id enriched-thread)
         (q.counter/increment-counter db-conn)
         enriched-thread)
-      (throw (Exception. "No image provided or the image requested does not exist in the account's inventory.")))))
+      (throw (Exception. "The image requested does not exist in the account's inventory.")))))
 
 (defn find-thread-by-id!
   [redis-conn id]
@@ -58,6 +107,7 @@
         post-count (q.counter/get-count! db-conn)
         not-empty? (complement empty?)
         post (m.post/req&id->post post-body post-count)
+        _ (validate-add-post post)
         image-name (m.post/image post)
         image (into {} (q.image/get-image-by-name! db-conn image-name))
         image-id (m.image/id image)
@@ -73,3 +123,12 @@
     (update-thread! redis-conn thread-id updated-thread)
     (q.counter/increment-counter db-conn)
     updated-thread))
+
+(defn delete-thread-by-id! [redis-conn thread-id]
+  (let [thread (find-thread-by-id! redis-conn thread-id)]
+    (if thread
+      (db.redis/del redis-conn thread-id)
+      (throw (Exception. (format "Thread No. %s not found." thread-id))))))
+
+(defn delete-all-threads! [redis-conn]
+  (db.redis/flush-all redis-conn))

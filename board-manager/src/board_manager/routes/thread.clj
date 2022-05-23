@@ -55,6 +55,22 @@
         (log/infof "%s" (.getMessage e))
         (response/bad-request (.getMessage e))))))
 
+(defn kill-thread! [req]
+  (let [redis-conn (get-in req [:components :redis-conn])
+        thread-id (get-in req [:path-params :id])]
+    (try
+      (doall
+        (query.thread/delete-thread-by-id! redis-conn thread-id)
+        (response/response (format "Thread No. %s has been deleted" thread-id)))
+      (catch Exception e
+        (log/infof "%s" (.getMessage e))
+        (response/bad-request (.getMessage e))))))
+
+(defn nuke-threads! [req]
+  (let [redis-conn (get-in req [:components :redis-conn])]
+    (query.thread/delete-all-threads! redis-conn)
+    (response/response "Threads deleted")))
+
 (def thread-routes
   [["/threads"
    {:get peek-threads! 
@@ -66,4 +82,12 @@
             :handler get-thread!}
       :put {:summary "Inserts a post into a thread by id"
             :middleware [[middleware/wrap-auth]]
-            :handler put-thread!}}]])
+            :handler put-thread!}}]
+   ["/kill/:id"
+    {:get {:summary "Kills/deletes a thread (in redis cache) by id"
+           ;;  :middleware [[middleware/wrap-admin]]
+           :handler kill-thread!}}]
+   ["/nuke"
+    {:get {:summary "Nukes the entire board"
+           ;; :middleware [[middleware/wrap-admin]]
+           :handler nuke-threads!}}]])

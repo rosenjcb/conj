@@ -32,7 +32,7 @@ export function AboutPage() {
           <Faq question={"Am I anonymous?"} answer={"You will always be anonymous (or have the option to insert a name) for each post. Creating a persistent inventory for each user is the reason behind the login requirement. Your username/email is not public info."}/>
           <Faq question={"Are my credentials safe?"} answer={"I salt and hash every password created before inserting into the DB. I take precaution to guard your personal data but be smart and use a new password for this account (I can't guarantee anything)."}/>
         </FaqList>
-        <a href="http://localhost:3000/">[Back to Home]</a>
+        <a href="/">[Back to Home]</a>
       </DetailsContainer>
     </Root>
   )

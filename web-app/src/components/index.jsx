@@ -28,3 +28,8 @@ const pickColor = (rarity) => {
 export const RarityImage = styled.img`
     border: 6px ridge ${props => pickColor(props.rarity)};
 `
+
+export const ErrorText = styled.p`
+  color: red;
+  margin: 0 auto;
+`;

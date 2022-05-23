@@ -50,7 +50,7 @@ export const Post = (props) => {
                         <PostMenuArrow/>
                     </PostInfo>
                     {!isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
-                    <blockquote>{processPostText(opNo, comment)}</blockquote>
+                    <NoOverflowBlockQuote>{processPostText(opNo, comment)}</NoOverflowBlockQuote>
                 </PostContent>
             </Root>
         </div>
@@ -85,6 +85,7 @@ const PostInfo = styled.div`
     gap: 4px;
     flex-direction: row;
     align-items: center;
+     
 `;
 
 const PostContent = styled.div`
@@ -132,6 +133,11 @@ const SideArrowRoot = styled.div`
     font-family: ${props => props.theme.fontFamily };
     font-size: ${props => props.theme.fontSize};
 `
+const NoOverflowBlockQuote = styled.blockquote`
+    max-width: calc(100vw - 2em - 80px);
+    overflow: hidden;
+`
+
 const PostMenuArrow = () => <ArrowRoot>▶</ArrowRoot>;
 
 const SideArrow = () => <SideArrowRoot>{'>>'}</SideArrowRoot>;
@@ -144,3 +150,4 @@ const PostLink = styled.a`
         color: red;
     }
 `
+

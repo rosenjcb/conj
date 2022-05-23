@@ -16,4 +16,13 @@
       {:id id :name name :subject subject :comment comment :image image}))
 
 (def id :id)
+
 (def image :image)
+
+(def subject :subject)
+
+#_{:clj-kondo/ignore [:redefined-var]}
+(def comment :comment)
+
+#_{:clj-kondo/ignore [:redefined-var]}
+(def name :name)

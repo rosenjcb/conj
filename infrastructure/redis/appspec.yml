@@ -1,9 +1,0 @@
-version: 0.0
-Resources:
-  - TargetService:
-      Type: AWS::ECS::Service
-      Properties:
-        TaskDefinition: "arn:aws:ecs:us-west-2:267892765183:task-definition/redis-service:6"
-        LoadBalancerInfo:
-          ContainerName: "redis-container"
-          ContainerPort: 6379

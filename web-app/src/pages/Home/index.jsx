@@ -16,8 +16,6 @@ export function Home() {
     fetchThreads();
   },[])
 
-  console.log(JSON.stringify(threads.map(t => t.length)))
-
   return (
     <HomeRoot>
       <ThreadsContainer>

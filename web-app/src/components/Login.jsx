@@ -1,7 +1,9 @@
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Formik, Field} from 'formik';
 import { login, signup } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { ErrorText } from './index';
 
 const InputField = (props) => {
   const { label, field, form, secret } = props;
@@ -22,18 +24,30 @@ const InputField = (props) => {
 export function Login() {
 
   const history = useHistory();
+  
+  const [error, setError] = useState(null);
 
   const handleSignup = async(values) => {
-    await signup(values);
-    history.push('/');
-    history.go();
+    try {
+      setError("")
+      await signup(values);
+      history.push('/');
+      history.go();
+    } catch(e) {
+      setError("An account with that email already exists");
+    }
   }
 
   const handleLogin = async(values, actions) => {
-    actions.setSubmitting(false);
-    await login(values);
-    history.push('/')
-    history.go();
+    try {
+      setError("")
+      actions.setSubmitting(false);
+      await login(values);
+      history.push('/')
+      history.go();
+    } catch(e) {
+      setError(e.response.data)
+    }
   }
   
   return (
@@ -56,6 +70,7 @@ export function Login() {
               <button type="button" onClick={() => handleSignup(props.values)}>Signup</button> 
             </SubmitOptions>
             <a href="/about">Why do I need an account?</a>
+            {error ? <ErrorText>{error}</ErrorText> : null}
           </StyledForm>
       )}
       </Formik>

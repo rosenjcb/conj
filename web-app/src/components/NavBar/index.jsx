@@ -17,6 +17,8 @@ export function NavBar() {
 
   const [me, setMe] = useState("none"); 
 
+  const [error, setError] = useState(null);
+
   useEffect(async() => {
     try { 
       const res = await callMe();
@@ -28,13 +30,18 @@ export function NavBar() {
 
   const handleSubmit = async(post) => {
     console.log(post);
-    const res = await upsertThread(post, location.pathname);
-    const thread = res.data;
-    const newThread = thread.length === 1;
-    dispatch(swapThread(thread))
-    if(newThread) {
-      history.push(`/thread/${res.data[0].id}`);
-      history.go()
+    setError(null);
+    try {
+      const res = await upsertThread(post, location.pathname);
+      const thread = res.data;
+      const newThread = thread.length === 1;
+      dispatch(swapThread(thread))
+      if(newThread) {
+        history.push(`/thread/${res.data[0].id}`);
+        history.go()
+      }
+    } catch (error) {
+      setError(error.response.data);
     }
   }
 
@@ -49,7 +56,7 @@ export function NavBar() {
         <AccountRoot>
           <HR width="50%"/>
           <AccountDetails/> 
-          <CenteredSubmitPost handleSubmit={handleSubmit}/>
+          <CenteredSubmitPost handleSubmit={handleSubmit} error={error}/>
         </AccountRoot> 
         } 
       <HR/>
@@ -61,6 +68,7 @@ const CenteredSubmitPost = styled(SubmitPost)`
   margin: 0 auto;
   width: fit-content;
 `;
+
 
 const NavRoot = styled.div`
   background-color: #eef2ff; 

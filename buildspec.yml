@@ -17,11 +17,18 @@ phases:
       - ls -al
       - echo
       - echo Test started on `date`
+      - LEIN_ROOT=true 
+      - cd ./web-app
+      - yarn && yarn test
+      - cd ../board-manager
+      - lein test
+      - cd $CODEBUILD_SRC_DIR
   build:
     commands:
       - echo Entering build phase...
       - echo Build started on `date`
-      - LEIN_ROOT=true 
+      - mv ./infrastructure/board-manager/appspec.yml ./board-manager
+      - mv ./infrastructure/board-manager/taskdef.json ./board-manager
       - mkdir ./board-manager/resources/public
       - cd ./web-app
       - yarn build && cp -R ./build/* ../board-manager/resources/public
@@ -30,7 +37,6 @@ phases:
       - mv ./target/board-manager-0.1.0-SNAPSHOT-standalone.jar .
       - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 267892765183.dkr.ecr.us-west-2.amazonaws.com
       # - aws ecr get-login-password --region us-west-2 --profile rosenjcb | docker login --username AWS --password-stdin 267892765183.dkr.ecr.us-west-2.amazonaws.com
-      # - aws ecr get-login-password --region us-west-2 | docker login --username rosenjcb --password-stdin 9bpTSniiUbgC6Cz
       - docker build -t pepechan .
       - docker tag pepechan:latest 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest 
       - docker push 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest

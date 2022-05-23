@@ -24,11 +24,13 @@ export const SubmitPost = (props) => {
 
   let randomString = Math.random().toString(36);
 
-  const { handleSubmit, className } = props;
-  
+  const { handleSubmit, className, error } = props;
+
   const post = useSelector(state => state.post);
   
   const dispatch = useDispatch();
+
+  const { images } = useImages();
 
   const initialValues = {
     name: 'Anonymous',
@@ -57,7 +59,8 @@ export const SubmitPost = (props) => {
             <SubmitField title={"Name"} input={<FieldInput name="name" as="input" value={props.values.name} placeholder="Anonymous" onChange={props.handleChange}/>}/>
             <SubmitField title={"Subject"} input={<FieldInput name="subject" as="input" value={props.values.subject} onChange={props.handleChange}/>} isSubmit/>
             <SubmitField title={"Comment"} input={<FieldInput name="comment" as="textarea" value={post.content} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>}/>
-            <SubmitField title={"Image"} input={<ImagePicker key={randomString} handleChange={props.handleChange}/>}/>
+            <SubmitField title={"Image"} input={<ImagePicker images={images} key={randomString} handleChange={props.handleChange}/>}/>
+            {error ? <ErrorText>{error}</ErrorText> : null}
           </Form>
         )}
       </Formik>
@@ -90,13 +93,11 @@ const sortImages = (images) => {
 
 const ImagePicker = (props) => {
 
-  const { handleChange } = props;
+  const { handleChange, images } = props;
 
   const [isOpen, setIsOpen] = useState(false);
 
   const [pickedImage, setPickedImage] = useState(null);
-
-  const { images } = useImages();
 
   const [groupedImages, setGroupedImages] = useState({});
 
@@ -222,7 +223,7 @@ const ImagePickerModal = Modal.styled`
   flex-direction: column;
   border: 1px solid ${props => props.theme.post.border};
   background-color: ${props => props.theme.post.backgroundColor}
-`
+`;
 
 const ImageGallery = styled.div`
     display: flex;
@@ -232,7 +233,7 @@ const ImageGallery = styled.div`
     padding: 10px;
     gap: 10px;
     overflow-y: scroll;
-`
+`;
 
 const Header = styled.div`
     height: 10%;
@@ -247,8 +248,13 @@ const ImageGalleryTitle = styled(BoldTitle)`
     justify-content: center;
     flex-direction: column;
     width: 90%;
-`
+`;
 
 const CloseButton = styled.button`
     width: 10%;
-`
+`;
+
+const ErrorText = styled.p`
+  color: red;
+  margin: 0 auto;
+`;

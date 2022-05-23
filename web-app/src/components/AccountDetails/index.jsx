@@ -33,6 +33,7 @@ export const AccountDetails = (props) => {
 
 const Info = styled.h1`
   font-size: 2rem;
+  word-wrap: break-word;
   margin: 0 auto;
   text-align: center;
 `;
