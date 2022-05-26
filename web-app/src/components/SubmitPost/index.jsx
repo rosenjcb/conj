@@ -24,7 +24,7 @@ export const SubmitPost = (props) => {
 
   let randomString = Math.random().toString(36);
 
-  const { handleSubmit, className, error } = props;
+  const { handleSubmit, className } = props;
 
   const post = useSelector(state => state.post);
   
@@ -60,7 +60,6 @@ export const SubmitPost = (props) => {
             <SubmitField title={"Subject"} input={<FieldInput name="subject" as="input" value={props.values.subject} onChange={props.handleChange}/>} isSubmit/>
             <SubmitField title={"Comment"} input={<FieldInput name="comment" as="textarea" value={post.content} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>}/>
             <SubmitField title={"Image"} input={<ImagePicker images={images} key={randomString} handleChange={props.handleChange}/>}/>
-            {error ? <ErrorText>{error}</ErrorText> : null}
           </Form>
         )}
       </Formik>
@@ -187,6 +186,7 @@ const FieldInput = styled(Field)`
   margin-right: 2px;
   padding: 2px 4px 3px;
   border: 1px solid #aaa;
+  flex: 1;
   outline: none;
   font-family: aria, helvetica, sans-serif;
   font-size: 10pt;
@@ -252,9 +252,4 @@ const ImageGalleryTitle = styled(BoldTitle)`
 
 const CloseButton = styled.button`
     width: 10%;
-`;
-
-const ErrorText = styled.p`
-  color: red;
-  margin: 0 auto;
 `;

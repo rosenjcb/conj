@@ -1,14 +1,17 @@
 (ns board-manager.query.thread
   (:require
+   [board-manager.model.account :as m.account]
    [board-manager.model.thread :as m.thread]
    [board-manager.model.post :as m.post]
    [board-manager.query.counter :as q.counter]
    [board-manager.query.db.redis :as db.redis]
    [board-manager.model.image :as m.image]
+   [board-manager.query.account :as q.account] 
    [board-manager.query.accountinventory :as q.accountinventory]
    [board-manager.query.image :as q.image]
    [board-manager.model.accountinventory :as m.accountinventory]
-   [clojure.tools.logging :as log]))
+   [clojure.tools.logging :as log]
+   [java-time :as t]))
 
 
 (def min-character-count 15)
@@ -53,7 +56,8 @@
 
       :else nil)))
 
-(defn ^:private ^:test validate-create-thread [post]
+(defn ^:private ^:test validate-create-thread 
+  [post]
   (let [_ (validate-name (m.post/name post))
         _ (validate-subject (m.post/subject post))
         comment (m.post/comment post)
@@ -70,12 +74,30 @@
 
       :else nil)))
 
+(defn ^:private ^:test validate-thread-time
+  [account]
+  (let [last-thread (m.account/last-thread account)
+        last-thread-instant (t/instant last-thread)
+        lapsed-time (t/time-between :minutes last-thread-instant (t/instant))]
+    (when (< lapsed-time 5)
+      (throw (Exception. (format "Only %s minutes have passed since your last thread. You must wait 5 minutes between creating new threads." lapsed-time))))))
+
+(defn ^:private ^:test validate-reply-time
+  [account]
+  (let [last-reply (m.account/last-reply account)
+        last-reply-instant(t/instant last-reply)
+        lapsed-time (t/time-between :seconds last-reply-instant (t/instant))]
+    (when (< lapsed-time 60)
+      (throw (Exception. (format "Only %s seconds have passed since your last reply. You must wait 60 seconds between replies." lapsed-time))))))
+
 (defn create-thread! 
   [db-conn redis-conn account req]
   (let [account-id (:id account)
+        db-account (q.account/find-account-by-id! db-conn account-id)
         post-count (q.counter/get-count! db-conn)
         thread (m.thread/req&id->thread req post-count)
         op (first thread)
+        _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         id (m.thread/id op)
         image-name (m.thread/image op)
@@ -89,6 +111,7 @@
         (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
         (db.redis/set redis-conn id enriched-thread)
         (q.counter/increment-counter db-conn)
+        (q.account/update-last-thread! db-conn account-id)
         enriched-thread)
       (throw (Exception. "The image requested does not exist in the account's inventory.")))))
 
@@ -104,6 +127,8 @@
   "Grabs a thread by its id, adds a post to it, and saves it to the database"  
   [db-conn redis-conn account thread-id post-body]
   (let [account-id (:id account)
+        db-account (q.account/find-account-by-id! db-conn account-id)
+        _ (validate-reply-time db-account)
         post-count (q.counter/get-count! db-conn)
         not-empty? (complement empty?)
         post (m.post/req&id->post post-body post-count)
@@ -122,6 +147,7 @@
         (throw (Exception. "Couldn't find the image in your inventory."))))
     (update-thread! redis-conn thread-id updated-thread)
     (q.counter/increment-counter db-conn)
+    (q.account/update-last-post! db-conn account-id)
     updated-thread))
 
 (defn delete-thread-by-id! [redis-conn thread-id]

@@ -4,17 +4,28 @@
             [board-manager.query.db.redis :as db.redis]
             [board-manager.query.image :as q.image]
             [board-manager.query.thread :as q.thread]
-            [clojure.test :refer [deftest is testing]]))
+            [clojure.test :refer [deftest is testing]]
+            [java-time :as t]))
 
 (def example-account {:id 19 :email "test@test.com"})
 
 (def base-request {:id 1 :name "Anonymous" :subject "" :comment "" :image ""})
+
+(def basic-account {:id 1 :email "test@test.com" :last_reply (t/sql-timestamp) :last_thread (t/sql-timestamp)})
 
 (def example-image {:id 19 :name "snot-pepe" :location "" :rarity "common"})
 
 (def basic-thread [{:id 100 :name "Anonymous" :subject "" :image ""}])
 
 (def example-item [{:id 1 :account_id 1 :image_id 19}])
+
+(defn- subtract-minutes [min time]
+  (let [instant (t/local-date-time time)]
+    (t/sql-timestamp (t/minus instant (t/minutes min)))))
+
+(defn- subtract-seconds [min time]
+  (let [instant (t/local-date-time time)]
+    (t/sql-timestamp (t/minus instant (t/seconds min)))))
 
 (deftest validate-post
   (testing "Valid original posts return nil (do not throw)"
@@ -41,10 +52,12 @@
              image-name "snot-pepe"
              not-enough-chars (assoc base-request :image image-name :comment too-short)
              too-many-chars (assoc base-request :image image-name :comment too-long)
-             no-image-provided (assoc base-request :image "" :comment valid-comment)]
+             no-image-provided (assoc base-request :image "" :comment valid-comment)
+             too-early (update basic-account :last_thread (partial subtract-minutes 3))]
         (is (thrown-with-msg? java.lang.Exception #"Comment is below 15 characters." (#'q.thread/validate-create-thread not-enough-chars)))
         (is (thrown-with-msg? java.lang.Exception #"Comment is above character limit 5001/5000." (#'q.thread/validate-create-thread too-many-chars)))
-        (is (thrown-with-msg? java.lang.Exception #"An image is required for posting threads. Try replying to a thread to collect pepes." (#'q.thread/validate-create-thread no-image-provided)))))
+        (is (thrown-with-msg? java.lang.Exception #"An image is required for posting threads. Try replying to a thread to collect pepes." (#'q.thread/validate-create-thread no-image-provided)))
+        (is (thrown-with-msg? java.lang.Exception #"Only 3 minutes have passed since your last thread. You must wait 5 minutes between creating new threads." (#'q.thread/validate-thread-time too-early)))))
   (testing "Valid original posts return nil (do not throw)"
     (let [post-comment "Lorem ipsum facto 15 char."
           image-name "snot-pepe"
@@ -58,6 +71,8 @@
        (let [too-long (apply str (repeat 5001 "a"))
              image-name "snot-pepe"
              too-many-chars (assoc base-request :image image-name :comment too-long)
-             blank-reply base-request]
+             blank-reply base-request
+             too-early (update basic-account :last_reply (partial subtract-seconds 30))]
         (is (thrown-with-msg? java.lang.Exception #"Comment is above character limit 5001/5000." (#'q.thread/validate-add-post too-many-chars)))
-        (is (thrown-with-msg? java.lang.Exception #"Either a non-empty comment or image is required for replies." (#'q.thread/validate-add-post blank-reply))))))
+        (is (thrown-with-msg? java.lang.Exception #"Either a non-empty comment or image is required for replies." (#'q.thread/validate-add-post blank-reply)))
+        (is (thrown-with-msg? java.lang.Exception #"Only 30 seconds have passed since your last reply. You must wait 60 seconds between replies." (#'q.thread/validate-reply-time too-early))))))

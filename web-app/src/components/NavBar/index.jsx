@@ -56,7 +56,10 @@ export function NavBar() {
         <AccountRoot>
           <HR width="50%"/>
           <AccountDetails/> 
-          <CenteredSubmitPost handleSubmit={handleSubmit} error={error}/>
+          <PostContainer>
+            <CenteredSubmitPost handleSubmit={handleSubmit}/>
+            <ErrorText>{error}</ErrorText>
+          </PostContainer>
         </AccountRoot> 
         } 
       <HR/>
@@ -64,11 +67,42 @@ export function NavBar() {
   )
 }
 
-const CenteredSubmitPost = styled(SubmitPost)`
+const PostContainer = styled.div`
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media all and (min-width: 1024px) and (max-width: 1280px) {
+    min-width: 40%;
+    max-width: 40%;
+  }
+  
+  @media all and (min-width: 768px) and (max-width: 1024px) { 
+    min-width: 40%;
+    max-width: 40%;
+  }
+  
+  @media all and (min-width: 480px) and (max-width: 768px) { 
+    min-width: 100%;
+    max-width: 100%;
+  }
+  
+  @media all and (max-width: 480px) { 
+    min-width: 100%;
+    max-width: 100%;
+  }
+`;
+
+const ErrorText = styled.p`
+  color: red;
   margin: 0 auto;
   width: fit-content;
 `;
 
+const CenteredSubmitPost = styled(SubmitPost)`
+  min-width: 100%;
+`;
 
 const NavRoot = styled.div`
   background-color: #eef2ff; 
