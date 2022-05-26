@@ -147,7 +147,7 @@
         (throw (Exception. "Couldn't find the image in your inventory."))))
     (update-thread! redis-conn thread-id updated-thread)
     (q.counter/increment-counter db-conn)
-    (q.account/update-last-post! db-conn account-id)
+    (q.account/update-last-reply! db-conn account-id)
     updated-thread))
 
 (defn delete-thread-by-id! [redis-conn thread-id]
