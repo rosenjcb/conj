@@ -20,9 +20,9 @@
    :columns [:email :pass]
    :values [[email pass]]})
 
-(defn- q-update-last-post [account-id]
+(defn- q-update-last-reply [account-id]
   {:update [:account]
-   :set {:last-post (t/sql-timestamp)}
+   :set {:last_reply (t/sql-timestamp)}
    :where [:= m.account/id account-id]})
 
 (defn- q-update-last-thread [account-id]
@@ -39,8 +39,8 @@
 (defn create-account! [db-conn account]
   (sql/execute-one! (db-conn) (sql.helper/format (q-add-account account))))
 
-(defn update-last-post! [db-conn account-id]
-  (sql/execute-one! (db-conn) (sql.helper/format (q-update-last-post account-id))))
+(defn update-last-reply! [db-conn account-id]
+  (sql/execute-one! (db-conn) (sql.helper/format (q-update-last-reply account-id))))
 
 (defn update-last-thread! [db-conn account-id]
   (sql/execute-one! (db-conn) (sql.helper/format (q-update-last-thread account-id))))
