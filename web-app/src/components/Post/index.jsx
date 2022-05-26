@@ -81,11 +81,11 @@ const Root = styled.div`
 
 const PostInfo = styled.div`
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-start;
     gap: 4px;
     flex-direction: row;
     align-items: center;
-     
 `;
 
 const PostContent = styled.div`
