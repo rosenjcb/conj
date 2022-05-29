@@ -1,6 +1,5 @@
 import React from 'react';
 import { Post } from '../Post'
-import * as _ from 'lodash';
 
 export function Thread(props) {
 

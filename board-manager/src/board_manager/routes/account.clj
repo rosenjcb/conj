@@ -4,11 +4,12 @@
    [board-manager.services.auth :as s.auth]
    [board-manager.services.item-generation :as item-generation.service]
    [board-manager.model.account :as m.account]
-   [clojure.tools.logging :as log]
-   [ring.util.response :as response]
-   [reitit.coercion.malli :as malli]
    [board-manager.query.accountinventory :as q.accountinventory]
-   [board-manager.middleware :as middleware]))
+   [board-manager.middleware :as middleware]
+   [clojure.tools.logging :as log]
+   [reitit.coercion.malli :as malli]
+   [ring.util.response :as response])
+  (:import [org.postgresql.util PSQLException]))
 
 (defn get-my-account! [req]
   (let [db-conn (get-in req [:components :db-conn])
@@ -34,12 +35,15 @@
 (defn create-account! [req]
   (let [auth-service (get-in req [:components :auth-service])
         item-gen-service (get-in req [:components :item-generation-service])
-        account-req (get-in req [:parameters :body])
-        account (s.auth/add-account! auth-service account-req)
-        account-id (m.account/id account)]
-    (dotimes [_ 3] (item-generation.service/draw-item! item-gen-service account-id))
-    (->> (:refresh-token account)
-         (set-cookies (response/status 200)))))
+        account-req (get-in req [:parameters :body])]
+    (try 
+      (let [account (s.auth/add-account! auth-service account-req)
+            account-id (m.account/id account)]  
+        (dotimes [_ 3] (item-generation.service/draw-item! item-gen-service account-id))
+        (->> (:refresh-token account)
+             (set-cookies (response/status 200))))
+      (catch PSQLException _
+        (response/bad-request "An account with that email already exists")))))
 
 (defn authenticate-account! [req]
   (let [auth-service (get-in req [:components :auth-service])
@@ -54,17 +58,39 @@
  (let [resp (response/status 200)] 
    (assoc resp :cookies {:access_token {:value nil} :refresh_token {:value nil}})))
 
+(defn- email? [email]
+  (let [re-email #"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"]
+    (and (string? email) (re-matches re-email email))))
+
+(defn- pass? [s]
+  (let [re-pass #"[A-Za-z\d@$!%*?&]{6,20}$"]
+    (some? (re-matches re-pass s))))
+
+(def ^:private email-schema 
+  [:email 
+   [:fn 
+    {:error/message "Email must be a valid address."}
+    email?]])
+
+(def ^:private pass-schema 
+  [:pass 
+   [:fn 
+    {:error/message "Password must be between 6 and 20 alphanumeric characters."}
+    pass?]])
+
 (def account-routes
   [["/accounts"
     {:post {:name ::create-account
             :summary "Creates a new account"
             :coercion malli/coercion
-            :parameters {:body [:map [:email string?] [:pass string?]]}
+            :parameters {:body [:map 
+                                email-schema 
+                                pass-schema]}
             :handler create-account!}}]
    ["/ping"
     {:get {:name ::ping
            ::summary "A testing endpoint that returns a simple message"
-           :handler (fn [req] (response/response "Ok"))}}]
+           :handler (constantly (response/response "Ok"))}}]
    ["/me"
     {:get {:name ::account-by-id
            :summary "Grab an account by id"
@@ -81,7 +107,7 @@
     {:post {:name ::authenticate-account
             :summary "Authenticates an existing account"
             :coercion malli/coercion
-            :parameters {:body [:map [:email string?] [:pass string?]]}
+            :parameters {:body [:map [:email string?] pass-schema]}
             :handler authenticate-account!}}]
    ["/logout"
     {:get {:name ::logout

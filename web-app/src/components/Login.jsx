@@ -4,6 +4,7 @@ import { Formik, Field} from 'formik';
 import { login, signup } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { ErrorText } from './index';
+import { parseError } from '../util/error';
 
 const InputField = (props) => {
   const { label, field, form, secret } = props;
@@ -34,7 +35,7 @@ export function Login() {
       history.push('/');
       history.go();
     } catch(e) {
-      setError("An account with that email already exists");
+      setError(parseError(e));
     }
   }
 
@@ -46,7 +47,7 @@ export function Login() {
       history.push('/')
       history.go();
     } catch(e) {
-      setError(e.response.data)
+      setError(parseError(e))
     }
   }
   
@@ -114,6 +115,24 @@ const Header = styled.div`
 const Root = styled.div`
   margin: 0 auto;
   background-color: ${props => props.theme.login.body.backgroundColor};
+  text-align: center;
+  width: 500px;
+
+  @media all and (min-width: 1024px) and (max-width: 1280px) { 
+    width: 500px;
+  }
+  
+  @media all and (min-width: 768px) and (max-width: 1024px) { 
+    width: 500px;
+  }
+  
+  @media all and (min-width: 480px) and (max-width: 768px) { 
+    width: 100%;
+  }
+  
+  @media all and (max-width: 480px) { 
+    width: 100%;
+  }
 `;
 
 const Label = styled.label`

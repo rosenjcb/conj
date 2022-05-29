@@ -32,4 +32,5 @@ export const RarityImage = styled.img`
 export const ErrorText = styled.p`
   color: red;
   margin: 0 auto;
+  word-wrap: break-word;
 `;
