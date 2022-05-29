@@ -57,7 +57,7 @@ export function NavBar() {
           <HR width="50%"/>
           <AccountDetails/> 
           <PostContainer>
-            <CenteredSubmitPost handleSubmit={handleSubmit}/>
+            <SubmitPost handleSubmit={handleSubmit}/>
             <ErrorText>{error}</ErrorText>
           </PostContainer>
         </AccountRoot> 
@@ -100,9 +100,9 @@ const ErrorText = styled.p`
   width: fit-content;
 `;
 
-const CenteredSubmitPost = styled(SubmitPost)`
-  min-width: 100%;
-`;
+// const CenteredSubmitPost = styled(SubmitPost)`
+//   min-width: 100%;
+// `;
 
 const NavRoot = styled.div`
   background-color: #eef2ff; 
