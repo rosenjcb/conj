@@ -45,7 +45,7 @@ export const Post = (props) => {
                         <input type="checkbox"/>
                         <Subject>{subject}</Subject>
                         <Name>{name}</Name>
-                        { post.time ? <p>{new Date(post.time).toLocaleTimeString(undefined, options)}</p> : null }
+                        { post.time ? <span>{new Date(post.time).toLocaleTimeString(undefined, options)}</span> : null }
                         <PostLink href={postHref} onClick={handleClick}>{` No.${id} `}</PostLink>
                         <PostMenuArrow/>
                     </PostInfo>
