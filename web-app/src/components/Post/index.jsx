@@ -31,7 +31,9 @@ export const Post = (props) => {
         }
     }
 
-    const postHref = opNo === id ? `thread/${opNo}` : `thread/${opNo}#${id}`;
+    const prefix = preview ? 'thread/' : ''
+
+    const postHref = opNo === id ? `${prefix}${opNo}` : `${prefix}${opNo}#${id}`;
 
     var options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
 
