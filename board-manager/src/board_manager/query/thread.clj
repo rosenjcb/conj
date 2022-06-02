@@ -11,6 +11,7 @@
    [board-manager.query.image :as q.image]
    [board-manager.model.accountinventory :as m.accountinventory]
    [clojure.tools.logging :as log]
+   [clj-time :as t]
    [java-time :as t]))
 
 
@@ -105,7 +106,7 @@
         image-id (m.image/id image)
         item (q.accountinventory/get-item-from-inventory-by-account-id&image-id db-conn account-id image-id)
         item-id (m.accountinventory/id item)
-        enriched-thread (vector (assoc op :image (into {} image)))]
+        enriched-thread (vector (assoc op :image (into {} image) :time (t/zoned-date-time)))]
     (if (some? item) 
       (do
         (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
@@ -139,7 +140,7 @@
         item (q.accountinventory/get-item-from-inventory-by-account-id&image-id db-conn account-id image-id)
         item-id (m.accountinventory/id item)
         old-thread (find-thread-by-id! redis-conn thread-id)
-        enriched-post (assoc post :image (dissoc image :id))
+        enriched-post (assoc post :image (dissoc image :id) :time (t/zoned-date-time))
         updated-thread (m.thread/add-post enriched-post old-thread)]
     (when (not-empty? image-name)
       (if item-id

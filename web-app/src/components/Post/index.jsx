@@ -33,6 +33,8 @@ export const Post = (props) => {
 
     const postHref = opNo === id ? `thread/${opNo}` : `thread/${opNo}#${id}`;
 
+    var options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
+
     return (
         <div ref={handleRef}>
             {!isOriginalPost ? <SideArrow/> : null }
@@ -43,6 +45,7 @@ export const Post = (props) => {
                         <input type="checkbox"/>
                         <Subject>{subject}</Subject>
                         <Name>{name}</Name>
+                        { post.time ? <p>{new Date(post.time).toLocaleTimeString(undefined, options)}</p> : null }
                         <PostLink href={postHref} onClick={handleClick}>{` No.${id} `}</PostLink>
                         <PostMenuArrow/>
                     </PostInfo>
