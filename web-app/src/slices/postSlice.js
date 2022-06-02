@@ -9,8 +9,7 @@ export const postSlice = createSlice({
   initialState,
   reducers: {
     insertPostLink: (state, action) => {
-      const potentialSpacing = state.content === "" ? "" : "\n"
-      return {...state, content: state.content + potentialSpacing + ">>" + action.payload}
+      return {...state, content: state.content + ">>" + action.payload + "\n"}
     },
     updateText: (state, action) => {
       state.content = action.payload; 

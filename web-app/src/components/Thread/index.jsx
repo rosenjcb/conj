@@ -18,7 +18,7 @@ export function Thread(props) {
   return(
     <div>
       { thread && thread.length > 0 && threadRef && threadRef.current
-          ? thread.map((post, index) => <Post preview={false} highlight={hashedIndex === index} handleRef={(el) => threadRef.current[index] = el} opNo={op.id} key={post.id} post={post}/>) 
+          ? thread.map((post, index) => <Post preview={preview} highlight={hashedIndex === index} handleRef={(el) => threadRef.current[index] = el} opNo={op.id} key={post.id} post={post}/>) 
           : null }
     </div>
   )

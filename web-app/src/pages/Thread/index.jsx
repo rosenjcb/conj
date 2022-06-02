@@ -40,7 +40,7 @@ export function ThreadPage() {
 
   return(
     <Root>
-      <Thread hashedIndex={hashedIndex} threadRef={threadRef} thread={thread.current}/>
+      <Thread hashedIndex={hashedIndex} threadRef={threadRef} preview={false} thread={thread.current}/>
     </Root>
   )
 }

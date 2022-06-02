@@ -20,20 +20,18 @@ export const Post = (props) => {
 
     const { name, subject, id, comment, image } = post;
 
-    const history = useHistory();
-
     const isOriginalPost = opNo === id;
 
     const dispatch = useDispatch();
 
-    const handleClick = (_) => {
-        if(preview && isOriginalPost) {
-          history.push(`/thread/${opNo}`);
-          history.go();
-        } else {
-          dispatch(insertPostLink(id));
+    const handleClick = (e) => {
+        if(!preview) {
+            e.preventDefault();
+            dispatch(insertPostLink(id));
         }
     }
+
+    const postHref = opNo === id ? `thread/${opNo}` : `thread/${opNo}#${id}`;
 
     return (
         <div ref={handleRef}>
@@ -45,8 +43,7 @@ export const Post = (props) => {
                         <input type="checkbox"/>
                         <Subject>{subject}</Subject>
                         <Name>{name}</Name>
-                        {/* {isOriginalPost ? <PostLink href={`/thread/${id}`}>{` No.${id} `}</PostLink> : ` No.${id} `} */}
-                        <PostLink onClick={handleClick}>{` No.${id} `}</PostLink>
+                        <PostLink href={postHref} onClick={handleClick}>{` No.${id} `}</PostLink>
                         <PostMenuArrow/>
                     </PostInfo>
                     {!isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
