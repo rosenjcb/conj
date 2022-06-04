@@ -9,6 +9,10 @@ import { parseError } from '../util/error';
 const InputField = (props) => {
   const { label, field, form, secret } = props;
 
+  const type = props.type ?? 'text';
+
+  const autocomplete = props.autocomplete ?? 'false';
+
   const handleChange = (e) => {
     e.preventDefault();
     form.setFieldValue(field.name, e.target.value);
@@ -17,7 +21,7 @@ const InputField = (props) => {
   return (
     <InputFieldRoot>
       <Label>{label}</Label>
-      <TextField secret={secret} type="text" placeholder={props.placeholder} onChange={handleChange}/>
+      <TextField type={type} name={type} autocomplete={autocomplete} secret={secret} placeholder={props.placeholder} onChange={handleChange}/>
     </InputFieldRoot>
   )
 }
@@ -64,8 +68,8 @@ export function Login() {
         {(props) => (
           <StyledForm onSubmit={props.handleSubmit}>
             <h1>Welcome to Pepechan!</h1>
-            <Field label="Email" name="email" placeholder="user@domain.com" component={InputField}/>
-            <Field label="Password" name="pass" secret={true} component={InputField}/>
+            <Field label="Email" type="email" autocomplete="email" name="email" placeholder="user@domain.com" component={InputField}/>
+            <Field label="Password" type="password" autocomplete="current-password" name="pass" secret={true} component={InputField}/>
             <SubmitOptions>
               <button type="submit">Login</button> 
               <button type="button" onClick={() => handleSignup(props.values)}>Signup</button> 
