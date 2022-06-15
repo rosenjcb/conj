@@ -1,4 +1,4 @@
-import React, { } from 'react';
+import React, { useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Helmet from 'react-helmet';
@@ -7,6 +7,7 @@ import { ModalProvider } from 'styled-react-modal';
 import { useSelector } from 'react-redux';
 import { NavBar } from './components/NavBar';
 import { Home } from './pages/Home'
+import { QuickReply } from './components/Reply';
 import { AboutPage } from './pages/About';
 
 export const theme = {
@@ -67,6 +68,8 @@ const WithNavBar = (props) => {
 function App() {
   const thread = useSelector(state => state.thread);
 
+  const hideQuickReply = useSelector(state => state.post).hidden;
+
   return (
     <ThemeProvider theme={theme}>    
     <ModalProvider>
@@ -74,7 +77,9 @@ function App() {
         <Helmet>
           <title>/b/ - Random</title>
         </Helmet>
+        {/* {!hideQuickReply ? <QuickReply/> : null } */}
         <Router forceRefresh>
+          <QuickReply/>
           <Switch>
             <Route exact path="/">
               <WithNavBar component={<Home/>}/>
@@ -104,4 +109,5 @@ const AppRoot = styled.div`
   padding-left: 5px;
   padding-right: 5px;
 `;
+
 export default App;

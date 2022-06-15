@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { SubmitPost } from '../../components/SubmitPost';
+import { Reply } from '../Reply';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { HR } from '../index';
@@ -29,10 +29,11 @@ export function NavBar() {
   },[])
 
   const handleSubmit = async(post) => {
-    console.log(post);
     setError(null);
     try {
-      const res = await upsertThread(post, location.pathname);
+      const slugs  = location.pathname.split('/');
+      const threadNo = slugs[2];
+      const res = await upsertThread(post, threadNo);
       const thread = res.data;
       const newThread = thread.length === 1;
       dispatch(swapThread(thread))
@@ -40,8 +41,10 @@ export function NavBar() {
         history.push(`/thread/${res.data[0].id}`);
         history.go()
       }
+      return true;
     } catch (error) {
       setError(error.response.data);
+      return false;
     }
   }
 
@@ -57,7 +60,7 @@ export function NavBar() {
           <HR width="50%"/>
           <AccountDetails/> 
           <PostContainer>
-            <SubmitPost handleSubmit={handleSubmit}/>
+            <Reply handleSubmit={handleSubmit}/>
             <ErrorText>{error}</ErrorText>
           </PostContainer>
         </AccountRoot> 

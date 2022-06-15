@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { RarityImage } from '../index';
 import { processPostText } from '../../util/post';
 import { useDispatch } from 'react-redux';
-import { insertPostLink } from '../../slices/postSlice';
+import { insertPostLink, openQuickReply } from '../../slices/postSlice';
 import { useHistory } from 'react-router-dom';
 
 const Thumbnail = ({rarity, location}) => {
@@ -25,17 +25,16 @@ export const Post = (props) => {
     const dispatch = useDispatch();
 
     const handleClick = (e) => {
-        if(!preview) {
-            e.preventDefault();
-            dispatch(insertPostLink(id));
-        }
+        e.preventDefault();
+        dispatch(insertPostLink(id));
+        dispatch(openQuickReply(opNo));
     }
 
-    const prefix = preview ? 'thread/' : ''
+    const prefix = preview ? '/thread/' : ''
 
     const postHref = opNo === id ? `${prefix}${opNo}` : `${prefix}${opNo}#${id}`;
 
-    var options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
+    const options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
 
     return (
         <div ref={handleRef}>
@@ -49,6 +48,7 @@ export const Post = (props) => {
                         <Name>{name}</Name>
                         { post.time ? <span>{new Date(post.time).toLocaleTimeString(undefined, options)}</span> : null }
                         <PostLink href={postHref} onClick={handleClick}>{` No.${id} `}</PostLink>
+                        { isOriginalPost ? <span>[<ThreadLink href={`/thread/${opNo}`}>Reply</ThreadLink>]</span> : null } 
                         <PostMenuArrow/>
                     </PostInfo>
                     {!isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
@@ -80,6 +80,12 @@ const Root = styled.div`
     margin-bottom: 4px;
     padding: 2px;
 `;
+
+const ThreadLink = styled.a`
+    &:hover {
+        color: red;
+    }
+`
 
 const PostInfo = styled.div`
     display: flex;
@@ -132,13 +138,14 @@ const SideArrowRoot = styled.div`
     margin-right: 2px;
     margin-top: 0;
     margin-left: 2px;
-    font-family: ${props => props.theme.fontFamily };
+    font-family: ${props => props.theme.fontFamily};
     font-size: ${props => props.theme.fontSize};
-`
+`;
+
 const NoOverflowBlockQuote = styled.blockquote`
     max-width: calc(100vw - 2em - 80px);
     overflow: hidden;
-`
+`;
 
 const PostMenuArrow = () => <ArrowRoot>▶</ArrowRoot>;
 

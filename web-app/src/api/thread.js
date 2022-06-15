@@ -7,9 +7,7 @@ export const createThread = (post) => axios.post('/threads', post);
 
 export const fetchThreads = () => axios.get('/threads');
 
-export const upsertThread = (post, path) => {
-  const slugs  = path.split('/');
-  const id = slugs[2];
-  return slugs.length === 3 ? axios.put(`/threads/${id}`, post) : axios.post('/threads', post);
+export const upsertThread = (post, opNo) => {
+  return opNo ? axios.put(`/threads/${opNo}`, post) : axios.post('/threads', post);
 }
 
