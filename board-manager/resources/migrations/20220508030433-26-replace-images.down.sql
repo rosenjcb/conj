@@ -1,3 +1,3 @@
-DELETE from accountinventory;
---;;
-DELETE from image;
+-- DELETE from accountinventory;
+-- --;;
+-- DELETE from image;

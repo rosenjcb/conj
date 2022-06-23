@@ -28,14 +28,6 @@
             [migratus-lein "0.7.3"]]
   :main board-manager.handler
   :repl-options {:host "0.0.0.0"}
-  ;; :migratus {:store :database
-  ;;             :migration-dir "migrations"
-  ;;             :db "postgres://pepechan-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com:5432/postgres?user=postgres&password=Frameshare8*8"}
-            ;;   :db {:classname "org.postgresql"
-            ;;         :subprotocol "postgres"
-            ;;         :subname "//localhost/postgres"
-            ;;         :user "admin"
-            ;;         :password "pass"}}
   :source-paths ["src" "config"]
   :profiles
   {:local {:dependencies [[javax.servlet/servlet-api "2.5"]
