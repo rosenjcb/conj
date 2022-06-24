@@ -4,16 +4,15 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Helmet from 'react-helmet';
 import { ThreadPage } from './pages/Thread';
 import { ModalProvider } from 'styled-react-modal';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { NavBar } from './components/NavBar';
 import { Home } from './pages/Home'
-import { QuickReply } from './components/Reply';
+import { Reply } from './components/Reply';
 import { AboutPage } from './pages/About';
 import { FiMenu } from "react-icons/fi";
 import { BiMessageDetail } from 'react-icons/bi';
 import { BsFillReplyFill } from 'react-icons/bs';
-
-
+import { openQuickReply } from './slices/postSlice';
 import * as chroma from 'chroma-js';
 
 export const newTheme = {
@@ -99,7 +98,6 @@ const Board = () => {
   return(
     <BoardRoot>
       { !isMobile ? <BoardDrawer/> : null }
-      <BoardDrawer/>
       <Page>
         <HomeNavBar>
           <HamburgerMenu/>
@@ -107,11 +105,36 @@ const Board = () => {
           <GreyText>|</GreyText>
           <Header>Make fun posts here!</Header>
         </HomeNavBar>
-        <ThreadPreview/>
+        <Body>
+          <StyledReply/>
+          <ThreadPreview/>
+        </Body>
       </Page>
     </BoardRoot>
   )
 }
+
+
+const StyledReply = styled(Reply)`
+  border-radius: 8px;
+  padding: 2rem;
+  padding-right: 10%;
+  padding-left: 10%;
+  width: 80%;
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Body = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-stat;
+  flex-direction: column;
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
+`
 
 const Post = () => {
 
@@ -120,7 +143,7 @@ const Post = () => {
   const dispatch = useDispatch();
 
   const handleClick = () => {
-    dispatch(toggleQuickReply());
+    dispatch(openQuickReply());
   };
 
   const toggleFullScreen = () => {
@@ -153,7 +176,6 @@ const Post = () => {
         <Header>This is an Example Title</Header>
         <ActionsContainer>
           <WithText component={<MessageDetail/>} direction="row" text="10"/>
-          <Reply onClick={handleClick}/>
         </ActionsContainer>
       </HeaderRoot>
     </PostRoot>
@@ -191,7 +213,7 @@ const WithTextRoot = styled.div`
   flex-direction: ${props => props.direction ?? "row"};
 `;
 
-const Reply = styled(BsFillReplyFill)`
+const ReplyIcon = styled(BsFillReplyFill)`
   color: white;
   width: 48px;
   height: 48px;
@@ -261,7 +283,7 @@ const Page = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  width: 70%;
+  width: 30%;
 `;
 
 const ThreadPreviewRoot = styled.ul`
@@ -269,7 +291,6 @@ const ThreadPreviewRoot = styled.ul`
   height: calc(100vh - 96px);
   padding: 1.5rem;
   margin: 0;
-  background-color: ${props => props.theme.newTheme.colors.primary};
 `
 
 const HamburgerMenu = styled(FiMenu)`
@@ -474,7 +495,7 @@ function App() {
         </Helmet>
         {/* {!hideQuickReply ? <QuickReply/> : null } */}
         <Router forceRefresh>
-          <QuickReply/>
+          {/* <QuickReply/> */}
           <Switch>
             <Route exact path="/">
               <WithNavBar component={<Home/>}/>

@@ -4,13 +4,16 @@ import Modal from 'styled-react-modal';
 import { useImages } from '../../hooks/useImages';
 import { Formik, Form, Field } from 'formik';
 import * as _ from 'lodash';
-import { BoldTitle, RarityImage } from '../index';
+import { BoldTitle, RarityImage, RoundButton, RoundImage } from '../index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost, closeQuickReply } from '../../slices/postSlice';
 import { swapThread } from '../../slices/threadSlice';
 import Draggable from 'react-draggable';
 import { upsertThread } from '../../api/thread';
+import chroma from 'chroma-js';
+import { BiImageAdd } from 'react-icons/bi';
+import { AiFillDelete } from 'react-icons/ai';
 
 const SubmitField = (props) => {
   const { title, input, isSubmit, isSeparateLabel } = props;
@@ -59,80 +62,158 @@ export const Reply = (props) => {
       onSubmit={submitPost}>
         {(props) => (
           <Form className={className}>
-            <SubmitField title={"Name"} isSeparateLabel={true} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
+            <CommentBody name="subject" as="textarea" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
+            {post.image ? <PreviewImage src={post.image}/> : null}
+            {/* <SubmitField title={"Name"} isSeparateLabel={true} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
             <SubmitField title={"Subject"} isSeparateLabel={true} input={<FieldInput name="subject" as="input" placeholder="Subject" value={post.subject} onChange={(e) => handleChange(props.handleChange, e, 'subject')}/>} isSubmit/>
             <SubmitField title={"Comment"} isSeparateLabel={true} input={<FieldInput name="comment" as="textarea" value={post.comment} placeholder="Comment" onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>}/>
-            <SubmitField title={"Image"} isSeparateLabel={true} input={<ImagePicker images={images} key={randomString} value={post.image} handleChange={(e) => handleChange(props.handleChange, e, 'image')}/>}/>
+            <SubmitField title={"Image"} isSeparateLabel={true} input={<ImagePicker images={images} key={randomString} value={post.image} handleChange={(e) => handleChange(props.handleChange, e, 'image')}/>}/>  */}
+            <ActionsContainer>
+              <UploadImage/>
+              <RoundButton>Post</RoundButton>
+            </ActionsContainer>
           </Form>
         )}
       </Formik>
   )
 }
 
-export const QuickReply = (props) => {
-  let randomString = Math.random().toString(36);
+const PreviewImage = ({src}) => {
 
-  const { className } = props;
-
-  const post = useSelector(state => state.post);
-  
   const dispatch = useDispatch();
 
-  const history = useHistory();
+  const handleClick = () => {
+    dispatch(updateEntry({key: "image", value: null}));
+  };
 
-  const [error, setError] = useState(null);
-
-  const { images } = useImages();
-
-  const handleChange = (formikHandler, e, key) => {
-    formikHandler(e);
-    dispatch(updateEntry({key: key, value: e.target.value}));
-  }
-
-  const submitPost = async(values, actions) => {
-    setError(null);
-    try {
-      const res = await upsertThread(post, post.threadNo);
-      const thread = res.data;
-      dispatch(swapThread(thread));
-      dispatch(closeQuickReply());
-      dispatch(resetPost());
-      history.push(`/thread/${res.data[0].id}`);
-      history.go()
-    } catch (error) {
-      setError(error.response.data);
-    }
-  }
-
-  const handleClose = (e) => {
-    e.preventDefault();
-    dispatch(closeQuickReply());
-  }
-
-  return(
-    <Draggable bounds="parent">
-    <QuickReplyRoot hidden={post.hidden}>
-    <Formik
-      initialValues={post}
-      onSubmit={submitPost}>
-        {(props) => (
-          <Form className={className}>
-            <QuickReplySubject>
-              {`Reply To Thread No. ${post.threadNo}`}
-              <CloseButton onClick={handleClose}/>
-            </QuickReplySubject>
-            <SubmitField title={"Name"} isSeparateLabel={false} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
-            <SubmitField title={"Subject"} isSeparateLabel={false} input={<FieldInput name="subject" as="input" placeholder="Subject" value={post.subject} onChange={(e) => handleChange(props.handleChange, e, 'subject')}/>}/>
-            <SubmitField title={"Comment"} isSeparateLabel={false} input={<FieldInput name="comment" as="textarea" placeholder="Comment" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>}/>
-            <SubmitField title={"Image"} isSeparateLabel={false} isSubmit input={<ImagePicker images={images} key={randomString} value={post.image} handleChange={(e) => handleChange(props.handleChange, e, 'image')}/>}/>
-            <ErrorDetails>{error}</ErrorDetails>
-          </Form>
-        )}
-    </Formik>
-    </QuickReplyRoot>
-    </Draggable>
+  return (
+    <PreviewImageRoot>
+      <IconContainer><DeleteIcon onClick={handleClick}/></IconContainer>
+      <RoundImage src={src}/>
+    </PreviewImageRoot>
   )
 }
+
+const PreviewImageRoot = styled.div`
+  display: inline-block;
+  position: relative;
+`;
+
+const IconContainer = styled.div`
+  position: absolute; 
+  top: -10px;
+  left: -10px;
+  width: fit-content;
+  margin: 0;
+  padding: 0;
+`
+
+const DeleteIcon = styled(AiFillDelete)`
+  width: 24px;
+  height: 24px;
+  color: ${props => props.theme.newTheme.colors.white};
+`;
+
+export const UploadImageIcon = styled(BiImageAdd)`
+  color: white;
+  width: 3rem;
+  height: 3rem;
+`;
+
+const UploadImage = () => {
+
+  const dispatch = useDispatch();
+
+  const handlePick = (e) => {
+    dispatch(updateEntry({key: 'image', value: URL.createObjectURL(e.target.files[0])}));
+  }
+
+  return (
+    <label for="file-input">
+      <UploadImageIcon/>
+      <UploadImageInput id="file-input" onChange={handlePick}/>
+    </label>
+  )
+}
+
+const UploadImageInput = styled.input.attrs(props => ({type: "file"}))`
+  display: none;
+  color: transparent;
+`;
+
+const ActionsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  width: 100%;
+  margin: 0 auto;
+  align-items: center;
+`;
+
+// export const QuickReply = (props) => {
+//   let randomString = Math.random().toString(36);
+
+//   const { className } = props;
+
+//   const post = useSelector(state => state.post);
+  
+//   const dispatch = useDispatch();
+
+//   const history = useHistory();
+
+//   const [error, setError] = useState(null);
+
+//   const { images } = useImages();
+
+//   const handleChange = (formikHandler, e, key) => {
+//     formikHandler(e);
+//     dispatch(updateEntry({key: key, value: e.target.value}));
+//   }
+
+//   const submitPost = async(values, actions) => {
+//     setError(null);
+//     try {
+//       const res = await upsertThread(post, post.threadNo);
+//       const thread = res.data;
+//       dispatch(swapThread(thread));
+//       dispatch(closeQuickReply());
+//       dispatch(resetPost());
+//       history.push(`/thread/${res.data[0].id}`);
+//       history.go()
+//     } catch (error) {
+//       setError(error.response.data);
+//     }
+//   }
+
+//   const handleClose = (e) => {
+//     e.preventDefault();
+//     dispatch(closeQuickReply());
+//   }
+
+//   return(
+//     <Draggable bounds="parent">
+//     <QuickReplyRoot hidden={post.hidden}>
+//     <Formik
+//       initialValues={post}
+//       onSubmit={submitPost}>
+//         {(props) => (
+//           <Form className={className}>
+//             <QuickReplySubject>
+//               {`Reply To Thread No. ${post.threadNo}`}
+//               <CloseButton onClick={handleClose}/>
+//             </QuickReplySubject>
+//             <SubmitField title={"Name"} isSeparateLabel={false} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
+//             <SubmitField title={"Subject"} isSeparateLabel={false} input={<FieldInput name="subject" as="input" placeholder="Subject" value={post.subject} onChange={(e) => handleChange(props.handleChange, e, 'subject')}/>}/>
+//             <SubmitField title={"Comment"} isSeparateLabel={false} input={<FieldInput name="comment" as="textarea" placeholder="Comment" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>}/>
+//             <SubmitField title={"Image"} isSeparateLabel={false} isSubmit input={<ImagePicker images={images} key={randomString} value={post.image} handleChange={(e) => handleChange(props.handleChange, e, 'image')}/>}/>
+//             <ErrorDetails>{error}</ErrorDetails>
+//           </Form>
+//         )}
+//     </Formik>
+//     </QuickReplyRoot>
+//     </Draggable>
+//   )
+// }
 
 const sortImages = (images) => {
   const compare = (a, b) => {
@@ -275,6 +356,24 @@ const FieldInput = styled(Field)`
     }
 `;
 
+const CommentBody = styled(Field).attrs(props => ({type: "textarea"}))`
+  color: ${props => props.theme.newTheme.colors.white};
+  font-size: 1.5rem;
+  background-color: inherit;
+  resize: none;
+  appearance: none;
+  margin: 0;
+  width: 100%;
+  height: 4rem;
+  padding: 0;
+  outline: none;
+  border: none;
+
+  ::placeholder {
+    color: ${props => props.theme.newTheme.colors.white};
+  }
+`
+
 const FieldFilePicker = styled.div`
   margin: 0;
   width: 292px;
@@ -345,13 +444,12 @@ const CloseButton = styled.button`
 `;
 
 const QuickReplyRoot = styled.div`
-  min-height: 125px;
-  min-width: 335px;
-  max-width: 125px;
-  max-height: 335px;
-  left: calc(50% - 125px);
-  bottom: calc(50% - 165px);
-  background-color: ${props => props.theme.post.border};
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighter().hex()};
+  border-radius: 8px;
+  width: 30%;
+  height: 45%; 
+  left: calc(50% - 30%);
+  bottom: calc(50% - 45%);
   position: absolute;
   z-index: 1;
 
