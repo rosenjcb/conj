@@ -1,162 +1,320 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components';
-import { RarityImage } from '../index';
+import { Text, ErrorText, Avatar } from '../index';
 import { processPostText } from '../../util/post';
 import { useDispatch } from 'react-redux';
 import { insertPostLink, openQuickReply } from '../../slices/postSlice';
 import { useHistory } from 'react-router-dom';
+import chroma from 'chroma-js';
+import { BiMessageDetail } from 'react-icons/bi'; 
 
-const Thumbnail = ({rarity, location}) => {
-    return(
-        <ThumbnailLink>
-            { location ? <RarityImage alt="" src={location} rarity={rarity} width={150} height={150}/> : null }
-        </ThumbnailLink>
-    )
-};
+// const Thumbnail = ({rarity, location}) => {
+//     return(
+//         <ThumbnailLink>
+//             { location ? <RarityImage alt="" src={location} rarity={rarity} width={150} height={150}/> : null }
+//         </ThumbnailLink>
+//     )
+// };
+const WithText = ({direction, component, text}) => {
+  return (
+    <WithTextRoot direction={direction}>
+      {component} 
+      <Header>{text}</Header>
+    </WithTextRoot>
+  )
+}
 
 export const Post = (props) => {
+    
+  const [fullScreen, setFullScreen] = useState(false);
 
-    const { post, opNo, handleRef, highlight, preview } = props;
+  const dispatch = useDispatch();
 
-    const { name, subject, id, comment, image } = post;
+  const toggleFullScreen = () => {
+    setFullScreen(!fullScreen);
+  }
 
-    const isOriginalPost = opNo === id;
+  const { post, opNo, handleRef, highlight, preview } = props;
 
-    const dispatch = useDispatch();
+  // const { name, subject, id, comment, image } = post;
 
-    const handleClick = (e) => {
-        e.preventDefault();
-        dispatch(insertPostLink(id));
-        dispatch(openQuickReply(opNo));
-    }
+  // const isOriginalPost = opNo === id;
 
-    const prefix = preview ? '/thread/' : ''
+  const handleClick = (e) => {
+      e.preventDefault();
+      dispatch(insertPostLink("1234"));
+      // dispatch(openQuickReply(opNo));
+  }
 
-    const postHref = opNo === id ? `${prefix}${opNo}` : `${prefix}${opNo}#${id}`;
+  const prefix = preview ? '/thread/' : ''
 
-    const options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
+  // const postHref = opNo === id ? `${prefix}${opNo}` : `${prefix}${opNo}#${id}`;
 
-    return (
-        <div ref={handleRef}>
-            {!isOriginalPost ? <SideArrow/> : null }
-            <Root isOriginalPost={isOriginalPost} highlight={highlight}>
-                <PostContent>
-                    {isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
-                    <PostInfo>
-                        <input type="checkbox"/>
-                        <Subject>{subject}</Subject>
-                        <Name>{name}</Name>
-                        { post.time ? <span>{new Date(post.time).toLocaleTimeString(undefined, options)}</span> : null }
-                        <PostLink href={postHref} onClick={handleClick}>{` No.${id} `}</PostLink>
-                        { isOriginalPost ? <span>[<ThreadLink href={`/thread/${opNo}`}>Reply</ThreadLink>]</span> : null } 
-                        <PostMenuArrow/>
-                    </PostInfo>
-                    {!isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
-                    <NoOverflowBlockQuote>{processPostText(opNo, comment)}</NoOverflowBlockQuote>
-                </PostContent>
-            </Root>
-        </div>
-    );
+  const options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
+
+  return(
+    <PostRoot ref={handleRef}>
+      <ContentRoot>
+        <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src="https://media.springernature.com/relative-r300-703_m1050/springer-static/image/art%3A10.1038%2F528452a/MediaObjects/41586_2015_Article_BF528452a_Figg_HTML.jpg"/>
+        <Text align="left">
+          <ErrorText>Hello World</ErrorText> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+          Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        </Text>
+      </ContentRoot>
+      <HeaderRoot>
+        <UserInfo>
+          <Avatar src="/pepe_icon.jpg"/>
+          <TextContainer>
+            <Text>HelloWorld34</Text>
+            <Link href={""} onClick={handleClick}>#1234</Link>
+            <Text>8:52pm</Text>
+          </TextContainer>
+        </UserInfo>
+        <ActionsContainer>
+          <WithText component={<MessageDetail/>} direction="row" text="10"/>
+        </ActionsContainer>
+      </HeaderRoot>
+    </PostRoot>
+  )
 }
 
-const postColor = (styleProps) => {
-    if(styleProps.isOriginalPost) return "inherit";
-    if(styleProps.highlight) {
-        return styleProps.theme.post.selected;
-    } else {
-        return styleProps.theme.post.border;
-    }
-}
-
-const Root = styled.div`
-    background-color: ${props => postColor(props)};
-    border: 1px solid ${props => props.isOriginalPost ? "none" : props.theme.post.border};
-    font-size: ${props => props.theme.post.fontSize};
-    font-family: ${props => props.theme.post.fontFamily};
-    border-left: none;
-    border-top: none;
-    display: ${props => props.isOriginalPost ? "block" : "table"};
-    margin-top: 2px;
-    margin-bottom: 4px;
-    padding: 2px;
+const WithTextRoot = styled.div`
+  display: flex;
+  flex-direction: ${props => props.direction ?? "row"};
 `;
 
-const ThreadLink = styled.a`
-    &:hover {
-        color: red;
-    }
+const MessageDetail = styled(BiMessageDetail)`
+  color: white;
+  width: 48px;
+  height: 48px;
+`;
+
+const TextContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+`
+const UserInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+`;
+
+const Image = styled.img`
+  aspect-ratio: 16 / 9;
+  width: fit-content;
+  max-width: ${props => !props.fullScreen ? "200px;" : "100%"};
+  max-height: ${props => !props.fullScreen ? "112px;" : "100%"};
+  border-radius: 8px;
+  margin-right: 10px;
+  float: left;
+`;
+
+const Header = styled.h1`
+  text-align: ${props => props.align ?? "center"};
+  color: ${props => props.theme.newTheme.colors.white};
+  font-size: 1.5em;
+  padding: 0;
+  margin: 0;
+`;
+
+const HeaderRoot = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  border-radius: 8px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1).hex()};
+`;
+
+const ContentRoot = styled.div`
+  display: block;
+  width: 100%;
+`;
+
+const PostRoot = styled.li`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  flex-flow: wrap;
+  align-items: center;
+  width: 100%;
+  padding-top: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
+  border-bottom-radius: 4px;
+  gap: 10px;
+`;
+
+const Link = styled.a`
+  color: white;
+
+  &:hover {
+      color: ${props => props.theme.newTheme.colors.primary};
+  }
 `
 
-const PostInfo = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    gap: 4px;
-    flex-direction: row;
-    align-items: center;
+// export const Post = (props) => {
+
+//     const { post, opNo, handleRef, highlight, preview } = props;
+
+//     const { name, subject, id, comment, image } = post;
+
+//     const isOriginalPost = opNo === id;
+
+//     const dispatch = useDispatch();
+
+//     const handleClick = (e) => {
+//         e.preventDefault();
+//         dispatch(insertPostLink(id));
+//         dispatch(openQuickReply(opNo));
+//     }
+
+//     const prefix = preview ? '/thread/' : ''
+
+//     const postHref = opNo === id ? `${prefix}${opNo}` : `${prefix}${opNo}#${id}`;
+
+//     const options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
+
+//     return (
+//         <div ref={handleRef}>
+//             {!isOriginalPost ? <SideArrow/> : null }
+//             <Root isOriginalPost={isOriginalPost} highlight={highlight}>
+//                 <PostContent>
+//                     {isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
+//                     <PostInfo>
+//                         <input type="checkbox"/>
+//                         <Subject>{subject}</Subject>
+//                         <Name>{name}</Name>
+//                         { post.time ? <span>{new Date(post.time).toLocaleTimeString(undefined, options)}</span> : null }
+//                         <PostLink href={postHref} onClick={handleClick}>{` No.${id} `}</PostLink>
+//                         { isOriginalPost ? <span>[<ThreadLink href={`/thread/${opNo}`}>Reply</ThreadLink>]</span> : null } 
+//                         <PostMenuArrow/>
+//                     </PostInfo>
+//                     {!isOriginalPost ? <Thumbnail rarity={image.rarity} location={image.location}/> : null}
+//                     <NoOverflowBlockQuote>{processPostText(opNo, comment)}</NoOverflowBlockQuote>
+//                 </PostContent>
+//             </Root>
+//         </div>
+//     );
+// }
+
+// const postColor = (styleProps) => {
+//     if(styleProps.isOriginalPost) return "inherit";
+//     if(styleProps.highlight) {
+//         return styleProps.theme.post.selected;
+//     } else {
+//         return styleProps.theme.post.border;
+//     }
+// }
+
+// const Root = styled.div`
+//     background-color: ${props => postColor(props)};
+//     border: 1px solid ${props => props.isOriginalPost ? "none" : props.theme.post.border};
+//     font-size: ${props => props.theme.post.fontSize};
+//     font-family: ${props => props.theme.post.fontFamily};
+//     border-left: none;
+//     border-top: none;
+//     display: ${props => props.isOriginalPost ? "block" : "table"};
+//     margin-top: 2px;
+//     margin-bottom: 4px;
+//     padding: 2px;
+// `;
+
+// const ThreadLink = styled.a`
+//     &:hover {
+//         color: red;
+//     }
+// `
+
+// const PostInfo = styled.div`
+//     display: flex;
+//     flex-wrap: wrap;
+//     justify-content: flex-start;
+//     gap: 4px;
+//     flex-direction: row;
+//     align-items: center;
+// `;
+
+// const PostContent = styled.div`
+//     display: block;
+//     align-items: center;
+// `;
+
+// const ThumbnailLink = styled.a`
+//     float: left;
+//     margin-left: 20px;
+//     margin-right: 20px;
+//     margin-top: 3px;
+//     margin-bottom: 5px;
+// `;
+
+// const Name = styled.span`
+//     font-weight: 700;
+//     color: ${props => props.theme.post.name.color};
+// `;
+
+// const Subject = styled.span`
+//     color: ${props => props.theme.post.subject.color};
+//     font-weight: 700;
+// `;
+
+// const ArrowRoot = styled.span`
+//     margin-left: 5px;
+//     text-decoration: none;
+//     line-height: 1em;
+//     display: inline-block;
+//     width: 1em;
+//     height: 1em;
+//     text-align: center;
+//     outline: none;
+//     opacity: 0.8;
+//     color: #34345c;
+// `;
+
+// const SideArrowRoot = styled.div`
+//     color: #b7c5d9;
+//     float: left;
+//     margin-right: 2px;
+//     margin-top: 0;
+//     margin-left: 2px;
+//     font-family: ${props => props.theme.fontFamily};
+//     font-size: ${props => props.theme.fontSize};
+// `;
+
+// const NoOverflowBlockQuote = styled.blockquote`
+//     max-width: calc(100vw - 2em - 80px);
+//     overflow: hidden;
+// `;
+
+// const PostMenuArrow = () => <ArrowRoot>▶</ArrowRoot>;
+
+// const SideArrow = () => <SideArrowRoot>{'>>'}</SideArrowRoot>;
+
+// const PostLink = styled.a`
+//     color: inherit;
+//     text-decoration: none;
+
+//     &:hover {
+//         color: red;
+//     }
+// `
+
+const ActionsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
 `;
-
-const PostContent = styled.div`
-    display: block;
-    align-items: center;
-`;
-
-const ThumbnailLink = styled.a`
-    float: left;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-top: 3px;
-    margin-bottom: 5px;
-`;
-
-const Name = styled.span`
-    font-weight: 700;
-    color: ${props => props.theme.post.name.color};
-`;
-
-const Subject = styled.span`
-    color: ${props => props.theme.post.subject.color};
-    font-weight: 700;
-`;
-
-const ArrowRoot = styled.span`
-    margin-left: 5px;
-    text-decoration: none;
-    line-height: 1em;
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    text-align: center;
-    outline: none;
-    opacity: 0.8;
-    color: #34345c;
-`;
-
-const SideArrowRoot = styled.div`
-    color: #b7c5d9;
-    float: left;
-    margin-right: 2px;
-    margin-top: 0;
-    margin-left: 2px;
-    font-family: ${props => props.theme.fontFamily};
-    font-size: ${props => props.theme.fontSize};
-`;
-
-const NoOverflowBlockQuote = styled.blockquote`
-    max-width: calc(100vw - 2em - 80px);
-    overflow: hidden;
-`;
-
-const PostMenuArrow = () => <ArrowRoot>▶</ArrowRoot>;
-
-const SideArrow = () => <SideArrowRoot>{'>>'}</SideArrowRoot>;
-
-const PostLink = styled.a`
-    color: inherit;
-    text-decoration: none;
-
-    &:hover {
-        color: red;
-    }
-`
-

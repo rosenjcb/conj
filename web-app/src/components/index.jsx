@@ -5,7 +5,7 @@ export const HR = styled.hr`
   width: ${props => props.width ?? "100%"};
   border: none;
   border-top: 1px solid ${props => props.theme.lineBreak.borderTop};
-`
+`;
 
 export const BoldTitle = styled.span`
   font-size: 10pt;
@@ -13,7 +13,7 @@ export const BoldTitle = styled.span`
   color: ${props => props.theme.primary};
   font-family: ${props => props.theme.fontFamily};
   font-weight: 700;
-`
+`;
 
 const pickColor = (rarity) => {
     const colorMap = {
@@ -25,15 +25,24 @@ const pickColor = (rarity) => {
     return colorMap[rarity] ?? 'white';
 }
 
-
 export const RarityImage = styled.img`
     border: 6px ridge ${props => pickColor(props.rarity)};
-`
+`;
 
 export const ErrorText = styled.p`
-  color: red;
+  color: #ed4245;
   margin: 0 auto;
   word-wrap: break-word;
+`;
+
+export const Text = styled.p`
+  font-weight: 500; 
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: ${props => props.theme.newTheme.colors.white};
+  font-family: 'Open Sans', sans-serif;
+  padding: 0;
+  margin: 0;
 `;
 
 export const RoundButton = styled.button`
@@ -57,3 +66,8 @@ export const RoundImage = styled.img`
   border-radius: 8px;
 `;
 
+export const Avatar = styled.img`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+`;

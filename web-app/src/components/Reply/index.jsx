@@ -4,7 +4,7 @@ import Modal from 'styled-react-modal';
 import { useImages } from '../../hooks/useImages';
 import { Formik, Form, Field } from 'formik';
 import * as _ from 'lodash';
-import { BoldTitle, RarityImage, RoundButton, RoundImage } from '../index';
+import { BoldTitle, RarityImage, RoundButton, RoundImage, Avatar } from '../index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost, closeQuickReply } from '../../slices/postSlice';
@@ -15,18 +15,6 @@ import chroma from 'chroma-js';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';
 
-const SubmitField = (props) => {
-  const { title, input, isSubmit, isSeparateLabel } = props;
-
-  return(
-    <FieldRoot>
-      { isSeparateLabel ? <FieldName>{title}</FieldName> : null }
-      {input}
-      { isSubmit ? <button type="submit">Post</button> : null}
-    </FieldRoot>
-  )
-}
-
 export const Reply = (props) => {
 
   let randomString = Math.random().toString(36);
@@ -36,8 +24,6 @@ export const Reply = (props) => {
   const post = useSelector(state => state.post);
   
   const dispatch = useDispatch();
-
-  const { images } = useImages();
 
   const initialValues = {
     name: 'Anonymous',
@@ -61,8 +47,9 @@ export const Reply = (props) => {
       initialValues={initialValues}
       onSubmit={submitPost}>
         {(props) => (
-          <Form className={className}>
-            <CommentBody name="subject" as="textarea" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
+          <StyledForm className={className}>
+            <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/>
+            <CommentBody contentEditable name="comment" as="div" data-ph="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')} html={post.comment}></CommentBody>
             {post.image ? <PreviewImage src={post.image}/> : null}
             {/* <SubmitField title={"Name"} isSeparateLabel={true} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
             <SubmitField title={"Subject"} isSeparateLabel={true} input={<FieldInput name="subject" as="input" placeholder="Subject" value={post.subject} onChange={(e) => handleChange(props.handleChange, e, 'subject')}/>} isSubmit/>
@@ -72,11 +59,23 @@ export const Reply = (props) => {
               <UploadImage/>
               <RoundButton>Post</RoundButton>
             </ActionsContainer>
-          </Form>
+          </StyledForm>
         )}
       </Formik>
   )
 }
+
+export const StyledForm = styled(Form)`
+  border-radius: 8px;
+  padding: 2rem;
+  width: calc(80% - 64px);
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+`;
 
 const PreviewImage = ({src}) => {
 
@@ -149,71 +148,6 @@ const ActionsContainer = styled.div`
   margin: 0 auto;
   align-items: center;
 `;
-
-// export const QuickReply = (props) => {
-//   let randomString = Math.random().toString(36);
-
-//   const { className } = props;
-
-//   const post = useSelector(state => state.post);
-  
-//   const dispatch = useDispatch();
-
-//   const history = useHistory();
-
-//   const [error, setError] = useState(null);
-
-//   const { images } = useImages();
-
-//   const handleChange = (formikHandler, e, key) => {
-//     formikHandler(e);
-//     dispatch(updateEntry({key: key, value: e.target.value}));
-//   }
-
-//   const submitPost = async(values, actions) => {
-//     setError(null);
-//     try {
-//       const res = await upsertThread(post, post.threadNo);
-//       const thread = res.data;
-//       dispatch(swapThread(thread));
-//       dispatch(closeQuickReply());
-//       dispatch(resetPost());
-//       history.push(`/thread/${res.data[0].id}`);
-//       history.go()
-//     } catch (error) {
-//       setError(error.response.data);
-//     }
-//   }
-
-//   const handleClose = (e) => {
-//     e.preventDefault();
-//     dispatch(closeQuickReply());
-//   }
-
-//   return(
-//     <Draggable bounds="parent">
-//     <QuickReplyRoot hidden={post.hidden}>
-//     <Formik
-//       initialValues={post}
-//       onSubmit={submitPost}>
-//         {(props) => (
-//           <Form className={className}>
-//             <QuickReplySubject>
-//               {`Reply To Thread No. ${post.threadNo}`}
-//               <CloseButton onClick={handleClose}/>
-//             </QuickReplySubject>
-//             <SubmitField title={"Name"} isSeparateLabel={false} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
-//             <SubmitField title={"Subject"} isSeparateLabel={false} input={<FieldInput name="subject" as="input" placeholder="Subject" value={post.subject} onChange={(e) => handleChange(props.handleChange, e, 'subject')}/>}/>
-//             <SubmitField title={"Comment"} isSeparateLabel={false} input={<FieldInput name="comment" as="textarea" placeholder="Comment" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>}/>
-//             <SubmitField title={"Image"} isSeparateLabel={false} isSubmit input={<ImagePicker images={images} key={randomString} value={post.image} handleChange={(e) => handleChange(props.handleChange, e, 'image')}/>}/>
-//             <ErrorDetails>{error}</ErrorDetails>
-//           </Form>
-//         )}
-//     </Formik>
-//     </QuickReplyRoot>
-//     </Draggable>
-//   )
-// }
 
 const sortImages = (images) => {
   const compare = (a, b) => {
@@ -356,21 +290,40 @@ const FieldInput = styled(Field)`
     }
 `;
 
-const CommentBody = styled(Field).attrs(props => ({type: "textarea"}))`
-  color: ${props => props.theme.newTheme.colors.white};
-  font-size: 1.5rem;
+const CommentBody = styled(Field)`
+  color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
+  font-size: 1.25rem;
+  word-break: break-word;
   background-color: inherit;
   resize: none;
   appearance: none;
   margin: 0;
   width: 100%;
-  height: 4rem;
+  padding: 0;
+  outline: none;
+  border: none;
+  height: fit-content;
+
+  &:empty:not(:focus):before{
+    content:attr(data-ph)
+}
+`
+
+const SubjectInput = styled(Field).attrs(props => ({type: "text"}))`
+  color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
+  font-size: 2.5rem;
+  background-color: inherit;
+  resize: none;
+  appearance: none;
+  margin: 0;
+  width: 100%;
+  margin-bottom: 1rem;
   padding: 0;
   outline: none;
   border: none;
 
   ::placeholder {
-    color: ${props => props.theme.newTheme.colors.white};
+    color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
   }
 `
 
