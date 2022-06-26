@@ -69,8 +69,8 @@
       (< (count comment) min-character-count)
       (throw (Exception. (format "Comment is below %s characters." min-character-count)))
 
-      (= image "")
-      (throw (Exception. "An image is required for posting threads. Try replying to a thread to collect pepes."))
+      ;; (= image "")
+      ;; (throw (Exception. "An image is required for posting threads. Try replying to a thread to collect pepes."))
 
       :else nil)))
 

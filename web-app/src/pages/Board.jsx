@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FiMenu } from "react-icons/fi";
 import { BiMessageDetail } from 'react-icons/bi';
@@ -9,6 +9,8 @@ import { Reply } from '../components/Reply';
 import { Post } from '../components/Post';
 import { useDispatch } from 'react-redux';
 import { ErrorText, Avatar } from '../components';
+import * as _ from 'lodash';
+import { fetchThreads } from '../api/thread';
 
 const detectMobile = () => {
   console.log(window.innerWidth);
@@ -17,6 +19,20 @@ const detectMobile = () => {
 
 export const BoardPage = () => {
   const isMobile = detectMobile();
+
+  const [threads, setThreads] = useState([]);
+
+  useEffect(() => {
+    const res = fetchThreads();
+    setThreads(res.data);
+  },[])
+
+  // return (
+  //   <HomeRoot>
+  //     <ThreadsContainer>
+  //     </ThreadsContainer>
+  //   </HomeRoot>
+  // );
 
   return(
     <BoardRoot>
@@ -56,37 +72,18 @@ const HomeReply = () => {
     )
 }
 
-const HomeReplyRoot = styled.div`
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    align-items: flex-start;
-    margin-top: 10px;
-    gap: 10px;
-`;
 
-const Body = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-stat;
-  flex-direction: column;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
-
-  overflow-y: scroll;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`
 
 const ThreadPreview = () => {
 
   return(
     <ThreadPreviewRoot>
+
+      { _.orderBy(threads, o => o[o.length - 1].id, ["desc"]).map((thread, index) => <div key={index}><Thread preview={true} thread={thread}/><HR/></div>)}
+      {/* <Post/>
       <Post/>
       <Post/>
-      <Post/>
-      <Post/>
+      <Post/> */}
     </ThreadPreviewRoot>
   )
 }
@@ -292,3 +289,26 @@ const GreyText = styled(Text)`
   text-align: center;
   color: ${props => props.theme.newTheme.colors.grey};
 `;
+
+const HomeReplyRoot = styled.div`
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 10px;
+    gap: 10px;
+`;
+
+const Body = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-stat;
+  flex-direction: column;
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
+
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
