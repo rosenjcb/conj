@@ -4,9 +4,10 @@ import { Text, ErrorText, Avatar } from '../index';
 import { processPostText } from '../../util/post';
 import { useDispatch } from 'react-redux';
 import { insertPostLink, openQuickReply } from '../../slices/postSlice';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation, Link } from 'react-router-dom';
 import chroma from 'chroma-js';
 import { BiMessageDetail } from 'react-icons/bi'; 
+import { Reply } from '../Reply';
 
 // const Thumbnail = ({rarity, location}) => {
 //     return(
@@ -36,47 +37,109 @@ export const Post = (props) => {
 
   const { post, opNo, handleRef, highlight, preview } = props;
 
-  // const { name, subject, id, comment, image } = post;
+  const { name, subject, id, comment, image, time } = post;
 
-  // const isOriginalPost = opNo === id;
+  const isOriginalPost = opNo === id;
 
   const handleClick = (e) => {
       e.preventDefault();
-      dispatch(insertPostLink("1234"));
+      dispatch(insertPostLink(opNo));
       // dispatch(openQuickReply(opNo));
   }
 
   const prefix = preview ? '/thread/' : ''
 
-  // const postHref = opNo === id ? `${prefix}${opNo}` : `${prefix}${opNo}#${id}`;
+  const postHref = opNo === id ? `${prefix}${opNo}` : `${prefix}${opNo}#${id}`;
 
-  const options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
+  const handlePostDate = () => {
+    const now = new Date();
+    const then = new Date(time);
+
+    const hours = Math.abs(now - then) / 36e5;
+
+    if(hours < 24) {
+      if (hours < 0) { 
+        const minutes = hours / 60; 
+        if (minutes < 0) { 
+          const seconds = minutes / 60
+          return `${seconds} seconds ago`;
+        }
+        return `${Math.round(minutes)} minutes ago`;
+      }
+      return `${Math.round(hours)} hours ago`;
+    } else {
+      return then.toLocaleDateString()
+    }
+  }
+
+  const formattedTime = handlePostDate();
+
+  return (
+    isOriginalPost && !preview
+      ? 
+        <OriginalPost postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
+                                   toggleFullScreen={toggleFullScreen} id={id} name={name} handleClick={handleClick}
+                                   opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image}/> 
+      : 
+        <ReplyPost postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
+                                    toggleFullScreen={toggleFullScreen} id={id} name={name} handleClick={handleClick}
+                                    opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image}/>
+  )
+}
+
+const OriginalPost = (props) => {
+  const { postHref, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
+
+  return(
+    <PostRoot ref={handleRef}>
+      <OriginalContentRoot>
+        <HeaderText>{subject}</HeaderText>
+        <CenteredImage fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
+        <Text align="left">
+          {comment}
+        </Text>
+      </OriginalContentRoot>
+      <HeaderRoot>
+        <UserInfo>
+          <Avatar src="/pepe_icon.jpg"/>
+          <TextContainer>
+            <Text>{name}</Text>
+            <PostLink href={postHref} onClick={handleClick}>#{id}</PostLink>
+            <Text>{formattedTime}</Text>
+          </TextContainer>
+        </UserInfo>
+        <ActionsContainer>
+          <WithText component={<Link to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></Link>} direction="row" text="10"/>
+        </ActionsContainer>
+      </HeaderRoot>
+      <ThreadReply/>
+    </PostRoot>
+  )
+}
+
+const ReplyPost = (props) => {
+  const { postHref, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
 
   return(
     <PostRoot ref={handleRef}>
       <ContentRoot>
-        <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src="https://media.springernature.com/relative-r300-703_m1050/springer-static/image/art%3A10.1038%2F528452a/MediaObjects/41586_2015_Article_BF528452a_Figg_HTML.jpg"/>
+        <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
         <Text align="left">
-          <ErrorText>Hello World</ErrorText> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-          Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+          <ErrorText>{subject}</ErrorText>
+          {comment}
         </Text>
       </ContentRoot>
       <HeaderRoot>
         <UserInfo>
           <Avatar src="/pepe_icon.jpg"/>
           <TextContainer>
-            <Text>HelloWorld34</Text>
-            <Link href={""} onClick={handleClick}>#1234</Link>
-            <Text>8:52pm</Text>
+            <Text>{name}</Text>
+            <PostLink href={postHref} onClick={handleClick}>#{id}</PostLink>
+            <Text>{formattedTime}</Text>
           </TextContainer>
         </UserInfo>
         <ActionsContainer>
-          <WithText component={<MessageDetail/>} direction="row" text="10"/>
+          <WithText component={<Link to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></Link>} direction="row" text="10"/>
         </ActionsContainer>
       </HeaderRoot>
     </PostRoot>
@@ -110,12 +173,17 @@ const UserInfo = styled.div`
 const Image = styled.img`
   aspect-ratio: 16 / 9;
   width: fit-content;
-  max-width: ${props => !props.fullScreen ? "200px;" : "100%"};
-  max-height: ${props => !props.fullScreen ? "112px;" : "100%"};
+  width: ${props => !props.fullScreen ? "200px;" : "100%"};
+  height: ${props => !props.fullScreen ? "112px;" : "100%"};
   border-radius: 8px;
   margin-right: 10px;
   float: left;
 `;
+
+const CenteredImage = styled(Image)`
+  float: none;
+  margin: 0 auto;
+`
 
 const Header = styled.h1`
   text-align: ${props => props.align ?? "center"};
@@ -139,6 +207,14 @@ const HeaderRoot = styled.div`
   background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1).hex()};
 `;
 
+const OriginalContentRoot = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-direction: column;
+  width: 100%;
+`
+
 const ContentRoot = styled.div`
   display: block;
   width: 100%;
@@ -151,20 +227,26 @@ const PostRoot = styled.li`
   flex-flow: wrap;
   align-items: center;
   width: 100%;
-  padding-top: 2.5rem;
-  padding-bottom: 2rem;
-  border-bottom: 1px solid ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
-  border-bottom-radius: 4px;
+  padding-bottom: 1.5rem;
+  padding-top: 1rem;
+  // border-bottom: 1px solid ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
+  // border-bottom-radius: 4px;
   gap: 10px;
 `;
 
-const Link = styled.a`
+const PostLink = styled(Link)`
   color: white;
 
   &:hover {
       color: ${props => props.theme.newTheme.colors.primary};
   }
-`
+`;
+
+const ThreadReply = styled(Reply)`
+  margin: 0 auto;
+  width: 100%;
+  margin-top: 2rem;
+`;
 
 // export const Post = (props) => {
 
@@ -318,3 +400,7 @@ const ActionsContainer = styled.div`
   flex-direction: row;
   align-items: center;
 `;
+
+const HeaderText = styled(ErrorText)`
+  font-size: 2.5rem;
+`

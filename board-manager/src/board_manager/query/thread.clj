@@ -100,20 +100,25 @@
         _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         id (m.thread/id op)
-        image-name (m.thread/image op)
-        image (q.image/get-image-by-name! db-conn image-name)
-        image-id (m.image/id image)
-        item (q.accountinventory/get-item-from-inventory-by-account-id&image-id db-conn account-id image-id)
-        item-id (m.accountinventory/id item)
-        enriched-thread (vector (assoc op :image (into {} image) :time (t/zoned-date-time)))]
-    (if (some? item) 
-      (do
-        (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
-        (db.redis/set redis-conn id enriched-thread)
-        (q.counter/increment-counter db-conn)
-        (q.account/update-last-thread! db-conn account-id)
-        enriched-thread)
-      (throw (Exception. "The image requested does not exist in the account's inventory.")))))
+        image {:location "https://wow.zamimg.com/images/wow/icons/large/inv_boots_chain_08.jpg" :id 1}
+        ;; image-name (m.thread/image op)
+        ;; image (q.image/get-image-by-name! db-conn image-name)
+        ;; image-id (m.image/id image)
+        ;; item (q.accountinventory/get-item-from-inventory-by-account-id&image-id db-conn account-id image-id)
+        ;; item-id (m.accountinventory/id item)
+        enriched-thread (vector (assoc op :image image :time (t/zoned-date-time)))]
+    ;; (if (some? item) 
+    ;; (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
+    (db.redis/set redis-conn id enriched-thread)
+    (q.counter/increment-counter db-conn)
+    (q.account/update-last-thread! db-conn account-id)
+    enriched-thread))
+      ;; (throw (Exception. "The image requested does not exist in the account's inventory.")))))
+
+(comment
+  (+ 1 2)
+  (log/info "hello world")
+  (print "hello world"))
 
 (defn find-thread-by-id!
   [redis-conn id]

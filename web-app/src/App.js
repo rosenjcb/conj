@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Helmet from 'react-helmet';
 import { ThreadPage } from './pages/Thread';
 import { ModalProvider } from 'styled-react-modal';
 import { useSelector } from 'react-redux';
-import { NavBar } from './components/NavBar';
+import { WithNavBar } from './components/NavBar';
 import { Home } from './pages/Home'
 import { AboutPage } from './pages/About';
 import { BoardPage } from './pages/Board';
-
 
 export const newTheme = {
   colors: {
@@ -71,16 +70,16 @@ export const theme = {
 }
 
 
-const WithNavBar = (props) => {
-  const { component } = props;
+// const WithNavBar = (props) => {
+//   const { component } = props;
 
-  return(
-    <div>
-      <NavBar/>
-      {component} 
-    </div>
-  )
-}
+//   return(
+//     <div>
+//       <NavBar/>
+//       {component} 
+//     </div>
+//   )
+// }
 
 
 
@@ -104,9 +103,12 @@ function App() {
               <WithNavBar component={<Home/>}/>
             </Route>
             <Route exact path="/boards/:board">
-              <BoardPage/>
+              <WithNavBar component={<BoardPage/>}/>
             </Route>
             <Route path="/thread/:id">
+              <WithNavBar component={<ThreadPage preview={false} thread={thread}/>}/>
+            </Route>
+            <Route path="/boards/:board/thread/:id">
               <WithNavBar component={<ThreadPage preview={false} thread={thread}/>}/>
             </Route>
             <Route exact path ="/about">

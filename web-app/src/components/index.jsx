@@ -4,7 +4,9 @@ import chroma from 'chroma-js';
 export const HR = styled.hr`
   width: ${props => props.width ?? "100%"};
   border: none;
-  border-top: 1px solid ${props => props.theme.lineBreak.borderTop};
+  height: 4px;
+  background-color ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
+  border-radius: 8px;
 `;
 
 export const BoldTitle = styled.span`

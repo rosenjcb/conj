@@ -9,15 +9,72 @@ import { AccountDetails } from '../AccountDetails';
 import { upsertThread } from '../../api/thread';
 import { Login } from '../Login';
 import { me as callMe } from '../../api/account'
+import chroma from 'chroma-js';
+import { FiMenu } from 'react-icons/fi';
 
-export function NavBar() {
-  const location = useLocation();
-  const history = useHistory(); 
-  const dispatch = useDispatch();
+// export function NavBar() {
+//   const location = useLocation();
+//   const history = useHistory(); 
+//   const dispatch = useDispatch();
 
-  const [me, setMe] = useState("none"); 
+//   const [me, setMe] = useState("none"); 
 
-  const [error, setError] = useState(null);
+//   const [error, setError] = useState(null);
+
+//   useEffect(async() => {
+//     try { 
+//       const res = await callMe();
+//       setMe(res);
+//     } catch(e) {
+//       setMe(null);
+//     }
+//   },[])
+
+//   const handleSubmit = async(post) => {
+//     setError(null);
+//     try {
+//       const slugs  = location.pathname.split('/');
+//       const threadNo = slugs[2];
+//       const res = await upsertThread(post, threadNo);
+//       const thread = res.data;
+//       const newThread = thread.length === 1;
+//       dispatch(swapThread(thread))
+//       if(newThread) {
+//         history.push(`/thread/${res.data[0].id}`);
+//         history.go()
+//       }
+//       return true;
+//     } catch (error) {
+//       setError(error.response.data);
+//       return false;
+//     }
+//   }
+
+//   return (
+//     <NavRoot>
+//       <Title href="/">/b/ - Random</Title>
+//       <HR width="90%"/>
+//       {!me 
+//         ? 
+//           <Login/>
+//         : 
+//         <AccountRoot>
+//           <HR width="50%"/>
+//           <AccountDetails/> 
+//           <PostContainer>
+//             <Reply handleSubmit={handleSubmit}/>
+//             <ErrorText>{error}</ErrorText>
+//           </PostContainer>
+//         </AccountRoot> 
+//         } 
+//       <HR/>
+//     </NavRoot>
+//   )
+// }
+
+export const WithNavBar = ({component}) => {
+
+  const [me, setMe] = useState(null);
 
   useEffect(async() => {
     try { 
@@ -28,47 +85,88 @@ export function NavBar() {
     }
   },[])
 
-  const handleSubmit = async(post) => {
-    setError(null);
-    try {
-      const slugs  = location.pathname.split('/');
-      const threadNo = slugs[2];
-      const res = await upsertThread(post, threadNo);
-      const thread = res.data;
-      const newThread = thread.length === 1;
-      dispatch(swapThread(thread))
-      if(newThread) {
-        history.push(`/thread/${res.data[0].id}`);
-        history.go()
-      }
-      return true;
-    } catch (error) {
-      setError(error.response.data);
-      return false;
-    }
+  const detectMobile = () => {
+    // console.log(window.innerWidth);
+    return window.innerWidth < 768;
   }
 
-  return (
-    <NavRoot>
-      <Title href="/">/b/ - Random</Title>
-      <HR width="90%"/>
-      {!me 
-        ? 
-          <Login/>
-        : 
-        <AccountRoot>
-          <HR width="50%"/>
-          <AccountDetails/> 
-          <PostContainer>
-            <Reply handleSubmit={handleSubmit}/>
-            <ErrorText>{error}</ErrorText>
-          </PostContainer>
-        </AccountRoot> 
-        } 
-      <HR/>
-    </NavRoot>
+  const isMobile = detectMobile();
+
+  const navBar = (
+    <BoardRoot>
+      { !isMobile ? <BoardDrawer/> : null }
+      <Page>
+        <HomeNavBar>
+          <HamburgerMenu/>
+          <Header>/b/ - random</Header>
+          <GreyText>|</GreyText>
+          <Header>Make fun posts here!</Header>
+        </HomeNavBar>
+        {component}
+      </Page>
+    </BoardRoot>
+  )
+
+  return me ? navBar : <Login/>;
+}
+
+const BoardDrawer = () => {
+
+  const history = useHistory();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('hi')
+  }
+
+  const handleClick = () => {
+    history.push("/boards/b")
+  }
+
+  return(
+    <BoardDrawerRoot>
+      <TitleContainer>
+        <Header>Boards</Header>
+      </TitleContainer>
+      <Content>
+        <BoardList>
+          <BoardItem onClick={handleClick}>/b/ - random</BoardItem>
+          <BoardItem>/sp/ - sports</BoardItem>
+          <BoardItem>/int/ - international</BoardItem>
+          <BoardItem>/g/ - technology</BoardItem>
+          <BoardItem>/a/ - anime</BoardItem>
+        </BoardList>
+        <SearchForm onSubmit={handleSubmit}>
+          <Input type="text"/>
+        </SearchForm>
+      </Content>
+    </BoardDrawerRoot>
   )
 }
+
+const Page = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  @media all and (min-width: 1024px) {
+    width: 30%;
+  }
+  
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    width: 30%;
+  }
+  
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    visibility: visible;
+    width: 100%;
+   }
+  
+  @media all and (max-width: 480px) { 
+    visibility: visible;
+    width: 100%;
+  }
+`;
+
 
 const PostContainer = styled.div`
   margin: 0 auto;
@@ -132,5 +230,172 @@ const Title = styled.a`
 
   &:hover {
     cursor: pointer;  
+  }
+`;
+
+const Submit = styled.button`
+  color: ${props => chroma(props.theme.newTheme.colors.white)};
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten().hex()};
+  border: none;
+  border-radius: 16px;
+  font-size: 2rem;
+`;
+
+const SearchForm = styled.form`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+`;
+
+const Input = styled.input`
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten().hex()};
+  border-radius: 80px;
+  font-size: 2rem;
+  width: 60%;
+  color: ${props => chroma(props.theme.newTheme.colors.white)};
+  margin-bottom: 10px;
+  padding: 0;
+`;
+
+const Content = styled.body`
+  display: flex;
+  justify-content: space-between;
+  flex-direction column;
+  height: calc(100vh - 92px);
+`;
+
+const BoardList = styled.ul`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  color: ${props => props.theme.newTheme.colors.white};
+  margin: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 3em;
+  padding-bottom: 3em;
+`;
+
+const Header = styled.h1`
+  text-align: ${props => props.align ?? "center"};
+  color: ${props => props.theme.newTheme.colors.white};
+  font-size: 1.5em;
+  padding: 0;
+  margin: 0;
+`;
+
+const BoardItem = styled(Header)`
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1).hex()};
+  border-radius: 12px; 
+  padding: 8px;
+  user-select: none;
+
+  &:hover {
+    background-color: ${props => chroma(props.theme.newTheme.colors.primary).darken(0.25).hex()};
+    cursor: pointer;
+  }
+`;
+
+const BoardDrawerRoot = styled.div`
+  min-height: 100vh;
+  width: 300px;
+  background-color: ${props => props.theme.newTheme.colors.primary};
+  border-right: 1px solid black; 
+`;
+
+const BoardRoot = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  max-height: 100vh;
+  background-color ${props => chroma(props.theme.newTheme.colors.primary).darken(0.3)};
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  border-bottom: 1px solid black;
+  height: 92px;
+  text-align: center;
+`
+
+const HomeNavBar = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  flex-direction: row;
+  width: calc(100% - 20px);
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.7)};
+  border-bottom: 1px solid black;
+  min-height: calc(92px - 20px);
+  padding: 10px;
+  align-items: center;
+`;
+
+const Text = styled.p`
+  font-weight: 500; 
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: ${props => props.theme.newTheme.colors.white};
+  font-family: 'Open Sans', sans-serif;
+  padding: 0;
+  margin: 0;
+`;
+
+const GreyText = styled(Text)`
+  text-align: center;
+  color: ${props => props.theme.newTheme.colors.grey};
+`;
+
+const HomeReplyRoot = styled.div`
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 10px;
+    gap: 10px;
+`;
+
+const Body = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-stat;
+  flex-direction: column;
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
+
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
+
+const HamburgerMenu = styled(FiMenu)`
+  color: white;
+  width: 48px;
+  height: 48px;
+  padding-right: 10px;
+
+  @media all and (min-width: 1024px) {
+    visibility: hidden;
+  }
+  
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    visibility: hidden;
+  }
+  
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    visibility: visible;
+   }
+  
+  @media all and (max-width: 480px) { 
+    visibility: visible;
   }
 `;

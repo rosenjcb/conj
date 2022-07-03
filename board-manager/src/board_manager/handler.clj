@@ -123,8 +123,8 @@
                     (Thread. ^Runnable (shutdown-system-fn system))))
 
 (defn -main [& args]
-  (let [logger (log-impl/get-logger log/*logger-factory* *ns*)]
-  (log/infof "Starting main application (not HTTP Server)")
-  (let [config (config-from-env)
-        system (component/start (system config))]
-    (add-shutdown-hook! system))))
+  (let [_ (log-impl/get-logger log/*logger-factory* *ns*)]
+    (log/infof "Starting main application (not HTTP Server)")
+    (let [config (config-from-env)
+          system (component/start (system config))]
+      (add-shutdown-hook! system))))

@@ -14,42 +14,53 @@ import { upsertThread } from '../../api/thread';
 import chroma from 'chroma-js';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';
+import { useLocation } from 'react-router-dom/cjs/react-router-dom';
 
 export const Reply = (props) => {
 
-  let randomString = Math.random().toString(36);
+  // let randomString = Math.random().toString(36);
 
-  const { handleSubmit, className } = props;
+  const { handleSubmit, className, isOriginalPost } = props;
 
   const post = useSelector(state => state.post);
   
   const dispatch = useDispatch();
 
-  const initialValues = {
-    name: 'Anonymous',
-    subject: '',
-    comment: '',
-    image: ''
-  };
+  // const initialValues = {
+  //   name: 'Anonymous',
+  //   subject: '',
+  //   comment: '',
+  //   image: ''
+  // };
 
   const handleChange = (formikHandler, e, key) => {
+    console.log(e);
     formikHandler(e);
     dispatch(updateEntry({key: key, value: e.target.value}));
   }
 
+  const location = useLocation();
+
+  const pathSlugs = location.pathname.split("/"); 
+
+  const finalSlug = pathSlugs[pathSlugs.length - 1].match(/(\d+)/);
+
   const submitPost = async(values, actions) => {
-    const res = await handleSubmit(post);
+    const opNo = parseInt(finalSlug);
+
+    const res = await upsertThread(post, opNo);
+
     if(res) dispatch(resetPost());
   }
 
   return(
     <Formik
-      initialValues={initialValues}
+      initialValues={post}
       onSubmit={submitPost}>
         {(props) => (
           <StyledForm className={className}>
-            <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/>
-            <CommentBody contentEditable name="comment" as="div" data-ph="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')} html={post.comment}></CommentBody>
+            { isOriginalPost ? <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/> : null }
+            <CommentBody name="comment" as="input" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
             {post.image ? <PreviewImage src={post.image}/> : null}
             {/* <SubmitField title={"Name"} isSeparateLabel={true} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
             <SubmitField title={"Subject"} isSeparateLabel={true} input={<FieldInput name="subject" as="input" placeholder="Subject" value={post.subject} onChange={(e) => handleChange(props.handleChange, e, 'subject')}/>} isSubmit/>
@@ -57,7 +68,7 @@ export const Reply = (props) => {
             <SubmitField title={"Image"} isSeparateLabel={true} input={<ImagePicker images={images} key={randomString} value={post.image} handleChange={(e) => handleChange(props.handleChange, e, 'image')}/>}/>  */}
             <ActionsContainer>
               <UploadImage/>
-              <RoundButton>Post</RoundButton>
+              <RoundButton type="submit">Post</RoundButton>
             </ActionsContainer>
           </StyledForm>
         )}
@@ -173,63 +184,63 @@ const sortImages = (images) => {
   return Object.values(res).sort(compare);
 }
 
-const ImagePicker = (props) => {
+// const ImagePicker = (props) => {
 
-  const { handleChange, images } = props;
+//   const { handleChange, images } = props;
 
-  const [isOpen, setIsOpen] = useState(false);
+//   const [isOpen, setIsOpen] = useState(false);
 
-  const post = useSelector(state => state.post);
+//   const post = useSelector(state => state.post);
   
-  const selectedImage = post.image;
+//   const selectedImage = post.image;
 
-  const [groupedImages, setGroupedImages] = useState({});
+//   const [groupedImages, setGroupedImages] = useState({});
 
-  const handlePick = (image) => {
-    const { name } = image;
-    const event = { 'target': { 'name': 'image', value: name}}
-    setIsOpen(false);
-    handleChange(event);
-  };
+//   const handlePick = (image) => {
+//     const { name } = image;
+//     const event = { 'target': { 'name': 'image', value: name}}
+//     setIsOpen(false);
+//     handleChange(event);
+//   };
 
-  useEffect(() => {
-    const sortedImages = sortImages(images).map((value, index) => <Item image={value} key={`${value.name}${index}`} badgeText={value.count} rarity={value.rarity} alt="" handleClick={(_) => handlePick(value)}/>);
-    setGroupedImages(sortedImages);
-  },[images, handleChange])
+//   useEffect(() => {
+//     const sortedImages = sortImages(images).map((value, index) => <Item image={value} key={`${value.name}${index}`} badgeText={value.count} rarity={value.rarity} alt="" handleClick={(_) => handlePick(value)}/>);
+//     setGroupedImages(sortedImages);
+//   },[images, handleChange])
 
-  const toggleOpen = (e) => {
-    if(e) { e.preventDefault(); }
-    setIsOpen(!isOpen);
-  }
+//   const toggleOpen = (e) => {
+//     if(e) { e.preventDefault(); }
+//     setIsOpen(!isOpen);
+//   }
 
-  return(
-    <div>
-      <FieldFilePicker>
-        <button onClick={(e) => toggleOpen(e)}>Choose File</button>
-        { selectedImage ? <span style={{paddingLeft: "2px"}}>{selectedImage}</span> : null }
-      </FieldFilePicker>
-      <ImagePickerModal isOpen={isOpen} onBackgroundClick={toggleOpen} onEscapeKeydown={toggleOpen}>
-        <Header>
-          <ImageGalleryTitle>Select an Image</ImageGalleryTitle>
-          <CloseButton size={24} onClick={() => setIsOpen(false)}/>
-        </Header>
-        {groupedImages.length > 0 ? <ImageGallery>{groupedImages}</ImageGallery> : null }
-      </ImagePickerModal>
-    </div>
-  )
-}
+//   return(
+//     <div>
+//       <FieldFilePicker>
+//         <button onClick={(e) => toggleOpen(e)}>Choose File</button>
+//         { selectedImage ? <span style={{paddingLeft: "2px"}}>{selectedImage}</span> : null }
+//       </FieldFilePicker>
+//       <ImagePickerModal isOpen={isOpen} onBackgroundClick={toggleOpen} onEscapeKeydown={toggleOpen}>
+//         <Header>
+//           <ImageGalleryTitle>Select an Image</ImageGalleryTitle>
+//           <CloseButton size={24} onClick={() => setIsOpen(false)}/>
+//         </Header>
+//         {groupedImages.length > 0 ? <ImageGallery>{groupedImages}</ImageGallery> : null }
+//       </ImagePickerModal>
+//     </div>
+//   )
+// }
 
-const Item = (props) => {
+// const Item = (props) => {
 
-  const { image, badgeText, handleClick, rarity } = props;
+//   const { image, badgeText, handleClick, rarity } = props;
 
-  return(
-    <div>
-      <RarityImage alt="" onClick={handleClick} width={50} height={50} src={image.location} rarity={rarity}/>
-      <Badge>{badgeText}</Badge>
-    </div>
-  )
-}
+//   return(
+//     <div>
+//       <RarityImage alt="" onClick={handleClick} width={50} height={50} src={image.location} rarity={rarity}/>
+//       <Badge>{badgeText}</Badge>
+//     </div>
+//   )
+// }
 
 const Badge = styled.div`
   border-radius: 50%;
@@ -303,11 +314,7 @@ const CommentBody = styled(Field)`
   outline: none;
   border: none;
   height: fit-content;
-
-  &:empty:not(:focus):before{
-    content:attr(data-ph)
-}
-`
+`;
 
 const SubjectInput = styled(Field).attrs(props => ({type: "text"}))`
   color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};

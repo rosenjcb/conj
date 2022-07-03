@@ -1,5 +1,7 @@
 import React from 'react';
 import { Post } from '../Post'
+import styled from 'styled-components';
+import { HR } from '..';
 
 export function Thread(props) {
 
@@ -9,17 +11,22 @@ export function Thread(props) {
 
   if(preview) {
     return (
-      <div>
-        {thread.map((post) => <Post preview={true} opNo={op.id} post={post} key={post.id}/>)}
-      </div>
+      <Root>
+        {thread.map((post) => <div><Post preview={true} opNo={op.id} post={post} key={post.id}/><HR/></div>)}
+      </Root>
     )
   }
 
   return(
-    <div>
+    <Root>
       { thread && thread.length > 0 && threadRef && threadRef.current
-          ? thread.map((post, index) => <Post preview={preview} highlight={hashedIndex === index} handleRef={(el) => threadRef.current[index] = el} opNo={op.id} key={post.id} post={post}/>) 
+          ? thread.map((post, index) => <div><Post preview={preview} highlight={hashedIndex === index} handleRef={(el) => threadRef.current[index] = el} opNo={op.id} key={post.id} post={post}/><HR/></div>) 
           : null }
-    </div>
+    </Root>
   )
 }
+
+const Root = styled.div`
+  width: 100%;
+  margin: 0 auto;
+`

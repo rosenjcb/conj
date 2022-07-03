@@ -6,6 +6,7 @@ import { BsFillReplyFill } from 'react-icons/bs';
 import { openQuickReply } from '../slices/postSlice';
 import * as chroma from 'chroma-js';
 import { Reply } from '../components/Reply';
+import { Thread } from '../components/Thread';
 import { Post } from '../components/Post';
 import { useDispatch } from 'react-redux';
 import { ErrorText, Avatar } from '../components';
@@ -22,8 +23,8 @@ export const BoardPage = () => {
 
   const [threads, setThreads] = useState([]);
 
-  useEffect(() => {
-    const res = fetchThreads();
+  useEffect(async() => {
+    const res = await fetchThreads();
     setThreads(res.data);
   },[])
 
@@ -36,19 +37,8 @@ export const BoardPage = () => {
 
   return(
     <BoardRoot>
-      { !isMobile ? <BoardDrawer/> : null }
-      <Page>
-        <HomeNavBar>
-          <HamburgerMenu/>
-          <Header>/b/ - random</Header>
-          <GreyText>|</GreyText>
-          <Header>Make fun posts here!</Header>
-        </HomeNavBar>
-        <Body>
-          <HomeReply/>
-          <ThreadPreview/>
-        </Body>
-      </Page>
+      <HomeReply/>
+      <ThreadPreview threads={threads}/>
     </BoardRoot>
   )
 }
@@ -74,16 +64,15 @@ const HomeReply = () => {
 
 
 
-const ThreadPreview = () => {
+const ThreadPreview = (props) => {
+
+  const { threads } = props;
 
   return(
     <ThreadPreviewRoot>
-
-      { _.orderBy(threads, o => o[o.length - 1].id, ["desc"]).map((thread, index) => <div key={index}><Thread preview={true} thread={thread}/><HR/></div>)}
-      {/* <Post/>
-      <Post/>
-      <Post/>
-      <Post/> */}
+      { threads.length > 0 
+        ? _.orderBy(threads, o => o[o.length - 1].id, ["desc"]).map((thread, index) => <Thread key={index} preview={true} thread={thread}/>)
+        : <Header>No threads yet. Make one?</Header>}
     </ThreadPreviewRoot>
   )
 }
@@ -242,16 +231,16 @@ const BoardDrawerRoot = styled.div`
   border-right: 1px solid black; 
 `;
 
-const BoardRoot = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  margin: 0 auto;
-  width: 100%;
-  height: 100%;
-  max-height: 100vh;
-  background-color ${props => chroma(props.theme.newTheme.colors.primary).darken(0.3)};
-`;
+// const BoardRoot = styled.div`
+//   display: flex;
+//   justify-content: center;
+//   flex-direction: row;
+//   margin: 0 auto;
+//   width: 100%;
+//   height: 100%;
+//   max-height: 100vh;
+//   background-color ${props => chroma(props.theme.newTheme.colors.primary).darken(0.3)};
+// `;
 
 const TitleContainer = styled.div`
   display: flex;
@@ -299,7 +288,7 @@ const HomeReplyRoot = styled.div`
     gap: 10px;
 `;
 
-const Body = styled.div`
+const BoardRoot = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-stat;
