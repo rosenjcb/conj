@@ -16,9 +16,11 @@
             [board-manager.routes.account :as account]
             [board-manager.services.auth :as auth.service]
             [board-manager.services.item-generation :as item-generation-service]
+            [cognitect.aws.client.api :as aws]
             [ring.util.response :as response]
             [ring.middleware.cookies :as cookies]
             [ring.middleware.resource :as resource]
+            [ring.middleware.multipart-params :as multipart]
             [board-manager.query.refresh-token :as q.refresh-token])
   (:import (com.zaxxer.hikari HikariDataSource))
   (:gen-class))
@@ -58,6 +60,7 @@
             :middleware
              [muuntaja/format-middleware
               cookies/wrap-cookies
+              multipart/wrap-multipart-params
               coercion/coerce-exceptions-middleware
               coercion/coerce-request-middleware
               coercion/coerce-response-middleware]}
@@ -97,6 +100,7 @@
 
 (defn system [config]
   (let [{:keys [db-host db-port db-name db-user db-pass port redis-host redis-port passphrase]} config
+        s3-client (aws/client {:api :s3 :region :us-west-2})
         db-spec {:dbtype "postgresql" :host db-host :port db-port :dbname db-name :username db-user :password db-pass}
         redis-conn {:pool {} :spec {:uri (str "redis://" redis-host ":" redis-port)}}]
     (log/infof "Here's your db-spec %s" db-spec)
@@ -104,7 +108,8 @@
      :auth-conf {:privkey "auth_privkey.pem" :passphrase passphrase}
      :db-conn (connection/component HikariDataSource db-spec)
      :redis-conn redis-conn
-     :api (component/using (new-api api-config) [:db-conn :redis-conn :item-generation-service :auth-service])
+     :s3-client s3-client
+     :api (component/using (new-api api-config) [:db-conn :redis-conn :item-generation-service :auth-service :s3-client])
      :item-generation-service (component/using (item-generation-service/new-service {:seed "TBD"}) [:db-conn])
      :auth-service (component/using (auth.service/new-service {:salt "1234" :auth-conf {:privkey "auth_privkey.pem" :pubkey "auth_pubkey.pem" :passphrase passphrase}}) [:db-conn])
      :server (component/using

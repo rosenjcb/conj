@@ -61,7 +61,7 @@ export const Reply = (props) => {
           <StyledForm className={className}>
             { isNewThread ? <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/> : null }
             <CommentBody name="comment" as="input" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
-            {post.image ? <PreviewImage src={post.image}/> : null}
+            {post.image ? <PreviewImage src={URL.createObjectURL(post.image)}/> : null}
             {/* <SubmitField title={"Name"} isSeparateLabel={true} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
             <SubmitField title={"Subject"} isSeparateLabel={true} input={<FieldInput name="subject" as="input" placeholder="Subject" value={post.subject} onChange={(e) => handleChange(props.handleChange, e, 'subject')}/>} isSubmit/>
             <SubmitField title={"Comment"} isSeparateLabel={true} input={<FieldInput name="comment" as="textarea" value={post.comment} placeholder="Comment" onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>}/>
@@ -138,7 +138,7 @@ const UploadImage = () => {
   const dispatch = useDispatch();
 
   const handlePick = (e) => {
-    dispatch(updateEntry({key: 'image', value: URL.createObjectURL(e.target.files[0])}));
+    dispatch(updateEntry({key: 'image', value: e.target.files[0]}));
   }
 
   return (

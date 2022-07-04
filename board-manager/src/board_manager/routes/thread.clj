@@ -14,12 +14,14 @@
 (defn create-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
         db-conn (get-in req [:components :db-conn])
-        body-params (:body-params req)
+        s3-client (get-in req [:components :s3-client])
+        _ (log/info (keys (:components req)))
+        multipart-params (:multipart-params req)
         account (:account req)]
     (try 
-      (->> body-params
-          (query.thread/create-thread! db-conn redis-conn account)
-          response/response)
+      (->> multipart-params 
+           (query.thread/create-thread! db-conn s3-client redis-conn account)
+           response/response)
       (catch Exception e
         (log/infof "Error: %s" e)
         (->> (str (.getMessage e))
@@ -40,13 +42,13 @@
         account-id (:id account)
         db-conn (get-in req [:components :db-conn])
         item-gen (get-in req [:components :item-generation-service])
-        body-params (:body-params req)
+        form-params (:params req)
         path-params (:path-params req)
         id (:id path-params)]
     (try
-      (->> body-params
-        (query.thread/add-post! db-conn redis-conn account id)
-        response/response)
+      (->> form-params 
+           (query.thread/add-post! db-conn redis-conn account id)
+           response/response)
       (catch Exception e
         (log/infof "%s" (.getMessage e))
         (response/bad-request (.getMessage e))))))

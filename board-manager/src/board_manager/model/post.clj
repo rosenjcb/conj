@@ -4,6 +4,7 @@
   [:map
     [:name {:optional true} string?] 
     [:subject {:optional true} string?]
+    ;; [:image {:optional true} map?]
     [:comment string?]])
 
 (defn model->data [t])

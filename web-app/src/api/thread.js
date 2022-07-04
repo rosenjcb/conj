@@ -8,6 +8,12 @@ export const createThread = (post) => axios.post('/threads', post);
 export const fetchThreads = () => axios.get('/threads');
 
 export const upsertThread = (post, opNo) => {
-  return opNo ? axios.put(`/threads/${opNo}`, post) : axios.post('/threads', post);
+  var formData = new FormData();
+  for (let [key, val] of Object.entries(post)) {
+    // append each item to the formData (converted to JSON strings)
+    if(val !== null) formData.append(key, val);
+  }
+
+  return opNo ? axios.put(`/threads/${opNo}`, formData, {headers: {"Content-Type": "multipart/form-data"}}) : axios.post('/threads', formData, {headers: {"Content-Type": "multipart/form-data"}});
 }
 
