@@ -47,9 +47,14 @@ export function ThreadPage() {
 }
 
 const Root = styled.div`
-  min-height: calc(100% - 93px);
+  min-height: calc(100% - 93px - 3rem);
   padding: 1.5rem;
   width: calc(100% - 3rem);
   margin: 0 auto;
   background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;

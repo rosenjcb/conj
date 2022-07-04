@@ -12,7 +12,7 @@ export function Thread(props) {
   if(preview) {
     return (
       <Root>
-        {thread.map((post) => <div><Post preview={true} opNo={op.id} post={post} key={post.id}/><HR/></div>)}
+        {thread.map((post) => <div><Post preview={true} opNo={op.id} post={post} key={post.id}/></div>)}
       </Root>
     )
   }
@@ -20,7 +20,7 @@ export function Thread(props) {
   return(
     <Root>
       { thread && thread.length > 0 && threadRef && threadRef.current
-          ? thread.map((post, index) => <div><Post preview={preview} highlight={hashedIndex === index} handleRef={(el) => threadRef.current[index] = el} opNo={op.id} key={post.id} post={post}/><HR/></div>) 
+          ? thread.map((post, index) => <div><Post preview={preview} highlight={hashedIndex === index} handleRef={(el) => threadRef.current[index] = el} opNo={op.id} key={post.id} post={post}/></div>) 
           : null }
     </Root>
   )
@@ -29,4 +29,14 @@ export function Thread(props) {
 const Root = styled.div`
   width: 100%;
   margin: 0 auto;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+`
+
+const OpRoot = styled(Root)`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 5rem;
 `

@@ -100,8 +100,8 @@
         _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         id (m.thread/id op)
-        image {:location "https://wow.zamimg.com/images/wow/icons/large/inv_boots_chain_08.jpg" :id 1}
-        ;; image-name (m.thread/image op)
+        image-name (m.thread/image op)
+        image {:location image-name :id 1}
         ;; image (q.image/get-image-by-name! db-conn image-name)
         ;; image-id (m.image/id image)
         ;; item (q.accountinventory/get-item-from-inventory-by-account-id&image-id db-conn account-id image-id)
@@ -114,11 +114,6 @@
     (q.account/update-last-thread! db-conn account-id)
     enriched-thread))
       ;; (throw (Exception. "The image requested does not exist in the account's inventory.")))))
-
-(comment
-  (+ 1 2)
-  (log/info "hello world")
-  (print "hello world"))
 
 (defn find-thread-by-id!
   [redis-conn id]
@@ -133,23 +128,23 @@
   [db-conn redis-conn account thread-id post-body]
   (let [account-id (:id account)
         db-account (q.account/find-account-by-id! db-conn account-id)
-        _ (validate-reply-time db-account)
+        ;; _ (validate-reply-time db-account)
         post-count (q.counter/get-count! db-conn)
-        not-empty? (complement empty?)
+        ;; not-empty? (complement empty?)
         post (m.post/req&id->post post-body post-count)
         _ (validate-add-post post)
         image-name (m.post/image post)
-        image (into {} (q.image/get-image-by-name! db-conn image-name))
-        image-id (m.image/id image)
-        item (q.accountinventory/get-item-from-inventory-by-account-id&image-id db-conn account-id image-id)
-        item-id (m.accountinventory/id item)
+        image {:location image-name}
+        ;; image-id (m.image/id image)
+        ;; item (q.accountinventory/get-item-from-inventory-by-account-id&image-id db-conn account-id image-id)
+        ;; item-id (m.accountinventory/id item)
         old-thread (find-thread-by-id! redis-conn thread-id)
-        enriched-post (assoc post :image (dissoc image :id) :time (t/zoned-date-time))
+        enriched-post (assoc post :image image :time (t/zoned-date-time))
         updated-thread (m.thread/add-post enriched-post old-thread)]
-    (when (not-empty? image-name)
-      (if item-id
-        (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
-        (throw (Exception. "Couldn't find the image in your inventory."))))
+    ;; (when (not-empty? image-name)
+    ;;   (if item-id
+    ;;     (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
+    ;;     (throw (Exception. "Couldn't find the image in your inventory."))))
     (update-thread! redis-conn thread-id updated-thread)
     (q.counter/increment-counter db-conn)
     (q.account/update-last-reply! db-conn account-id)

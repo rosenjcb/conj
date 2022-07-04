@@ -44,13 +44,9 @@
         path-params (:path-params req)
         id (:id path-params)]
     (try
-      (let [added-post (->> body-params
-                            (query.thread/add-post! db-conn redis-conn account id)
-                            response/response)
-            random-pick (item-generation.service/draw-item! item-gen account-id)]
-        (log/infof "Post added to thread %s" id)
-        (log/infof "Lucky draw was a %s" random-pick)
-        added-post) 
+      (->> body-params
+        (query.thread/add-post! db-conn redis-conn account id)
+        response/response)
       (catch Exception e
         (log/infof "%s" (.getMessage e))
         (response/bad-request (.getMessage e))))))

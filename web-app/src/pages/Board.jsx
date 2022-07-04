@@ -57,11 +57,10 @@ const HomeReply = () => {
     return (
         <HomeReplyRoot>
             <Avatar src="/pepe_icon.jpg"/>
-            <Reply/>
+            <Reply isNewThread/>
         </HomeReplyRoot>
     )
 }
-
 
 
 const ThreadPreview = (props) => {
@@ -285,17 +284,20 @@ const HomeReplyRoot = styled.div`
     flex-direction: row;
     align-items: flex-start;
     margin-top: 10px;
+    margin-bottom: 3rem;
+    margin-left: 5%; 
+    width: 85%;
     gap: 10px;
 `;
 
 const BoardRoot = styled.div`
   width: 100%;
   display: flex;
-  justify-content: flex-stat;
   flex-direction: column;
   background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
 
   overflow-y: scroll;
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
     display: none;

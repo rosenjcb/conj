@@ -20,7 +20,7 @@ export const Reply = (props) => {
 
   // let randomString = Math.random().toString(36);
 
-  const { handleSubmit, className, isOriginalPost } = props;
+  const { handleSubmit, className, isNewThread } = props;
 
   const post = useSelector(state => state.post);
   
@@ -59,7 +59,7 @@ export const Reply = (props) => {
       onSubmit={submitPost}>
         {(props) => (
           <StyledForm className={className}>
-            { isOriginalPost ? <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/> : null }
+            { isNewThread ? <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/> : null }
             <CommentBody name="comment" as="input" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
             {post.image ? <PreviewImage src={post.image}/> : null}
             {/* <SubmitField title={"Name"} isSeparateLabel={true} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
@@ -78,8 +78,11 @@ export const Reply = (props) => {
 
 export const StyledForm = styled(Form)`
   border-radius: 8px;
-  padding: 2rem;
-  width: calc(80% - 64px);
+  padding-right: 1rem;
+  padding-left: 1rem;
+  padding-bottom: 1.5rem;
+  padding-top: 1.5rem;
+  width: 100%;
   background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
   display: flex;
   justify-content: flex-start;

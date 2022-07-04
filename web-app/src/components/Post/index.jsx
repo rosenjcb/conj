@@ -92,6 +92,7 @@ const OriginalPost = (props) => {
 
   return(
     <PostRoot ref={handleRef}>
+      {/* <Ex> */}
       <OriginalContentRoot>
         <HeaderText>{subject}</HeaderText>
         <CenteredImage fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
@@ -112,10 +113,16 @@ const OriginalPost = (props) => {
           <WithText component={<Link to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></Link>} direction="row" text="10"/>
         </ActionsContainer>
       </HeaderRoot>
+      {/* </Ex> */}
       <ThreadReply/>
     </PostRoot>
   )
 }
+
+const Ex = styled.div`
+  width: 70%;
+  margin: 0 auto;
+`
 
 const ReplyPost = (props) => {
   const { postHref, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
@@ -123,7 +130,7 @@ const ReplyPost = (props) => {
   return(
     <PostRoot ref={handleRef}>
       <ContentRoot>
-        <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
+        { image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }
         <Text align="left">
           <ErrorText>{subject}</ErrorText>
           {comment}
@@ -197,9 +204,10 @@ const HeaderRoot = styled.div`
   display: flex;
   justify-content: space-between;
   flex-direction: row;
-  width: 100%;
+  width: calc(100% - 2rem);
   align-items: center;
-  border-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
   padding-left: 1rem;
   padding-right: 1rem;
   padding-top: 1.5rem;
@@ -207,18 +215,23 @@ const HeaderRoot = styled.div`
   background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1).hex()};
 `;
 
-const OriginalContentRoot = styled.div`
+const ContentRoot = styled.div`
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).hex()};
+  display: block;
+  // width: 100%;
+  width: calc(100% - 3rem);
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  padding: 1.5rem;
+`;
+
+const OriginalContentRoot = styled(ContentRoot)`
   display: flex;
   justify-content: flex-start;
   gap: 10px;
   flex-direction: column;
-  width: 100%;
+  // width: 100%;
 `
-
-const ContentRoot = styled.div`
-  display: block;
-  width: 100%;
-`;
 
 const PostRoot = styled.li`
   display: flex;
@@ -227,11 +240,13 @@ const PostRoot = styled.li`
   flex-flow: wrap;
   align-items: center;
   width: 100%;
-  padding-bottom: 1.5rem;
-  padding-top: 1rem;
+  margin-bottom: 5rem;
+  // background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten().hex()};
+  // border-radius: 8px;
+  // border: 4px solid black;
   // border-bottom: 1px solid ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
   // border-bottom-radius: 4px;
-  gap: 10px;
+  // gap: 10px;
 `;
 
 const PostLink = styled(Link)`
