@@ -123,10 +123,10 @@ function App() {
 }
 
 const AppRoot = styled.div`
-  background-color: ${props => props.theme.newTheme.colors.primary}; 
+  background-color: #6A77FC;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   min-height: 100vh;
   // min-height: calc(100vh - 13px);
   // padding-top: 5px;

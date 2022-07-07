@@ -68,14 +68,14 @@ export function Login() {
       >
         {(props) => (
           <StyledForm onSubmit={props.handleSubmit}>
-            <h1>Welcome to Pepechan!</h1>
-            <Field label="Email" type="email" autocomplete="email" name="email" placeholder="user@domain.com" component={InputField}/>
-            <Field label="Password" type="password" autocomplete="current-password" name="pass" secret={true} component={InputField}/>
+            <WelcomeMessage>Welcome to Pepechan!</WelcomeMessage>
+            <Field label="EMAIL" type="email" autocomplete="email" name="email" placeholder="user@domain.com" component={InputField}/>
+            <Field label="PASSWORD" type="password" autocomplete="current-password" name="pass" secret={true} component={InputField}/>
             <SubmitOptions>
-              <button type="submit">Login</button> 
-              <button type="button" onClick={() => handleSignup(props.values)}>Signup</button> 
+              <Button type="submit">Login</Button> 
+              <Button type="button" onClick={() => handleSignup(props.values)}>Signup</Button> 
             </SubmitOptions>
-            <a href="/about">Why do I need an account?</a>
+            <Link href="/about">Why do I need an account?</Link>
             {error ? <ErrorText>{error}</ErrorText> : null}
           </StyledForm>
       )}
@@ -87,9 +87,20 @@ export function Login() {
 const SubmitOptions = styled.div`
   display: flex;
   flex-direction: row;
+  justify-content: center;
   gap: 10px;
   padding-bottom: 1rem;
 `
+const Link = styled.a`
+  color: ${props => props.theme.newTheme.colors.white};
+`;
+
+const Button = styled.button`
+  background-color: #6A77FC;
+  color: ${props => props.theme.newTheme.colors.white};
+  border-color: transparent;
+  border-radius: 8px;
+`;
 
 const InputFieldRoot = styled.div`
   display: flex;
@@ -104,24 +115,31 @@ const StyledForm = styled.form`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  align-items: center;
   padding: 10px; 
+`;
+
+const WelcomeMessage  = styled.div`
+  color: #b9bbbe;
+  font-size: 80%;
 `;
 
 const Header = styled.div`
   width: 100%;
-  background-color: ${props => props.theme.login.header.backgroundColor};
-  color: ${props => props.theme.login.header.color};
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
+  color: ${props => props.theme.newTheme.colors.white};
   font-weight: 700;
   font-size: 131%; 
   text-align: center;
+  border-radius: 8px 8px;
+  margin-top: 1rem;
 `;
 
 const Root = styled.div`
   margin: 0 auto;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).darken().hex()};
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
   text-align: center;
   width: 500px;
+  border-radius: 8px 8px;
 
   @media all and (min-width: 1024px) and (max-width: 1280px) { 
     width: 500px;
@@ -141,9 +159,16 @@ const Root = styled.div`
 `;
 
 const Label = styled.label`
-  display: inline-block;
+  display: flex;
+  justify-content: flex-start;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: #b9bbbe;
 `;
 
 const TextField = styled.input`
   -webkit-text-security: ${props => props.secret ? "circle" : "none"};
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).darken(0.5).hex()};
+  border-radius: 8px;
+  border-color: transparent;
 `
