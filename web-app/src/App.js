@@ -17,7 +17,7 @@ export const newTheme = {
     success: "",
     failure: "",
     error: "",
-    warning: "",
+    warning: "#eed202",
     black: "black",
     white: "white",
     grey: "grey",
@@ -105,11 +105,8 @@ function App() {
             <Route exact path="/boards/:board">
               <WithNavBar component={<BoardPage/>}/>
             </Route>
-            <Route path="/thread/:id">
-              <WithNavBar component={<ThreadPage preview={false} thread={thread}/>}/>
-            </Route>
             <Route path="/boards/:board/thread/:id">
-              <WithNavBar component={<ThreadPage preview={false} thread={thread}/>}/>
+              <WithNavBar component={<ThreadPage preview={true} thread={thread}/>}/>
             </Route>
             <Route exact path ="/about">
               <AboutPage/>

@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FiMenu } from "react-icons/fi";
-import { BiMessageDetail } from 'react-icons/bi';
-import { BsFillReplyFill } from 'react-icons/bs';
-import { openQuickReply } from '../slices/postSlice';
 import * as chroma from 'chroma-js';
 import { Reply } from '../components/Reply';
 import { Thread } from '../components/Thread';
-import { Post } from '../components/Post';
-import { useDispatch } from 'react-redux';
-import { ErrorText, Avatar } from '../components';
+import {  Avatar } from '../components';
 import * as _ from 'lodash';
 import { fetchThreads } from '../api/thread';
 
@@ -28,13 +22,6 @@ export const BoardPage = () => {
     setThreads(res.data);
   },[])
 
-  // return (
-  //   <HomeRoot>
-  //     <ThreadsContainer>
-  //     </ThreadsContainer>
-  //   </HomeRoot>
-  // );
-
   return(
     <BoardRoot>
       <HomeReply/>
@@ -42,16 +29,6 @@ export const BoardPage = () => {
     </BoardRoot>
   )
 }
-
-// const Divider = styled.hr`
-//     margin: 0 auto;
-//     margin-top: 1rem;
-//     appearance: none;
-//     border-style: none;
-//     width: 90%;
-//     border-top: 3px solid ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
-//     border-radius: 4px;
-// `;
 
 const HomeReply = () => {
     return (
@@ -62,42 +39,22 @@ const HomeReply = () => {
     )
 }
 
-
 const ThreadPreview = (props) => {
 
   const { threads } = props;
 
+  useEffect(() => {
+    console.log(threads.length);
+  },[threads])
+
   return(
     <ThreadPreviewRoot>
       { threads.length > 0 
-        ? _.orderBy(threads, o => o[o.length - 1].id, ["desc"]).map((thread, index) => <Thread key={index} preview={true} thread={thread}/>)
+        ? _.orderBy(threads, o => o[o.length - 1].id, ["desc"]).map((thread, index) => <Thread board={''} key={index} preview={true} thread={thread}/>)
         : <Header>No threads yet. Make one?</Header>}
     </ThreadPreviewRoot>
   )
 }
-
-const Page = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
-  @media all and (min-width: 1024px) {
-    width: 30%;
-  }
-  
-  @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 30%;
-  }
-  
-  @media all and (min-width: 480px) and (max-width: 768px) {
-    visibility: visible;
-    width: 100%;
-   }
-  
-  @media all and (max-width: 480px) { 
-    visibility: visible;
-    width: 100%;
-  }
-`;
 
 const ThreadPreviewRoot = styled.ul`
   width: calc(100% - 3rem);
@@ -106,56 +63,6 @@ const ThreadPreviewRoot = styled.ul`
   margin: 0;
 `;
 
-const HamburgerMenu = styled(FiMenu)`
-  color: white;
-  width: 48px;
-  height: 48px;
-  padding-right: 10px;
-
-  @media all and (min-width: 1024px) {
-    visibility: hidden;
-  }
-  
-  @media all and (min-width: 768px) and (max-width: 1024px) {
-    visibility: hidden;
-  }
-  
-  @media all and (min-width: 480px) and (max-width: 768px) {
-    visibility: visible;
-   }
-  
-  @media all and (max-width: 480px) { 
-    visibility: visible;
-  }
-`;
-
-const BoardDrawer = () => {
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('hi')
-  }
-
-  return(
-    <BoardDrawerRoot>
-      <TitleContainer>
-        <Header>Boards</Header>
-      </TitleContainer>
-      <Content>
-        <BoardList>
-          <BoardItem>/b/ - random</BoardItem>
-          <BoardItem>/sp/ - sports</BoardItem>
-          <BoardItem>/int/ - international</BoardItem>
-          <BoardItem>/g/ - technology</BoardItem>
-          <BoardItem>/a/ - anime</BoardItem>
-        </BoardList>
-        <SearchForm onSubmit={handleSubmit}>
-          <Input type="text"/>
-        </SearchForm>
-      </Content>
-    </BoardDrawerRoot>
-  )
-}
 
 const Submit = styled.button`
   color: ${props => chroma(props.theme.newTheme.colors.white)};
@@ -229,17 +136,6 @@ const BoardDrawerRoot = styled.div`
   background-color: ${props => props.theme.newTheme.colors.primary};
   border-right: 1px solid black; 
 `;
-
-// const BoardRoot = styled.div`
-//   display: flex;
-//   justify-content: center;
-//   flex-direction: row;
-//   margin: 0 auto;
-//   width: 100%;
-//   height: 100%;
-//   max-height: 100vh;
-//   background-color ${props => chroma(props.theme.newTheme.colors.primary).darken(0.3)};
-// `;
 
 const TitleContainer = styled.div`
   display: flex;

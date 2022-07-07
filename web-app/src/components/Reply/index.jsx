@@ -50,7 +50,10 @@ export const Reply = (props) => {
 
     const res = await upsertThread(post, opNo);
 
-    if(res) dispatch(resetPost());
+    if(res) {
+      dispatch(swapThread(res.data));
+      dispatch(resetPost());
+    };
   }
 
   return(
@@ -60,7 +63,7 @@ export const Reply = (props) => {
         {(props) => (
           <StyledForm className={className}>
             { isNewThread ? <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/> : null }
-            <CommentBody name="comment" as="input" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
+            <CommentBody name="comment" as="textarea" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
             {post.image ? <PreviewImage src={URL.createObjectURL(post.image)}/> : null}
             {/* <SubmitField title={"Name"} isSeparateLabel={true} input={<FieldInput name="name" as="input" placeholder="Anonymous" value={post.name} onChange={(e) => handleChange(props.handleChange, e, 'name')}/>}/>
             <SubmitField title={"Subject"} isSeparateLabel={true} input={<FieldInput name="subject" as="input" placeholder="Subject" value={post.subject} onChange={(e) => handleChange(props.handleChange, e, 'subject')}/>} isSubmit/>
@@ -187,83 +190,6 @@ const sortImages = (images) => {
   return Object.values(res).sort(compare);
 }
 
-// const ImagePicker = (props) => {
-
-//   const { handleChange, images } = props;
-
-//   const [isOpen, setIsOpen] = useState(false);
-
-//   const post = useSelector(state => state.post);
-  
-//   const selectedImage = post.image;
-
-//   const [groupedImages, setGroupedImages] = useState({});
-
-//   const handlePick = (image) => {
-//     const { name } = image;
-//     const event = { 'target': { 'name': 'image', value: name}}
-//     setIsOpen(false);
-//     handleChange(event);
-//   };
-
-//   useEffect(() => {
-//     const sortedImages = sortImages(images).map((value, index) => <Item image={value} key={`${value.name}${index}`} badgeText={value.count} rarity={value.rarity} alt="" handleClick={(_) => handlePick(value)}/>);
-//     setGroupedImages(sortedImages);
-//   },[images, handleChange])
-
-//   const toggleOpen = (e) => {
-//     if(e) { e.preventDefault(); }
-//     setIsOpen(!isOpen);
-//   }
-
-//   return(
-//     <div>
-//       <FieldFilePicker>
-//         <button onClick={(e) => toggleOpen(e)}>Choose File</button>
-//         { selectedImage ? <span style={{paddingLeft: "2px"}}>{selectedImage}</span> : null }
-//       </FieldFilePicker>
-//       <ImagePickerModal isOpen={isOpen} onBackgroundClick={toggleOpen} onEscapeKeydown={toggleOpen}>
-//         <Header>
-//           <ImageGalleryTitle>Select an Image</ImageGalleryTitle>
-//           <CloseButton size={24} onClick={() => setIsOpen(false)}/>
-//         </Header>
-//         {groupedImages.length > 0 ? <ImageGallery>{groupedImages}</ImageGallery> : null }
-//       </ImagePickerModal>
-//     </div>
-//   )
-// }
-
-// const Item = (props) => {
-
-//   const { image, badgeText, handleClick, rarity } = props;
-
-//   return(
-//     <div>
-//       <RarityImage alt="" onClick={handleClick} width={50} height={50} src={image.location} rarity={rarity}/>
-//       <Badge>{badgeText}</Badge>
-//     </div>
-//   )
-// }
-
-const Badge = styled.div`
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  background-color: red;
-  position: relative; 
-  text-align: center;
-  color: white;
-  top: -15px;
-  left: 43px;
-`
-
-const FieldRoot = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  gap: 1px;
-`;
-
 const FieldName = styled.span`
   display: inline-flex;
   align-items: center;
@@ -277,46 +203,19 @@ const FieldName = styled.span`
   font-size: 10pt;
 `
 
-const QuickReplySubject = styled(FieldName)`
-  display: block;
-  width: calc(100% - 4px);
-  padding: 0;
-  margin: 0 auto;
-  text-align: center;
-  height: auto;
-  overflow: hidden;
-`;
-
-const FieldInput = styled(Field)`
-  margin: 0;
-  width: ${props => props.fill ? '292px' : '244px'};
-  margin-right: 2px;
-  padding: 2px 4px 3px;
-  border: 1px solid #aaa;
-  flex: 1;
-  outline: none;
-  font-family: aria, helvetica, sans-serif;
-  font-size: 10pt;
-  -webkit-appearance: none;
-
-  &:focus {
-        outline: none;
-    }
-`;
-
 const CommentBody = styled(Field)`
   color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
   font-size: 1.25rem;
   word-break: break-word;
   background-color: inherit;
-  resize: none;
-  appearance: none;
+  resize: vertical;
+  scrollbar-width: none;
   margin: 0;
   width: 100%;
   padding: 0;
   outline: none;
   border: none;
-  height: fit-content;
+  height: 5rem;
 `;
 
 const SubjectInput = styled(Field).attrs(props => ({type: "text"}))`

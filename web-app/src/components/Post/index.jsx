@@ -4,18 +4,11 @@ import { Text, ErrorText, Avatar } from '../index';
 import { processPostText } from '../../util/post';
 import { useDispatch } from 'react-redux';
 import { insertPostLink, openQuickReply } from '../../slices/postSlice';
-import { useHistory, useLocation, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import chroma from 'chroma-js';
 import { BiMessageDetail } from 'react-icons/bi'; 
 import { Reply } from '../Reply';
 
-// const Thumbnail = ({rarity, location}) => {
-//     return(
-//         <ThumbnailLink>
-//             { location ? <RarityImage alt="" src={location} rarity={rarity} width={150} height={150}/> : null }
-//         </ThumbnailLink>
-//     )
-// };
 const WithText = ({direction, component, text}) => {
   return (
     <WithTextRoot direction={direction}>
@@ -35,7 +28,7 @@ export const Post = (props) => {
     setFullScreen(!fullScreen);
   }
 
-  const { post, opNo, handleRef, highlight, preview } = props;
+  const { post, opNo, handleRef, highlight, preview, replyCount } = props;
 
   const { name, subject, id, comment, image, time } = post;
 
@@ -44,12 +37,11 @@ export const Post = (props) => {
   const handleClick = (e) => {
       e.preventDefault();
       dispatch(insertPostLink(opNo));
-      // dispatch(openQuickReply(opNo));
   }
 
   const prefix = preview ? '/thread/' : ''
 
-  const postHref = opNo === id ? `${prefix}${opNo}` : `${prefix}${opNo}#${id}`;
+  const postHref = isOriginalPost ? `${prefix}${opNo}` : `${prefix}${opNo}#${id}`;
 
   const handlePostDate = () => {
     const now = new Date();
@@ -58,11 +50,15 @@ export const Post = (props) => {
     const hours = Math.abs(now - then) / 36e5;
 
     if(hours < 24) {
-      if (hours < 0) { 
-        const minutes = hours / 60; 
-        if (minutes < 0) { 
-          const seconds = minutes / 60
-          return `${seconds} seconds ago`;
+      if (hours < 1) { 
+        const minutes = hours * 60; 
+        if (minutes < 1) { 
+          const seconds = minutes * 60;
+          if(seconds < 1) { 
+            return 'Just now';
+          } else {
+            return `${seconds} seconds ago`;
+          }
         }
         return `${Math.round(minutes)} minutes ago`;
       }
@@ -75,31 +71,44 @@ export const Post = (props) => {
   const formattedTime = handlePostDate();
 
   return (
-    isOriginalPost && !preview
+    isOriginalPost
       ? 
-        <OriginalPost postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
+        <OriginalPost preview={preview} highlight={false} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
                                    toggleFullScreen={toggleFullScreen} id={id} name={name} handleClick={handleClick}
-                                   opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image}/> 
+                                   opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image} replyCount={replyCount}/> 
       : 
-        <ReplyPost postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
+        <ReplyPost highlight={highlight} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
                                     toggleFullScreen={toggleFullScreen} id={id} name={name} handleClick={handleClick}
                                     opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image}/>
   )
 }
 
 const OriginalPost = (props) => {
-  const { postHref, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
+  const { postHref, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
+
+  const fullSizeContent = (
+    <OriginalContentRoot>
+      <HeaderText>{subject}</HeaderText>
+      <CenteredImage fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
+      <Text align="left">
+        {processPostText(opNo, comment)}
+      </Text>
+    </OriginalContentRoot>
+  ) 
+
+  const slimContent = (
+    <ContentRoot>
+      <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> 
+      <Text align="left">
+        <ErrorText>{subject}</ErrorText>
+        {processPostText(opNo, comment)}
+      </Text>
+    </ContentRoot>
+  )
 
   return(
     <PostRoot ref={handleRef}>
-      {/* <Ex> */}
-      <OriginalContentRoot>
-        <HeaderText>{subject}</HeaderText>
-        <CenteredImage fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
-        <Text align="left">
-          {comment}
-        </Text>
-      </OriginalContentRoot>
+      { preview ? slimContent : fullSizeContent }
       <HeaderRoot>
         <UserInfo>
           <Avatar src="/pepe_icon.jpg"/>
@@ -110,30 +119,25 @@ const OriginalPost = (props) => {
           </TextContainer>
         </UserInfo>
         <ActionsContainer>
-          <WithText component={<Link to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></Link>} direction="row" text="10"/>
+          <WithText component={<Link to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></Link>} direction="row" text={replyCount}/>
         </ActionsContainer>
       </HeaderRoot>
-      {/* </Ex> */}
       <ThreadReply/>
     </PostRoot>
   )
 }
 
-const Ex = styled.div`
-  width: 70%;
-  margin: 0 auto;
-`
-
 const ReplyPost = (props) => {
-  const { postHref, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
+  const { postHref, highlight, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
 
   return(
-    <PostRoot ref={handleRef}>
+    <PostRoot highlight={highlight} ref={handleRef}>
+      { highlight ? <YellowRibbon/> : null}
       <ContentRoot>
         { image && image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }
         <Text align="left">
           <ErrorText>{subject}</ErrorText>
-          {comment}
+          {processPostText(opNo, comment)}
         </Text>
       </ContentRoot>
       <HeaderRoot>
@@ -141,17 +145,25 @@ const ReplyPost = (props) => {
           <Avatar src="/pepe_icon.jpg"/>
           <TextContainer>
             <Text>{name}</Text>
-            <PostLink href={postHref} onClick={handleClick}>#{id}</PostLink>
+            <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
             <Text>{formattedTime}</Text>
           </TextContainer>
         </UserInfo>
-        <ActionsContainer>
-          <WithText component={<Link to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></Link>} direction="row" text="10"/>
-        </ActionsContainer>
       </HeaderRoot>
     </PostRoot>
   )
 }
+
+const YellowRibbon = styled.div`
+  width: calc(100% + 48px);
+  height: calc(100% + 2rem);
+  position: absolute;
+  border-radius: 2px;
+  top: -1rem;
+  left: -24px;
+  background-color: ${props => props.theme.newTheme.colors.warning};
+  opacity: 0.3;
+`;
 
 const WithTextRoot = styled.div`
   display: flex;
@@ -233,20 +245,15 @@ const OriginalContentRoot = styled(ContentRoot)`
   // width: 100%;
 `
 
-const PostRoot = styled.li`
+const PostRoot = styled.div`
   display: flex;
+  position: relative;
   flex-direction: column;
   justify-content: flex-start;
   flex-flow: wrap;
   align-items: center;
   width: 100%;
   margin-bottom: 5rem;
-  // background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten().hex()};
-  // border-radius: 8px;
-  // border: 4px solid black;
-  // border-bottom: 1px solid ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
-  // border-bottom-radius: 4px;
-  // gap: 10px;
 `;
 
 const PostLink = styled(Link)`

@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 export const processPostText = (opNo, text) => {
+  console.log(`Checking ${opNo} with text: ${text}`)
   if(text === null || text === undefined) return text;
 
   const textTrimmed = text.trim();
@@ -17,9 +18,9 @@ export const processPostText = (opNo, text) => {
       continue;
     }
 
-    if(line.match(/^[>]{2}[0-9]*$/)) {
+    if(line.match(/^[#]{1}[0-9]*$/)) {
       if(i !== 0) nodes.push(<br/>);
-      nodes.push(<a href={discoverHashLink(opNo, line)}>{line}</a>)
+      nodes.push(<PostLink href={discoverHashLink(opNo, line)}>{line}</PostLink>)
       continue;
     }
 
@@ -37,10 +38,14 @@ export const processPostText = (opNo, text) => {
 }
 
 const discoverHashLink = (opNo, reply) => {
-  const hashNumber = reply.substr(2);
-  return `/thread/${opNo}#${hashNumber}`;
+  const hashNumber = reply.substr(1);
+  return `${opNo}#${hashNumber}`;
 }
 
 const GreenText = styled.span`
   color: green;
 `;
+
+const PostLink = styled.a`
+  color: ${props => props.theme.newTheme.colors.white};
+`

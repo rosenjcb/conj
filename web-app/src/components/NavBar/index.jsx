@@ -1,76 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Reply } from '../Reply';
-import { useLocation, useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { HR } from '../index';
-import { swapThread } from '../../slices/threadSlice';
-import { AccountDetails } from '../AccountDetails';
-import { upsertThread } from '../../api/thread';
+import { useHistory } from 'react-router-dom';
 import { Login } from '../Login';
 import { me as callMe } from '../../api/account'
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
-
-// export function NavBar() {
-//   const location = useLocation();
-//   const history = useHistory(); 
-//   const dispatch = useDispatch();
-
-//   const [me, setMe] = useState("none"); 
-
-//   const [error, setError] = useState(null);
-
-//   useEffect(async() => {
-//     try { 
-//       const res = await callMe();
-//       setMe(res);
-//     } catch(e) {
-//       setMe(null);
-//     }
-//   },[])
-
-//   const handleSubmit = async(post) => {
-//     setError(null);
-//     try {
-//       const slugs  = location.pathname.split('/');
-//       const threadNo = slugs[2];
-//       const res = await upsertThread(post, threadNo);
-//       const thread = res.data;
-//       const newThread = thread.length === 1;
-//       dispatch(swapThread(thread))
-//       if(newThread) {
-//         history.push(`/thread/${res.data[0].id}`);
-//         history.go()
-//       }
-//       return true;
-//     } catch (error) {
-//       setError(error.response.data);
-//       return false;
-//     }
-//   }
-
-//   return (
-//     <NavRoot>
-//       <Title href="/">/b/ - Random</Title>
-//       <HR width="90%"/>
-//       {!me 
-//         ? 
-//           <Login/>
-//         : 
-//         <AccountRoot>
-//           <HR width="50%"/>
-//           <AccountDetails/> 
-//           <PostContainer>
-//             <Reply handleSubmit={handleSubmit}/>
-//             <ErrorText>{error}</ErrorText>
-//           </PostContainer>
-//         </AccountRoot> 
-//         } 
-//       <HR/>
-//     </NavRoot>
-//   )
-// }
 
 export const WithNavBar = ({component}) => {
 
@@ -116,7 +50,7 @@ const BoardDrawer = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('hi')
+    console.log('Search text')
   }
 
   const handleClick = () => {
@@ -262,7 +196,7 @@ const Content = styled.body`
   display: flex;
   justify-content: space-between;
   flex-direction column;
-  height: calc(100vh - 92px);
+  height: calc(100vh - 93px);
 `;
 
 const BoardList = styled.ul`

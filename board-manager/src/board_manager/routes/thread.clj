@@ -5,7 +5,6 @@
     [clojure.tools.logging :as log] 
     [ring.util.response :as response]))
 
-
 (defn peek-threads! [req]
   (let [redis-conn (get-in req [:components :redis-conn])]
     (response/response (query.thread/peek-threads! redis-conn))))
