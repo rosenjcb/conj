@@ -1,2 +1,0 @@
-ALTER TABLE image
-DROP COLUMN rarity;

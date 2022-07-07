@@ -12,16 +12,12 @@
             [next.jdbc.connection :as connection]
             [clojure.tools.logging :as log]
             [clojure.tools.logging.impl :as log-impl]
-            [board-manager.routes.image :as image]
             [board-manager.routes.account :as account]
             [board-manager.services.auth :as auth.service]
-            [board-manager.services.item-generation :as item-generation-service]
             [cognitect.aws.client.api :as aws]
             [ring.util.response :as response]
             [ring.middleware.cookies :as cookies]
-            [ring.middleware.resource :as resource]
-            [ring.middleware.multipart-params :as multipart]
-            [board-manager.query.refresh-token :as q.refresh-token])
+            [ring.middleware.multipart-params :as multipart])
   (:import (com.zaxxer.hikari HikariDataSource))
   (:gen-class))
 
@@ -53,7 +49,6 @@
   (ring/ring-handler
    (ring/router
     [thread/thread-routes 
-     image/image-routes
      account/account-routes]
     {:data {:muuntaja m/instance
             :coercion spec/coercion
@@ -69,10 +64,10 @@
     (spa-fallback-handler)
     (ring/create-default-handler))))
 
-(defrecord Api [handler db-conn redis-conn item-generation-service auth-service]
+(defrecord Api [handler db-conn redis-conn auth-service s3-client]
   component/Lifecycle
   (start [this]
-    (let [wrapped-app (app-middleware api-config {:db-conn db-conn :redis-conn redis-conn :item-generation-service item-generation-service :auth-service auth-service})] 
+    (let [wrapped-app (app-middleware api-config {:db-conn db-conn :redis-conn redis-conn :auth-service auth-service :s3-client s3-client})] 
       (assoc this :handler wrapped-app)))
 
   (stop [this]
@@ -109,8 +104,7 @@
      :db-conn (connection/component HikariDataSource db-spec)
      :redis-conn redis-conn
      :s3-client s3-client
-     :api (component/using (new-api api-config) [:db-conn :redis-conn :item-generation-service :auth-service :s3-client])
-     :item-generation-service (component/using (item-generation-service/new-service {:seed "TBD"}) [:db-conn])
+     :api (component/using (new-api api-config) [:db-conn :redis-conn :auth-service :s3-client])
      :auth-service (component/using (auth.service/new-service {:salt "1234" :auth-conf {:privkey "auth_privkey.pem" :pubkey "auth_pubkey.pem" :passphrase passphrase}}) [:db-conn])
      :server (component/using
               (new-server (Integer/parseInt port))

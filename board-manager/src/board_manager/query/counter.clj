@@ -1,8 +1,7 @@
 (ns board-manager.query.counter
   (:require
    [next.jdbc :as jdbc]
-   [next.jdbc.result-set :as rs]
-   [clojure.tools.logging :as log]))
+   [next.jdbc.result-set :as rs]))
 
 (defn get-counter! [db-conn]
   (jdbc/execute-one! (db-conn) ["SELECT * FROM counter where board = 'random'"] {:builder-fn rs/as-unqualified-lower-maps}))

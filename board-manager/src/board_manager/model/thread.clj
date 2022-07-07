@@ -1,6 +1,5 @@
 (ns board-manager.model.thread
   (:require 
-    [clojure.tools.logging :as log]
     [board-manager.model.post :as m.post]))
 
 (def schema 

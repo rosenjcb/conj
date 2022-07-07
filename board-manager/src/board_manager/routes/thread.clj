@@ -2,7 +2,6 @@
   (:require 
     [board-manager.middleware :as middleware] 
     [board-manager.query.thread :as query.thread]
-    [board-manager.services.item-generation :as item-generation.service]
     [clojure.tools.logging :as log] 
     [ring.util.response :as response]))
 
@@ -15,7 +14,6 @@
   (let [redis-conn (get-in req [:components :redis-conn])
         db-conn (get-in req [:components :db-conn])
         s3-client (get-in req [:components :s3-client])
-        _ (log/info (keys (:components req)))
         multipart-params (:multipart-params req)
         account (:account req)]
     (try 
@@ -38,16 +36,15 @@
 
 (defn put-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
+        s3-client (get-in req [:components :s3-client])
         account (:account req)
-        account-id (:id account)
         db-conn (get-in req [:components :db-conn])
-        item-gen (get-in req [:components :item-generation-service])
-        form-params (:params req)
+        multipart-params (:multipart-params req)
         path-params (:path-params req)
         id (:id path-params)]
     (try
-      (->> form-params 
-           (query.thread/add-post! db-conn redis-conn account id)
+      (->> multipart-params 
+           (query.thread/add-post! db-conn s3-client redis-conn account id)
            response/response)
       (catch Exception e
         (log/infof "%s" (.getMessage e))
