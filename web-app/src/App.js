@@ -123,7 +123,7 @@ function App() {
 }
 
 const AppRoot = styled.div`
-  background-color: #eef2ff; 
+  background-color: ${props => props.theme.newTheme.colors.primary}; 
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

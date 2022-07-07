@@ -5,6 +5,7 @@ import { login, signup } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { ErrorText } from './index';
 import { parseError } from '../util/error';
+import chroma from 'chroma-js';
 
 const InputField = (props) => {
   const { label, field, form, secret } = props;
@@ -118,7 +119,7 @@ const Header = styled.div`
 
 const Root = styled.div`
   margin: 0 auto;
-  background-color: ${props => props.theme.login.body.backgroundColor};
+  background-color: ${props => chroma(props.theme.newTheme.colors.primary).darken().hex()};
   text-align: center;
   width: 500px;
 
