@@ -24,7 +24,10 @@
                  [com.zaxxer/HikariCP "5.0.1"] ;;might have to come before logging libs
                  [buddy/buddy-sign "3.4.333"]
                  [buddy/buddy-hashers "1.8.158"]
-                 [clojure.java-time "0.3.3"]]
+                 [clojure.java-time "0.3.3"]
+                 [com.cognitect.aws/api "0.8.561"]
+                 [com.cognitect.aws/endpoints "1.1.12.230"]
+                 [com.cognitect.aws/s3 "822.2.1145.0"]]
   :exclusions [; Exclude transitive dependencies on concrete implementations
                ; and adapters of the above java logging abstractions:
                [ch.qos.logback/logback-classic]

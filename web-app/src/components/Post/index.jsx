@@ -130,7 +130,7 @@ const ReplyPost = (props) => {
   return(
     <PostRoot ref={handleRef}>
       <ContentRoot>
-        { image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }
+        { image && image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }
         <Text align="left">
           <ErrorText>{subject}</ErrorText>
           {comment}

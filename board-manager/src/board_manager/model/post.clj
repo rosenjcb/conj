@@ -4,6 +4,7 @@
   [:map
     [:name {:optional true} string?] 
     [:subject {:optional true} string?]
+    [:image {:optional true} map?]
     [:comment string?]])
 
 (defn model->data [t])
@@ -12,7 +13,7 @@
 (defn req&id->post
   "Takes a given API request and generates a new thread"
   [req id]
-    (let [{:keys [name subject comment image]} req]
+    (let [{:strs [name subject comment image]} req]
       {:id id :name name :subject subject :comment comment :image image}))
 
 (def id :id)

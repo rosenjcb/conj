@@ -4,7 +4,7 @@ const initialState = {
   name: "Anonymous",
   subject: "",
   comment: "",
-  image: "",
+  image: null, 
   hidden: true,
   threadNo: null
 }

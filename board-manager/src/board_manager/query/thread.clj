@@ -1,17 +1,14 @@
 (ns board-manager.query.thread
-  (:require
-   [board-manager.model.account :as m.account]
-   [board-manager.model.thread :as m.thread]
-   [board-manager.model.post :as m.post]
-   [board-manager.query.counter :as q.counter]
-   [board-manager.query.db.redis :as db.redis]
-   [board-manager.model.image :as m.image]
-   [board-manager.query.account :as q.account] 
-   [board-manager.query.accountinventory :as q.accountinventory]
-   [board-manager.query.image :as q.image]
-   [board-manager.model.accountinventory :as m.accountinventory]
-   [clojure.tools.logging :as log]
-   [java-time :as t]))
+  (:require [board-manager.model.account :as m.account]
+            [board-manager.model.post :as m.post]
+            [board-manager.model.thread :as m.thread]
+            [board-manager.query.account :as q.account]
+            [board-manager.query.counter :as q.counter]
+            [board-manager.query.db.redis :as db.redis]
+            [board-manager.query.db.s3 :as db.s3]
+            [clojure.java.io :as io]
+            [clojure.tools.logging :as log]
+            [java-time :as t]))
 
 
 (def min-character-count 15)
@@ -51,7 +48,7 @@
       (> (count comment) max-character-count)
       (throw (Exception. (format "Comment is above character limit %s/%s." (count comment) max-character-count)))
 
-      (and (= (count comment) 0) (= image ""))
+      (and (= (count comment) 0) ((complement some?) image))
       (throw (Exception. "Either a non-empty comment or image is required for replies."))
 
       :else nil)))
@@ -69,8 +66,8 @@
       (< (count comment) min-character-count)
       (throw (Exception. (format "Comment is below %s characters." min-character-count)))
 
-      ;; (= image "")
-      ;; (throw (Exception. "An image is required for posting threads. Try replying to a thread to collect pepes."))
+      ((complement some?) image)
+      (throw (Exception. "An image is required for posting threads."))
 
       :else nil)))
 
@@ -90,8 +87,12 @@
     (when (< lapsed-time 60)
       (throw (Exception. (format "Only %s seconds have passed since your last reply. You must wait 60 seconds between replies." lapsed-time))))))
 
+(defn- upload-image
+  [s3-client {:keys [filename tempfile]}]
+  (db.s3/upload-object s3-client "conj-images" filename (io/input-stream tempfile)))
+
 (defn create-thread! 
-  [db-conn redis-conn account req]
+  [db-conn s3-client redis-conn account req]
   (let [account-id (:id account)
         db-account (q.account/find-account-by-id! db-conn account-id)
         post-count (q.counter/get-count! db-conn)
@@ -100,20 +101,13 @@
         _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         id (m.thread/id op)
-        image-name (m.thread/image op)
-        image {:location image-name :id 1}
-        ;; image (q.image/get-image-by-name! db-conn image-name)
-        ;; image-id (m.image/id image)
-        ;; item (q.accountinventory/get-item-from-inventory-by-account-id&image-id db-conn account-id image-id)
-        ;; item-id (m.accountinventory/id item)
-        enriched-thread (vector (assoc op :image image :time (t/zoned-date-time)))]
-    ;; (if (some? item) 
-    ;; (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
+        image (m.thread/image op)
+        uploaded-image (upload-image s3-client image) 
+        enriched-thread (vector (assoc op :image uploaded-image :time (t/zoned-date-time)))]
     (db.redis/set redis-conn id enriched-thread)
     (q.counter/increment-counter db-conn)
     (q.account/update-last-thread! db-conn account-id)
     enriched-thread))
-      ;; (throw (Exception. "The image requested does not exist in the account's inventory.")))))
 
 (defn find-thread-by-id!
   [redis-conn id]
@@ -125,26 +119,18 @@
 
 (defn add-post!
   "Grabs a thread by its id, adds a post to it, and saves it to the database"  
-  [db-conn redis-conn account thread-id post-body]
+  [db-conn s3-client redis-conn account thread-id post-body]
   (let [account-id (:id account)
         db-account (q.account/find-account-by-id! db-conn account-id)
-        ;; _ (validate-reply-time db-account)
+        _ (validate-reply-time db-account)
         post-count (q.counter/get-count! db-conn)
-        ;; not-empty? (complement empty?)
         post (m.post/req&id->post post-body post-count)
         _ (validate-add-post post)
-        image-name (m.post/image post)
-        image {:location image-name}
-        ;; image-id (m.image/id image)
-        ;; item (q.accountinventory/get-item-from-inventory-by-account-id&image-id db-conn account-id image-id)
-        ;; item-id (m.accountinventory/id item)
+        image (m.post/image post)
+        uploaded-image (when image (upload-image s3-client image))
         old-thread (find-thread-by-id! redis-conn thread-id)
-        enriched-post (assoc post :image image :time (t/zoned-date-time))
+        enriched-post (assoc post :image uploaded-image :time (t/zoned-date-time))
         updated-thread (m.thread/add-post enriched-post old-thread)]
-    ;; (when (not-empty? image-name)
-    ;;   (if item-id
-    ;;     (q.accountinventory/delete-inventory-item-by-id! db-conn item-id)
-    ;;     (throw (Exception. "Couldn't find the image in your inventory."))))
     (update-thread! redis-conn thread-id updated-thread)
     (q.counter/increment-counter db-conn)
     (q.account/update-last-reply! db-conn account-id)
