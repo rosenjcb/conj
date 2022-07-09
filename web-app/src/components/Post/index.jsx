@@ -28,16 +28,16 @@ const handlePostDate = (time) => {
     if (hours < 1) { 
       const minutes = hours * 60; 
       if (minutes < 1) { 
-        const seconds = minutes * 60;
+        const seconds = Math.round(minutes * 60);
         if(seconds < 1) { 
           return 'Just now';
         } else {
-          return `${seconds} seconds ago`;
+          return `${seconds} ${seconds == 1 ? "second" : "seconds"} ago`;
         }
       }
-      return `${Math.round(minutes)} minutes ago`;
+      return `${Math.round(minutes)} ${minutes == 1 ? "minute" : "minutes"} ago`;
     }
-    return `${Math.round(hours)} hours ago`;
+    return `${Math.round(hours)} ${hours == 1 ? "hour" : "hours"} ago`;
   } else {
     return then.toLocaleDateString()
   }
