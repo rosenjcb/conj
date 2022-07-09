@@ -1,7 +1,6 @@
 import React from 'react';
 import { Post } from '../Post'
 import styled from 'styled-components';
-import { HR } from '..';
 
 export function Thread(props) {
 
@@ -13,15 +12,16 @@ export function Thread(props) {
     return (
       <Root>
         <Post board={board} replyCount={thread.length - 1} preview={true} opNo={op.id} post={op} key={op.id}/>
-        {/* {thread.map((post) => <div><Post preview={true} opNo={op.id} post={post} key={post.id}/></div>)} */}
       </Root>
     )
   }
 
+  const showHighlight = (index) => hashedIndex === index && index < thread.length - 1;
+
   return(
     <Root>
       { thread && thread.length > 0 && threadRef && threadRef.current
-          ? thread.map((post, index) => <Post board={board} preview={preview} highlight={hashedIndex === index} handleRef={(el) => threadRef.current[index] = el} opNo={op.id} key={post.id} post={post}/>) 
+          ? thread.map((post, index) => <Post board={board} replyCount={thread.length - 1} preview={false} highlight={showHighlight(index)} lastPost={index === thread.length - 1} handleRef={(el) => threadRef.current[index] = el} opNo={op.id} key={post.id} post={post}/>) 
           : null }
     </Root>
   )

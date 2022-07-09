@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Helmet from 'react-helmet';
 import { ThreadPage } from './pages/Thread';
-import { ModalProvider } from 'styled-react-modal';
 import { useSelector } from 'react-redux';
 import { WithNavBar } from './components/NavBar';
 import { Home } from './pages/Home'
@@ -69,38 +68,19 @@ export const theme = {
   newTheme: newTheme
 }
 
-
-// const WithNavBar = (props) => {
-//   const { component } = props;
-
-//   return(
-//     <div>
-//       <NavBar/>
-//       {component} 
-//     </div>
-//   )
-// }
-
-
-
 function App() {
   const thread = useSelector(state => state.thread);
 
-  const hideQuickReply = useSelector(state => state.post).hidden;
-
   return (
     <ThemeProvider theme={theme}>    
-    <ModalProvider>
       <AppRoot>
         <Helmet>
           <title>/b/ - Random</title>
         </Helmet>
-        {/* {!hideQuickReply ? <QuickReply/> : null } */}
         <Router forceRefresh>
-          {/* <QuickReply/> */}
           <Switch>
             <Route exact path="/">
-              <WithNavBar component={<Home/>}/>
+              <WithNavBar component={<AboutPage/>}/>
             </Route>
             <Route exact path="/boards/:board">
               <WithNavBar component={<BoardPage/>}/>
@@ -114,7 +94,6 @@ function App() {
           </Switch>
         </Router>
       </AppRoot>
-    </ModalProvider>
     </ThemeProvider>
   );
 }

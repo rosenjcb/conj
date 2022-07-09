@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 
 export const processPostText = (opNo, text) => {
-  console.log(`Checking ${opNo} with text: ${text}`)
   if(text === null || text === undefined) return text;
 
   const textTrimmed = text.trim();

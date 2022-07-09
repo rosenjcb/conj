@@ -37,7 +37,7 @@ export const ErrorText = styled.p`
   word-wrap: break-word;
 `;
 
-export const Text = styled.p`
+export const Text = styled.div`
   font-weight: 500; 
   font-size: 1rem;
   line-height: 1.5rem;

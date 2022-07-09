@@ -32,7 +32,7 @@ export function AboutPage() {
           <Faq question={"Am I anonymous?"} answer={"You will always be anonymous (or have the option to insert a name) for each post. Creating a persistent inventory for each user is the reason behind the login requirement. Your username/email is not public info."}/>
           <Faq question={"Are my credentials safe?"} answer={"I salt and hash every password created before inserting into the DB. I take precaution to guard your personal data but be smart and use a new password for this account (I can't guarantee anything)."}/>
         </FaqList>
-        <a href="/">[Back to Home]</a>
+        <StyledA href="/">[Back to Home]</StyledA>
       </DetailsContainer>
     </Root>
   )
@@ -48,27 +48,33 @@ const Faq = ({question, answer}) => {
   )
 }
 
+const StyledA = styled.a`
+  color: ${props => props.theme.newTheme.colors.accent};
+`;
+
 const FaqRoot = styled.li`
   display: flex;
   flex-direction: column;
-`
+`;
 
 const FaqList = styled.ul`
   list-style-type: none;
   padding: 0;
   margin: 0;
-`
+`;
 
 const Root = styled.div`
   min-height: 100vh;
   min-width: 100wh;
   text-align: center;
-`
+  color: ${props => props.theme.newTheme.colors.white};
+`;
+
 const DetailsContainer = styled.div`
   width: 50%;
   margin: 0 auto;
-` 
+`;
 
 const Paragraph = styled.p`
   text-align: left;
-`
+`;
