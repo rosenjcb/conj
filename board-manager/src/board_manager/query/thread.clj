@@ -19,18 +19,16 @@
 
 (def ^:const max-thread-count 5)
 
-(defn- trim-preview [t]
-  (let [no-op (drop 1 t)]
-  (conj (take-last 4 no-op) (first t))))
-
 (defn fetch-threads! 
   ([redis-conn] 
-   (fetch-threads! redis-conn false))
-  ([redis-conn peek?]
+   (fetch-threads! redis-conn {}))
+  ([redis-conn {:keys [sort? preview-length]}]
    (let [thread-ids (db.redis/get-keys redis-conn "*")]
      (->> thread-ids
          (map #(db.redis/get redis-conn %))
-         (map (if peek? trim-preview identity))))))
+         (map (if preview-length (partial m.thread/preview preview-length) identity))
+         (#(if sort? (m.thread/sort %) %)) ;;ugly af - needs to be changed
+         vec))))
 
 (defn- validate-subject
   [subject]
@@ -95,11 +93,9 @@
   [s3-client {:keys [filename tempfile]}]
   (db.s3/upload-object s3-client "conj-images" filename (io/input-stream tempfile)))
 
-(defn ^:private ^:test sort-threads
-  [threads] 
-    (log/info (type threads))
-    (let [res (sort-by (comp - :id last) threads)]
-      res))
+(defn- delete-image 
+  [s3-client filename]
+  (db.s3/delete-object s3-client "conj-images" filename))
 
 (defn find-thread-by-id!
   [redis-conn id]
@@ -119,22 +115,30 @@
         post-count (q.counter/get-count! db-conn)
         thread (m.thread/req&id->thread req post-count)
         op (first thread)
-        _ (validate-thread-time db-account)
-        ;; _ (validate-create-thread op)
+        ;; _ (validate-thread-time db-account)
+        _ (validate-create-thread op)
         id (m.thread/id op)
         image (m.thread/image op)
         uploaded-image (upload-image s3-client image) 
         enriched-thread (vector (assoc op :image uploaded-image :time (t/zoned-date-time)))
-        threads (fetch-threads! redis-conn)
-        thread-count (count threads)
-        sorted-threads (sort-threads threads)
-        expired-threads (when (> thread-count max-thread-count) (subseq sorted-threads max-thread-count thread-count))]
-    (doseq [thread expired-threads]
-            (delete-thread-by-id! redis-conn (m.post/id thread)))
+        sorted-threads (fetch-threads! redis-conn {:sort? true})
+        thread-count (count sorted-threads)
+        expired-threads (when (> thread-count max-thread-count) (subvec sorted-threads max-thread-count thread-count))]
+    (doseq [original-post (map first expired-threads)
+            :let [post-id (m.post/id original-post)]]
+      (log/infof "Deleting expired thread %s" post-id)
+      (delete-thread-by-id! redis-conn post-id))
+    (doseq [post (flatten expired-threads)
+            :let [post-id (m.post/id post)
+                  image (m.post/image post)]]
+      (log/infof "Deleting image %s from expired post %s" post-id image))
+      (delete-image s3-client (:filename image))
     (db.redis/set redis-conn id enriched-thread)
     (q.counter/increment-counter db-conn)
     (q.account/update-last-thread! db-conn account-id)
     enriched-thread))
+
+
 
 (defn update-thread! [redis-conn thread-id updated-thread]
   (db.redis/set redis-conn thread-id updated-thread))
