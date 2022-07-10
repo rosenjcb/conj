@@ -1,89 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Reply } from '../Reply';
-import { useLocation, useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { HR } from '../index';
-import { swapThread } from '../../slices/threadSlice';
-import { AccountDetails } from '../AccountDetails';
-import { upsertThread } from '../../api/thread';
+import { useHistory } from 'react-router-dom';
 import { Login } from '../Login';
 import { me as callMe } from '../../api/account'
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
 
-// export function NavBar() {
-//   const location = useLocation();
-//   const history = useHistory(); 
-//   const dispatch = useDispatch();
-
-//   const [me, setMe] = useState("none"); 
-
-//   const [error, setError] = useState(null);
-
-//   useEffect(async() => {
-//     try { 
-//       const res = await callMe();
-//       setMe(res);
-//     } catch(e) {
-//       setMe(null);
-//     }
-//   },[])
-
-//   const handleSubmit = async(post) => {
-//     setError(null);
-//     try {
-//       const slugs  = location.pathname.split('/');
-//       const threadNo = slugs[2];
-//       const res = await upsertThread(post, threadNo);
-//       const thread = res.data;
-//       const newThread = thread.length === 1;
-//       dispatch(swapThread(thread))
-//       if(newThread) {
-//         history.push(`/thread/${res.data[0].id}`);
-//         history.go()
-//       }
-//       return true;
-//     } catch (error) {
-//       setError(error.response.data);
-//       return false;
-//     }
-//   }
-
-//   return (
-//     <NavRoot>
-//       <Title href="/">/b/ - Random</Title>
-//       <HR width="90%"/>
-//       {!me 
-//         ? 
-//           <Login/>
-//         : 
-//         <AccountRoot>
-//           <HR width="50%"/>
-//           <AccountDetails/> 
-//           <PostContainer>
-//             <Reply handleSubmit={handleSubmit}/>
-//             <ErrorText>{error}</ErrorText>
-//           </PostContainer>
-//         </AccountRoot> 
-//         } 
-//       <HR/>
-//     </NavRoot>
-//   )
-// }
-
 export const WithNavBar = ({component}) => {
 
   const [me, setMe] = useState(null);
 
-  useEffect(async() => {
-    try { 
-      const res = await callMe();
-      setMe(res);
-    } catch(e) {
-      setMe(null);
-    }
-  },[])
+  useEffect(() => {
+    async function setAuth() {
+        try { 
+          const res = await callMe();
+          setMe(res);
+        } catch(e) {
+          setMe(null);
+        }
+      }
+    setAuth();
+  },[]);
 
   const detectMobile = () => {
     // console.log(window.innerWidth);
@@ -116,7 +53,7 @@ const BoardDrawer = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('hi')
+    console.log('Search text')
   }
 
   const handleClick = () => {
@@ -167,80 +104,6 @@ const Page = styled.div`
   }
 `;
 
-
-const PostContainer = styled.div`
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  @media all and (min-width: 1024px) and (max-width: 1280px) {
-    min-width: 40%;
-    max-width: 40%;
-  }
-  
-  @media all and (min-width: 768px) and (max-width: 1024px) { 
-    min-width: 40%;
-    max-width: 40%;
-  }
-  
-  @media all and (min-width: 480px) and (max-width: 768px) { 
-    min-width: 100%;
-    max-width: 100%;
-  }
-  
-  @media all and (max-width: 480px) { 
-    min-width: 100%;
-    max-width: 100%;
-  }
-`;
-
-const ErrorText = styled.p`
-  color: red;
-  margin: 0 auto;
-  width: fit-content;
-`;
-
-// const CenteredSubmitPost = styled(SubmitPost)`
-//   min-width: 100%;
-// `;
-
-const NavRoot = styled.div`
-  background-color: #eef2ff; 
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-`
-
-const AccountRoot = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  gap: 10px;
-`;
-
-const Title = styled.a`
-  font-family: ${props => props.theme.title.fontFamily};
-  font-size: ${props => props.theme.title.fontSize};
-  font-weight: ${props => props.theme.title.fontWeight};
-  letter-spacing: ${props => props.theme.title.letterSpacing};
-  text-align: center;
-  color: ${props => props.theme.title.color};
-  text-decoration: none;
-
-  &:hover {
-    cursor: pointer;  
-  }
-`;
-
-const Submit = styled.button`
-  color: ${props => chroma(props.theme.newTheme.colors.white)};
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten().hex()};
-  border: none;
-  border-radius: 16px;
-  font-size: 2rem;
-`;
-
 const SearchForm = styled.form`
   display: flex;
   flex-direction: row;
@@ -258,11 +121,11 @@ const Input = styled.input`
   padding: 0;
 `;
 
-const Content = styled.body`
+const Content = styled.div`
   display: flex;
   justify-content: space-between;
   flex-direction column;
-  height: calc(100vh - 92px);
+  height: calc(100vh - 93px);
 `;
 
 const BoardList = styled.ul`
@@ -321,7 +184,7 @@ const TitleContainer = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid ${props => chroma(props.theme.newTheme.colors.primary).darken(0.23).hex()};
   height: 92px;
   text-align: center;
 `
@@ -333,7 +196,8 @@ const HomeNavBar = styled.div`
   flex-direction: row;
   width: calc(100% - 20px);
   background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.7)};
-  border-bottom: 1px solid black;
+  // border-bottom: 1px solid black;
+  border-bottom: 1px solid ${props => chroma(props.theme.newTheme.colors.primary).hex()};
   min-height: calc(92px - 20px);
   padding: 10px;
   align-items: center;
@@ -353,29 +217,6 @@ const GreyText = styled(Text)`
   text-align: center;
   color: ${props => props.theme.newTheme.colors.grey};
 `;
-
-const HomeReplyRoot = styled.div`
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    align-items: flex-start;
-    margin-top: 10px;
-    gap: 10px;
-`;
-
-const Body = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-stat;
-  flex-direction: column;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
-
-  overflow-y: scroll;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`
 
 const HamburgerMenu = styled(FiMenu)`
   color: white;

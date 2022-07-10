@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Thread } from '../../components/Thread';
 import { useParams } from 'react-router'
@@ -23,6 +23,8 @@ export function ThreadPage() {
 
   const hashedIndex = thread.current.findIndex((p) => p.id === hash);
 
+  const [localReplyCount, setLocalReplyCount] = useState(0);
+
   useEffect(() => {
     if(hashedIndex !== undefined && threadRef.current[hashedIndex]) {
       threadRef.current[hashedIndex].scrollIntoView();
@@ -39,9 +41,16 @@ export function ThreadPage() {
         });
   },[id, dispatch]);
 
+  useEffect(() => {
+    const lastPostRef = threadRef.current[thread.current.length - 1];
+    if(lastPostRef !== undefined && localReplyCount > 0) {
+      lastPostRef.scrollIntoView({"behavior": "smooth"});
+    }
+  },[localReplyCount, thread]);
+
   return(
     <Root>
-      <Thread hashedIndex={hashedIndex} threadRef={threadRef} preview={false} thread={thread.current}/>
+      <Thread handleUpdateThread={() => setLocalReplyCount(localReplyCount + 1)} hashedIndex={hashedIndex} threadRef={threadRef} preview={false} thread={thread.current}/>
     </Root>
   )
 }
