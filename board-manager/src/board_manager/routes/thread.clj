@@ -7,7 +7,7 @@
 
 (defn peek-threads! [req]
   (let [redis-conn (get-in req [:components :redis-conn])]
-    (response/response (query.thread/peek-threads! redis-conn))))
+    (response/response (query.thread/fetch-threads! redis-conn true))))
 
 (defn create-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])

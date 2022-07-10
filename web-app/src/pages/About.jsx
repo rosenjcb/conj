@@ -12,7 +12,7 @@ export function AboutPage() {
         <h1>Pepechan</h1>
         <h2>Vision</h2>
         <Paragraph>
-          Pepechan was heavily inspired by a Youtube short titled {<a href="https://www.youtube.com/watch?v=QFj_JU6mzgQ">Rare Pepe market crashes and ruins lives</a>}. 
+          Pepechan was heavily inspired by a Youtube short titled {<StyledA href="https://www.youtube.com/watch?v=QFj_JU6mzgQ">Rare Pepe market crashes and ruins lives</StyledA>}. 
           The premise that there were Pepes you could collect and trade was so funny that I decided to make a website centered around the entire concept.
           Pepechan is an imageboard with the gimmick that you can only post images of Pepes that you have collected. Each Pepe is disposable and will disappear from your inventory once posted. You may have multiple copies of a unique Pepe.
         </Paragraph>
