@@ -13,14 +13,14 @@ import { BoardPage } from './pages/Board';
 export const newTheme = {
   colors: {
     primary: "#23262a",
-    accent: "#3A3E46",
+    accent: "#6A77FC",
     success: "",
     failure: "",
     error: "",
     warning: "",
     black: "black",
     white: "white",
-    grey: "grey",
+    grey: "#b9bbbe",
   }
 }
 
@@ -123,7 +123,7 @@ function App() {
 }
 
 const AppRoot = styled.div`
-  background-color: #6A77FC;
+  background-color: ${props => props.theme.newTheme.colors.accent};
   display: flex;
   flex-direction: column;
   justify-content: center;

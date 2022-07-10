@@ -6,6 +6,8 @@ import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { ErrorText } from './index';
 import { parseError } from '../util/error';
 import chroma from 'chroma-js';
+import { AccentButton, Link } from './index';
+
 
 const InputField = (props) => {
   const { label, field, form, secret } = props;
@@ -72,8 +74,8 @@ export function Login() {
             <Field label="EMAIL" type="email" autocomplete="email" name="email" placeholder="user@domain.com" component={InputField}/>
             <Field label="PASSWORD" type="password" autocomplete="current-password" name="pass" secret={true} component={InputField}/>
             <SubmitOptions>
-              <Button type="submit">Login</Button> 
-              <Button type="button" onClick={() => handleSignup(props.values)}>Signup</Button> 
+              <AccentButton type="submit">Login</AccentButton> 
+              <AccentButton type="button" onClick={() => handleSignup(props.values)}>Signup</AccentButton> 
             </SubmitOptions>
             <Link href="/about">Why do I need an account?</Link>
             {error ? <ErrorText>{error}</ErrorText> : null}
@@ -90,25 +92,17 @@ const SubmitOptions = styled.div`
   justify-content: center;
   gap: 10px;
   padding-bottom: 1rem;
-`
-const Link = styled.a`
-  color: ${props => props.theme.newTheme.colors.white};
-`;
-
-const Button = styled.button`
-  background-color: #6A77FC;
-  color: ${props => props.theme.newTheme.colors.white};
-  border-color: transparent;
-  border-radius: 8px;
+  padding-top: 1rem;
 `;
 
 const InputFieldRoot = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  width: 70%;
+  margin:0 auto;
   margin-top: 12px; 
   margin-bottom: 12px;
-  width: auto;
 `;
 
 const StyledForm = styled.form`
@@ -163,7 +157,7 @@ const Label = styled.label`
   justify-content: flex-start;
   font-size: 12px;
   margin-bottom: 8px;
-  color: #b9bbbe;
+  color: ${props => props.theme.newTheme.colors.grey};
 `;
 
 const TextField = styled.input`
@@ -171,4 +165,4 @@ const TextField = styled.input`
   background-color: ${props => chroma(props.theme.newTheme.colors.primary).darken(0.5).hex()};
   border-radius: 8px;
   border-color: transparent;
-`
+`;
