@@ -1,19 +1,25 @@
 (ns board-manager.query.db.s3
-  (:require [clojure.tools.logging :as logging]
+  (:require [board-manager.util.file :as util.file]
+            [clojure.tools.logging :as logging]
             [cognitect.aws.client.api :as aws]))
 
 (defn peek-object [client bucket-name filename]
-  (let [s3-object-attrs (aws/invoke client {:op :GetObjectAttributes :request {:Bucket bucket-name :Key filename}})
+  (let [s3-object-attrs (aws/invoke client {:op :GetObjectAcl :request {:Bucket bucket-name :Key filename}})
         object-exists? (nil? (:Error s3-object-attrs))]
     (when object-exists? s3-object-attrs)))
 
-(defn upload-object [client bucket-name filename inputstream]
-  (if (peek-object client bucket-name filename)
-    (upload-object client bucket-name (str filename "(copy)") inputstream)
-    (do
-      (logging/infof "Uploading to bucket: %s name: %s" bucket-name filename)
-      (aws/invoke client {:op :PutObject :request {:Bucket bucket-name :Key filename :Body inputstream}})
-      {:filename filename :location (format "https://%s.s3.amazonaws.com/%s" bucket-name filename)})))
+(defn upload-object
+  ([client bucket-name filename inputstream] (upload-object client bucket-name filename inputstream 0))
+  ([client bucket-name filename inputstream retry-count]
+   (let [{:keys [name extension]} (util.file/split-extension filename) 
+         formatted-filename (if (pos? retry-count) (str name "-" retry-count "." extension) filename)]
+    (logging/infof "Attempt #%s" retry-count)
+    (if (peek-object client bucket-name formatted-filename)
+      (upload-object client bucket-name filename inputstream (inc retry-count))
+      (do
+        (logging/infof "Uploading to bucket: %s name: %s" bucket-name formatted-filename)
+        (aws/invoke client {:op :PutObject :request {:Bucket bucket-name :Key formatted-filename :Body inputstream :ContentType (when (#{"png" "jpg" "jpeg" "gif"} extension) (str "image/" extension))}})
+        {:filename formatted-filename :location (format "https://%s.s3.amazonaws.com/%s" bucket-name formatted-filename)})))))
 
 (defn get-object [client bucket-name filename]
   (let [s3-object (aws/invoke client {:op :GetObject :request {:Bucket bucket-name :Key filename}})
@@ -38,9 +44,9 @@
   ;; (aws/invoke s3 {:op :CreateBucket})
   (aws/invoke s3 {:op :something})
   (def s3-client (:s3-client user/sys))
-  (def res (upload-object s3-client "conj-images" "testing" (.getBytes "this is a test")))
+  (def res (upload-object s3 "conj-images" "zzz" (.getBytes "this is a test")))
   (keys res)
-  (aws/invoke s3-client {:op :GetObject :request {:Bucket "conj-images" :Key "testng"}})
+  (aws/invoke s3-client {:op :GetObjectAttributes :request {:Bucket "conj-images" :Key "testing"}})
   (aws/doc s3-client :ListObjectsV2)
   (get-object s3-client "conj-images" "testig")
   (-> s3-client aws/ops res :response))
