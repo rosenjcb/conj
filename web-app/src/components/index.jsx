@@ -88,3 +88,8 @@ export const Avatar = styled.img`
 export const Link = styled.a`
   color: ${props => props.theme.newTheme.colors.white};
 `;
+
+
+export const TitlePoint = styled.h2`
+  color:  ${props => props.theme.newTheme.colors.white};
+`;

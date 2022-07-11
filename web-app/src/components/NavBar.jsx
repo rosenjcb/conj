@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { Login } from '../Login';
-import { me as callMe } from '../../api/account'
+import { Login } from './Login';
+import { me as callMe } from '../api/account'
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
 
@@ -175,8 +175,8 @@ const BoardRoot = styled.div`
   flex-direction: row;
   margin: 0 auto;
   width: 100%;
-  height: 100%;
   max-height: 100vh;
+  height: 100%;
   background-color ${props => chroma(props.theme.newTheme.colors.primary).darken(0.3)};
 `;
 

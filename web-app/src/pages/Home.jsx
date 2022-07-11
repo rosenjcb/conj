@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import * as _ from 'lodash';
-import { Thread } from '../../components/Thread';
-import { HR } from '../../components';
+import { Thread } from '../components/Thread';
+import { HR } from '../components';
 
 export function Home() {
   const [threads, setThreads] = useState([]);
