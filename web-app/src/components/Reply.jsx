@@ -1,12 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Formik, Form, Field } from 'formik';
-import { RoundButton, RoundImage } from '../index';
+import { RoundButton, RoundImage } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { updateEntry, resetPost } from '../../slices/postSlice';
-import { swapThread } from '../../slices/threadSlice';
-import { upsertThread } from '../../api/thread';
+import { updateEntry, resetPost } from '../slices/postSlice';
+import { swapThread } from '../slices/threadSlice';
+import { upsertThread } from '../api/thread';
 import chroma from 'chroma-js';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';

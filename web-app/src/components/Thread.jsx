@@ -1,5 +1,5 @@
 import React from 'react';
-import { Post } from '../Post'
+import { Post } from './Post'
 import styled from 'styled-components';
 
 export function Thread(props) {

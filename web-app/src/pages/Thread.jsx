@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Thread } from '../../components/Thread';
+import { Thread } from '../components/Thread';
 import { useParams } from 'react-router'
 import axios from 'axios'
-import { swapThread } from '../../slices/threadSlice';
+import { swapThread } from '../slices/threadSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import chroma from 'chroma-js';
