@@ -11,6 +11,9 @@ import chroma from 'chroma-js';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';
 import { useLocation } from 'react-router-dom/cjs/react-router-dom';
+import toast from 'react-hot-toast';
+import { parseError } from '../util/error';
+
 
 export const Reply = (props) => {
 
@@ -49,7 +52,7 @@ export const Reply = (props) => {
         history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
       }
     } catch(e) {
-      console.log(e);
+      toast.error(parseError(e));
     };
   }
 

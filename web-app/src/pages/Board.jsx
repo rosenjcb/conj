@@ -6,6 +6,8 @@ import { Thread } from '../components/Thread';
 import {  Avatar } from '../components';
 import * as _ from 'lodash';
 import { fetchThreads } from '../api/thread';
+import toast from 'react-hot-toast'
+import { parseError } from '../util/error';
 
 export const BoardPage = () => {
 
@@ -13,8 +15,12 @@ export const BoardPage = () => {
 
   useEffect(() => {
     async function fetchAndSetThreads() {
-      const res = await fetchThreads();
-      setThreads(res.data);
+      try {
+        const res = await fetchThreads();
+        setThreads(res.data);
+      } catch(e) {
+        toast.error(e.message);
+      }
     }
     fetchAndSetThreads();
   },[]);

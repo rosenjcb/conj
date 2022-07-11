@@ -7,6 +7,8 @@ import { swapThread } from '../slices/threadSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import chroma from 'chroma-js';
+import toast from 'react-hot-toast';
+import { parseError } from '../util/error';
 
 export function ThreadPage() {
 
@@ -32,13 +34,15 @@ export function ThreadPage() {
   },[hashedIndex])
 
   useEffect(() => {
-    axios.get(`/threads/${id}`)
-        .then((resp) => {
-            if(resp.data === "") {
-              window.location = "/";
-            }
-            dispatch(swapThread(resp.data))
-        });
+    try {
+      const res = axios.get(`/threads/${id}`);
+      if(res.data === "") {
+        window.location="/";
+      }
+      dispatch(swapThread(res.data));
+    } catch(e) {
+      toast.error(e.message);
+    }
   },[id, dispatch]);
 
   useEffect(() => {

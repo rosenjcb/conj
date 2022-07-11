@@ -8,6 +8,7 @@ import { WithNavBar } from './components/NavBar';
 import { Home } from './pages/Home'
 import { AboutPage } from './pages/About';
 import { BoardPage } from './pages/Board';
+import { Toaster } from 'react-hot-toast';
 
 export const newTheme = {
   colors: {
@@ -93,6 +94,7 @@ function App() {
             </Route>
           </Switch>
         </Router>
+        <Toaster />
       </AppRoot>
     </ThemeProvider>
   );

@@ -7,6 +7,7 @@ import { ErrorText } from './index';
 import { parseError } from '../util/error';
 import chroma from 'chroma-js';
 import { AccentButton, Link } from './index';
+import toast from 'react-hot-toast';
 
 
 const InputField = (props) => {
@@ -32,29 +33,25 @@ const InputField = (props) => {
 export function Login() {
 
   const history = useHistory();
-  
-  const [error, setError] = useState(null);
 
   const handleSignup = async(values) => {
     try {
-      setError("")
       await signup(values);
       history.push('/');
       history.go();
     } catch(e) {
-      setError(parseError(e));
+      toast.error(parseError(e));
     }
   }
 
   const handleLogin = async(values, actions) => {
     try {
-      setError("")
       actions.setSubmitting(false);
       await login(values);
       history.push('/')
       history.go();
     } catch(e) {
-      setError(parseError(e))
+      toast.error(parseError(e));
     }
   }
   
@@ -78,7 +75,6 @@ export function Login() {
               <AccentButton type="button" onClick={() => handleSignup(props.values)}>Signup</AccentButton> 
             </SubmitOptions>
             <Link href="/about">Why do I need an account?</Link>
-            {error ? <ErrorText>{error}</ErrorText> : null}
           </StyledForm>
       )}
       </Formik>
@@ -162,7 +158,6 @@ const Label = styled.label`
 
 const TextField = styled.input`
   -webkit-text-security: ${props => props.secret ? "circle" : "none"};
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).darken(0.5).hex()};
   border-radius: 8px;
   border-color: transparent;
 `;
