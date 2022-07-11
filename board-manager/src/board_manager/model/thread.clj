@@ -11,9 +11,9 @@
 (def image :image)
 
 #_{:clj-kondo/ignore [:redefined-var]}
-(defn sort
-  [threads] 
-  (sort-by (comp - :id last) threads))
+(defn sort [threads] 
+  (when threads
+    (sort-by (comp - :id last) threads)))
 
 (defn preview [length t]
   (let [no-op (drop 1 t)]

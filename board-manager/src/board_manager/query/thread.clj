@@ -140,8 +140,6 @@
     (q.account/update-last-thread! db-conn account-id)
     enriched-thread))
 
-
-
 (defn update-thread! [redis-conn thread-id updated-thread]
   (db.redis/set redis-conn thread-id updated-thread))
 
