@@ -11,22 +11,24 @@
             [java-time :as t]))
 
 
-(def min-character-count 15)
-(def max-character-count 5000)
+(def ^:const min-character-count 15)
+(def ^:const max-character-count 5000)
 
-(def max-name-count 30)
-(def max-subject-count 50)
+(def ^:const max-name-count 30)
+(def ^:const max-subject-count 50)
 
-(defn- trim-preview [t]
-  (let [no-op (drop 1 t)]
-  (conj (take-last 4 no-op) (first t))))
+(def ^:const max-thread-count 30)
 
-(defn peek-threads! 
-  [redis-conn]
-  (let [thread-ids (db.redis/get-keys redis-conn "*")]
-    (->> thread-ids
+(defn fetch-threads! 
+  ([redis-conn] 
+   (fetch-threads! redis-conn {}))
+  ([redis-conn {:keys [sort? preview-length]}]
+   (let [thread-ids (db.redis/get-keys redis-conn "*")]
+     (->> thread-ids
          (map #(db.redis/get redis-conn %))
-         (map trim-preview))))
+         (map (if preview-length (partial m.thread/preview preview-length) identity))
+         (#(if sort? (m.thread/sort %) %)) ;;ugly af - needs to be changed
+         vec))))
 
 (defn- validate-subject
   [subject]
@@ -91,6 +93,29 @@
   [s3-client {:keys [filename tempfile]}]
   (db.s3/upload-object s3-client "conj-images" filename (io/input-stream tempfile)))
 
+(defn- delete-image 
+  [s3-client filename]
+  (db.s3/delete-object s3-client "conj-images" filename))
+
+(defn find-thread-by-id!
+  [redis-conn id]
+  (let [thread-data (db.redis/get redis-conn id)]
+    thread-data)) 
+
+;; Wish I could test this but it's too side effect heavy.
+(defn delete-thread-by-id! [redis-conn s3-client thread-id]
+  (let [thread (find-thread-by-id! redis-conn thread-id)]
+    (if thread
+      (do 
+        (db.redis/del redis-conn thread-id)
+        (doseq [post thread
+                :let [post-id (m.post/id post)
+                      image (m.post/image post)]]
+          (when image
+            (log/infof "Deleting image %s from expired post %s" image post-id)
+            (delete-image s3-client (:filename image)))))
+      (throw (Exception. (format "Thread No. %s not found." thread-id))))))
+
 (defn create-thread! 
   [db-conn s3-client redis-conn account req]
   (let [account-id (:id account)
@@ -98,21 +123,24 @@
         post-count (q.counter/get-count! db-conn)
         thread (m.thread/req&id->thread req post-count)
         op (first thread)
-        _ (validate-thread-time db-account)
+        ;; _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         id (m.thread/id op)
         image (m.thread/image op)
         uploaded-image (upload-image s3-client image) 
-        enriched-thread (vector (assoc op :image uploaded-image :time (t/zoned-date-time)))]
+        enriched-thread (vector (assoc op :image uploaded-image :time (t/zoned-date-time)))
+        sorted-threads (fetch-threads! redis-conn {:sort? true})
+        thread-count (count sorted-threads)
+        expired-threads (when (> thread-count max-thread-count) (subvec sorted-threads max-thread-count thread-count))]
+    (doseq [original-post (map first expired-threads)
+            :let [post-id (m.post/id original-post)]]
+      (when post-id 
+        (log/infof "Deleting expired thread %s" post-id)
+        (delete-thread-by-id! redis-conn s3-client post-id)))
     (db.redis/set redis-conn id enriched-thread)
     (q.counter/increment-counter db-conn)
     (q.account/update-last-thread! db-conn account-id)
     enriched-thread))
-
-(defn find-thread-by-id!
-  [redis-conn id]
-  (let [thread-data (db.redis/get redis-conn id)]
-    thread-data)) 
 
 (defn update-thread! [redis-conn thread-id updated-thread]
   (db.redis/set redis-conn thread-id updated-thread))
@@ -136,11 +164,7 @@
     (q.account/update-last-reply! db-conn account-id)
     updated-thread))
 
-(defn delete-thread-by-id! [redis-conn thread-id]
-  (let [thread (find-thread-by-id! redis-conn thread-id)]
-    (if thread
-      (db.redis/del redis-conn thread-id)
-      (throw (Exception. (format "Thread No. %s not found." thread-id))))))
-
-(defn delete-all-threads! [redis-conn]
-  (db.redis/flush-all redis-conn))
+;; can probably be replaced with generic "del all redis keys and images" without validating the relationships 
+(defn delete-all-threads! [redis-conn s3-client]
+  (let [threads (fetch-threads! redis-conn)]
+    (dorun (map #(delete-thread-by-id! redis-conn s3-client (m.post/id (first %))) threads))))

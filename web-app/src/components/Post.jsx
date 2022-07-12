@@ -32,12 +32,12 @@ const handlePostDate = (time) => {
         if(seconds < 1) { 
           return 'Just now';
         } else {
-          return `${seconds} ${seconds == 1 ? "second" : "seconds"} ago`;
+          return `${seconds} ${seconds === 1 ? "second" : "seconds"} ago`;
         }
       }
-      return `${Math.round(minutes)} ${minutes == 1 ? "minute" : "minutes"} ago`;
+      return `${Math.round(minutes)} ${minutes === 1 ? "minute" : "minutes"} ago`;
     }
-    return `${Math.round(hours)} ${hours == 1 ? "hour" : "hours"} ago`;
+    return `${Math.round(hours)} ${hours === 1 ? "hour" : "hours"} ago`;
   } else {
     return then.toLocaleDateString()
   }
@@ -131,7 +131,7 @@ const ReplyPost = (props) => {
   const { postHref, highlight, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
 
   return(
-    <PostRoot key={id} highlight={highlight}>
+    <PostRoot highlight={highlight}>
       <YellowRibbon highlight={highlight} ref={handleRef}/>
       <ContentRoot>
         { image && image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }

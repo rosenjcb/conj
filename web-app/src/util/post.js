@@ -13,27 +13,27 @@ export const processPostText = (opNo, text) => {
   for(var i = 0; i < lines.length; i++){ 
     const line = lines[i];
     if(line === '') { 
-      nodes.push(<br/>); 
+      nodes.push(<br key={i}/>); 
       continue;
     }
 
     if(line.match(/^[#]{1}[0-9]*$/)) {
-      if(i !== 0) nodes.push(<br/>);
+      if(i !== 0) nodes.push(<br key={i}/>);
       nodes.push(<PostLink href={discoverHashLink(opNo, line)}>{line}</PostLink>)
       continue;
     }
 
     if(line.match("^[>]")) {
-      if(i !== 0) nodes.push(<br/>);
+      if(i !== 0) nodes.push(<br key={i}/>);
       nodes.push(<GreenText>{line}</GreenText>);
       continue;
     }
 
-    if(i !== 0) nodes.push(<br/>)
-    nodes.push(<span key={i}>{line}</span>)
+    if(i !== 0) nodes.push(<br key={i}/>);
+    nodes.push(<span key={i}>{line}</span>);
   }
 
-  return <span>{nodes}</span>
+  return <span>{nodes}</span>;
 }
 
 const discoverHashLink = (opNo, reply) => {

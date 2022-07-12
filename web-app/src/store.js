@@ -6,5 +6,6 @@ export const store = configureStore({
   reducer: {
     thread: threadReducer,
     post: postReducer
-  }
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false})
 });

@@ -5,7 +5,6 @@ import Helmet from 'react-helmet';
 import { ThreadPage } from './pages/Thread';
 import { useSelector } from 'react-redux';
 import { WithNavBar } from './components/NavBar';
-import { Home } from './pages/Home'
 import { AboutPage } from './pages/About';
 import { BoardPage } from './pages/Board';
 import { Toaster } from 'react-hot-toast';

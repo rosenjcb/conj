@@ -7,7 +7,7 @@
 
 (defn peek-threads! [req]
   (let [redis-conn (get-in req [:components :redis-conn])]
-    (response/response (query.thread/peek-threads! redis-conn))))
+    (response/response (query.thread/fetch-threads! redis-conn true))))
 
 (defn create-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
@@ -51,18 +51,19 @@
 
 (defn kill-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
+        s3-client (get-in req [:components :s3-client])
         thread-id (get-in req [:path-params :id])]
     (try
-      (doall
-        (query.thread/delete-thread-by-id! redis-conn thread-id)
-        (response/response (format "Thread No. %s has been deleted" thread-id)))
+      (query.thread/delete-thread-by-id! redis-conn s3-client thread-id)
+      (response/response (format "Thread No. %s has been deleted" thread-id))
       (catch Exception e
         (log/infof "%s" (.getMessage e))
         (response/bad-request (.getMessage e))))))
 
 (defn nuke-threads! [req]
-  (let [redis-conn (get-in req [:components :redis-conn])]
-    (query.thread/delete-all-threads! redis-conn)
+  (let [redis-conn (get-in req [:components :redis-conn])
+        s3-client (get-in req [:components :s3-client])]
+    (query.thread/delete-all-threads! redis-conn s3-client)
     (response/response "Threads deleted")))
 
 (def thread-routes

@@ -1,5 +1,6 @@
 (ns board-manager.query.thread-test
-  (:require [board-manager.query.thread :as q.thread]
+  (:require [board-manager.model.thread :as m.thread]
+            [board-manager.query.thread :as q.thread]
             [clojure.test :refer [deftest is testing]]
             [java-time :as t]))
 
@@ -11,9 +12,13 @@
 
 (def example-image {:id 19 :name "snot-pepe" :location "" :rarity "common"})
 
-(def basic-thread [{:id 100 :name "Anonymous" :subject "" :image ""}])
+(def basic-thread [{:id 100 :name "Anonymous" :subject "" :image nil}])
 
 (def example-item [{:id 1 :account_id 1 :image_id 19}])
+
+(def unsorted-threads (vec (map #(assoc-in basic-thread [0 :id] %) [101 99 87 22 94 105])))
+
+(def sorted-threads (vec (map #(assoc-in basic-thread [0 :id] %) [105 101 99 94 87 22])))
 
 (defn- subtract-minutes [min time]
   (let [instant (t/local-date-time time)]
@@ -40,7 +45,7 @@
     (let [post-comment "Lorem ipsum facto 15 char."
           image {:filename "snot-pepe" :tempfile nil}
           valid-thread-post (assoc base-request :comment post-comment :image image)]
-      (is (= nil (#'q.thread/validate-create-thread valid-thread-post)))))
+      (is (= nil (#'q.thread/validate-create-thread valid-thread-post))))
    (testing "Invalid original posts throw errors"
        (let [too-short "spam"
              too-long (apply str (repeat 5001 "a"))
@@ -53,7 +58,7 @@
         (is (thrown-with-msg? java.lang.Exception #"Comment is below 15 characters." (#'q.thread/validate-create-thread not-enough-chars)))
         (is (thrown-with-msg? java.lang.Exception #"Comment is above character limit 5001/5000." (#'q.thread/validate-create-thread too-many-chars)))
         (is (thrown-with-msg? java.lang.Exception #"An image is required for posting threads." (#'q.thread/validate-create-thread no-image-provided)))
-        (is (thrown-with-msg? java.lang.Exception #"Only 3 minutes have passed since your last thread. You must wait 5 minutes between creating new threads." (#'q.thread/validate-thread-time too-early)))))
+        (is (thrown-with-msg? java.lang.Exception #"Only 3 minutes have passed since your last thread. You must wait 5 minutes between creating new threads." (#'q.thread/validate-thread-time too-early))))))
   (testing "Valid original posts return nil (do not throw)"
     (let [post-comment "Lorem ipsum facto 15 char."
           image {:filename "snot-pepe" :tempfile nil}
@@ -62,7 +67,7 @@
           valid-via-comment&image (assoc base-request :comment post-comment :image image)]
       (is (= nil (#'q.thread/validate-add-post valid-via-image)))
       (is (= nil (#'q.thread/validate-add-post valid-via-comment)))
-      (is (= nil (#'q.thread/validate-add-post valid-via-comment&image)))))
+      (is (= nil (#'q.thread/validate-add-post valid-via-comment&image))))
    (testing "Invalid replies throw errors"
        (let [too-long (apply str (repeat 5001 "a"))
              image {:filename "snot-pepe" :tempfile nil}
@@ -71,4 +76,12 @@
              too-early (update basic-account :last_reply (partial subtract-seconds 30))]
         (is (thrown-with-msg? java.lang.Exception #"Comment is above character limit 5001/5000." (#'q.thread/validate-add-post too-many-chars)))
         (is (thrown-with-msg? java.lang.Exception #"Either a non-empty comment or image is required for replies." (#'q.thread/validate-add-post blank-reply)))
-        (is (thrown-with-msg? java.lang.Exception #"Only 30 seconds have passed since your last reply. You must wait 60 seconds between replies." (#'q.thread/validate-reply-time too-early))))))
+        (is (thrown-with-msg? java.lang.Exception #"Only 30 seconds have passed since your last reply. You must wait 60 seconds between replies." (#'q.thread/validate-reply-time too-early)))))))
+
+(deftest sort-threads
+  (testing "Empty threads sorts to empty threads and nil sorts to nil"
+    (is (= [] (m.thread/sort [])))
+    (is (= nil (m.thread/sort nil))))
+  (testing "Unsorted threads sorts to sorted threads"
+    (let [actual-sorted-threads (m.thread/sort unsorted-threads)]
+      (is (= actual-sorted-threads sorted-threads)))))
