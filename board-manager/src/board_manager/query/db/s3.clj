@@ -13,7 +13,6 @@
   ([client bucket-name filename inputstream retry-count]
    (let [{:keys [name extension]} (util.file/split-extension filename) 
          formatted-filename (if (pos? retry-count) (str name "-" retry-count "." extension) filename)]
-    (logging/infof "Attempt #%s" retry-count)
     (if (peek-object client bucket-name formatted-filename)
       (upload-object client bucket-name filename inputstream (inc retry-count))
       (do
@@ -27,10 +26,11 @@
     (when object-exists? s3-object)))
 
 (defn delete-object [client bucket-name filename]
-  (let [object-attrs (peek-object client bucket-name filename)] ;;might help to write a peek method to avoid getting the entire object into memory
+  (let [object-attrs (peek-object client bucket-name filename)]
     (when object-attrs
       (logging/infof "Deleting from bucket: %s file: %s" bucket-name filename)  
-      (aws/invoke client {:op :DeleteObject :request {:Bucket bucket-name :Key filename}}))))
+      (aws/invoke client {:op :DeleteObject :request {:Bucket bucket-name :Key filename}})
+      true)))
 
 (comment
   (require '[cognitect.aws.client.api :as aws])
