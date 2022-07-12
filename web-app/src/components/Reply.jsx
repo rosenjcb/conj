@@ -1,16 +1,19 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Formik, Form, Field } from 'formik';
-import { RoundButton, RoundImage } from '../index';
+import { RoundButton, RoundImage } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { updateEntry, resetPost } from '../../slices/postSlice';
-import { swapThread } from '../../slices/threadSlice';
-import { upsertThread } from '../../api/thread';
+import { updateEntry, resetPost } from '../slices/postSlice';
+import { swapThread } from '../slices/threadSlice';
+import { upsertThread } from '../api/thread';
 import chroma from 'chroma-js';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';
 import { useLocation } from 'react-router-dom/cjs/react-router-dom';
+import toast from 'react-hot-toast';
+import { parseError } from '../util/error';
+
 
 export const Reply = (props) => {
 
@@ -49,7 +52,7 @@ export const Reply = (props) => {
         history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
       }
     } catch(e) {
-      console.log(e);
+      toast.error(parseError(e));
     };
   }
 

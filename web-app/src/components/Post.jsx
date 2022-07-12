@@ -1,13 +1,13 @@
 import React, { useState } from 'react'
 import styled from 'styled-components';
-import { Text, ErrorText, Avatar } from '../index';
-import { processPostText } from '../../util/post';
+import { Text, ErrorText, Avatar } from './index';
+import { processPostText } from '../util/post';
 import { useDispatch } from 'react-redux';
-import { insertPostLink } from '../../slices/postSlice';
+import { insertPostLink } from '../slices/postSlice';
 import { Link } from 'react-router-dom';
 import chroma from 'chroma-js';
 import { BiMessageDetail } from 'react-icons/bi'; 
-import { Reply } from '../Reply';
+import { Reply } from './Reply';
 
 const WithText = ({direction, component, text}) => {
   return (

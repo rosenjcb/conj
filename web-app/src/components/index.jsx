@@ -62,6 +62,17 @@ export const RoundButton = styled.button`
   }
 `;
 
+export const AccentButton = styled(RoundButton)`
+  background-color: ${props => props.theme.newTheme.colors.accent};
+  color: ${props => props.theme.newTheme.colors.white};
+  border-color: transparent;
+  //border-radius: 8px;
+
+  &:hover {
+    background-color: ${props => chroma(props.theme.newTheme.colors.accent).darken().hex()};
+  }
+`;
+
 export const RoundImage = styled.img`
   max-width: 200px;
   aspect-ratio: 16/9;
@@ -72,4 +83,13 @@ export const Avatar = styled.img`
   width: 48px;
   height: 48px;
   border-radius: 50%;
+`;
+
+export const Link = styled.a`
+  color: ${props => props.theme.newTheme.colors.white};
+`;
+
+
+export const TitlePoint = styled.h2`
+  color:  ${props => props.theme.newTheme.colors.white};
 `;

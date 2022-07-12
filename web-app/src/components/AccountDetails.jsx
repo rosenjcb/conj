@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components';
-import { me, logout } from '../../api/account';
+import { me, logout } from '../api/account';
 
 export const AccountDetails = (props) => {
 
