@@ -46,5 +46,5 @@ const GreenText = styled.span`
 `;
 
 const PostLink = styled.a`
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
 `
