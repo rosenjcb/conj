@@ -103,7 +103,7 @@ export const StyledForm = styled(Form)`
   padding-bottom: 1.5rem;
   padding-top: 1.5rem;
   width: 100%;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten(1.5).hex()};
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
@@ -159,7 +159,7 @@ const ActionsContainer = styled.div`
 
 
 const CommentBody = styled(Field)`
-  color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
+  color: ${props => chroma(props.theme.colors.white).darken(0.8).hex()};
   font-size: 1.25rem;
   word-break: break-word;
   background-color: inherit;
@@ -174,7 +174,7 @@ const CommentBody = styled(Field)`
 `;
 
 const SubjectInput = styled(Field).attrs(props => ({type: "text"}))`
-  color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
+  color: ${props => chroma(props.theme.colors.white).darken(0.8).hex()};
   font-size: 2.5rem;
   background-color: inherit;
   resize: none;
@@ -187,7 +187,7 @@ const SubjectInput = styled(Field).attrs(props => ({type: "text"}))`
   border: none;
 
   ::placeholder {
-    color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
+    color: ${props => chroma(props.theme.colors.white).darken(0.8).hex()};
   }
 `;
 
@@ -208,7 +208,7 @@ const IconContainer = styled.div`
 const DeleteIcon = styled(AiFillDelete)`
   width: 24px;
   height: 24px;
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
 `;
 
 const UploadImageIcon = styled(BiImageAdd)`

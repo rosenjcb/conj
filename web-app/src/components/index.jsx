@@ -5,7 +5,7 @@ export const HR = styled.hr`
   width: ${props => props.width ?? "100%"};
   border: none;
   height: 4px;
-  background-color ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
+  background-color ${props => chroma(props.theme.colors.primary).brighten(1.5).hex()};
   border-radius: 8px;
 `;
 
@@ -41,15 +41,15 @@ export const Text = styled.div`
   font-weight: 500; 
   font-size: 1rem;
   line-height: 1.5rem;
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
   font-family: 'Open Sans', sans-serif;
   padding: 0;
   margin: 0;
 `;
 
 export const RoundButton = styled.button`
-  color: ${props => chroma(props.theme.newTheme.colors.white)};
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten().hex()};
+  color: ${props => chroma(props.theme.colors.white)};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten().hex()};
   border: none;
   border-radius: 9000px; 
   font-size: 1.5rem;
@@ -58,18 +58,18 @@ export const RoundButton = styled.button`
   padding-right: 20px;
 
   &:hover {
-    background-color: ${props => chroma(props.theme.newTheme.colors.primary).hex()};
+    background-color: ${props => chroma(props.theme.colors.primary).hex()};
   }
 `;
 
 export const AccentButton = styled(RoundButton)`
-  background-color: ${props => props.theme.newTheme.colors.accent};
-  color: ${props => props.theme.newTheme.colors.white};
+  background-color: ${props => props.theme.colors.accent};
+  color: ${props => props.theme.colors.white};
   border-color: transparent;
   //border-radius: 8px;
 
   &:hover {
-    background-color: ${props => chroma(props.theme.newTheme.colors.accent).darken().hex()};
+    background-color: ${props => chroma(props.theme.colors.accent).darken().hex()};
   }
 `;
 
@@ -86,10 +86,10 @@ export const Avatar = styled.img`
 `;
 
 export const Link = styled.a`
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
 `;
 
 
 export const TitlePoint = styled.h2`
-  color:  ${props => props.theme.newTheme.colors.white};
+  color:  ${props => props.theme.colors.white};
 `;
