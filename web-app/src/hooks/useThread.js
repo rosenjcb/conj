@@ -1,4 +1,5 @@
-// import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 // import axios from 'axios';
 
 // axios.defaults.baseURL = 'https://localhost:6006';
@@ -34,3 +35,7 @@
 
 //     return { res.data };
 // }
+
+export const useThread = () => {
+    const location = useLocation();
+}

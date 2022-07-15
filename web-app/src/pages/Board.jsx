@@ -16,7 +16,7 @@ export const BoardPage = () => {
   useEffect(() => {
     async function fetchAndSetThreads() {
       try {
-        const res = await fetchThreads();
+        const res = await fetchThreads("random");
         setThreads(res.data);
       } catch(e) {
         toast.error(e.message);

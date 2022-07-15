@@ -48,7 +48,8 @@
 (def api-config
   (ring/ring-handler
    (ring/router
-    [thread/thread-routes 
+    ["/api"
+     thread/thread-routes 
      account/account-routes]
     {:data {:muuntaja m/instance
             :coercion spec/coercion
