@@ -2,25 +2,12 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { Login } from './Login';
-import { me as callMe } from '../api/account'
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
 
 export const WithNavBar = ({component}) => {
 
-  const [me, setMe] = useState(null);
 
-  useEffect(() => {
-    async function setAuth() {
-        try { 
-          const res = await callMe();
-          setMe(res);
-        } catch(e) {
-          setMe(null);
-        }
-      }
-    setAuth();
-  },[]);
 
   const detectMobile = () => {
     // console.log(window.innerWidth);
@@ -29,7 +16,7 @@ export const WithNavBar = ({component}) => {
 
   const isMobile = detectMobile();
 
-  const navBar = (
+    return (
     <BoardRoot>
       { !isMobile ? <BoardDrawer/> : null }
       <Page>
@@ -43,8 +30,6 @@ export const WithNavBar = ({component}) => {
       </Page>
     </BoardRoot>
   )
-
-  return me ? navBar : <Login/>;
 }
 
 const BoardDrawer = () => {

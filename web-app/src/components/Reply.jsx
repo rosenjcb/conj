@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import { Formik, Form, Field } from 'formik';
 import { RoundButton, RoundImage } from './index';
@@ -13,6 +13,8 @@ import { AiFillDelete } from 'react-icons/ai';
 import { useLocation } from 'react-router-dom/cjs/react-router-dom';
 import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
+import { Login } from './Login';
+import { me as callMe } from '../api/account'
 
 
 export const Reply = (props) => {
@@ -41,7 +43,6 @@ export const Reply = (props) => {
   const opNo = parseInt(finalSlug);
 
   const submitPost = async(values, actions) => {
-
     try {
       const res = await upsertThread(post, opNo);
       dispatch(swapThread(res.data));
@@ -56,8 +57,27 @@ export const Reply = (props) => {
     };
   }
 
-  return(
-    <Formik
+  const [me, setMe] = useState(null);
+
+  useEffect(() => {
+    async function setAuth() {
+        try { 
+          const res = await callMe();
+          setMe(res);
+        } catch(e) {
+          setMe(null);
+        }
+      }
+    setAuth();
+  },[]);
+
+  if(!me) {
+    return(
+      <Login />
+    )
+  } else {
+    return(
+      <Formik
       initialValues={post}
       onSubmit={submitPost}>
         {(props) => (
@@ -72,7 +92,8 @@ export const Reply = (props) => {
           </StyledForm>
         )}
       </Formik>
-  )
+    )
+  }
 }
 
 export const StyledForm = styled(Form)`

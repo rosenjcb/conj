@@ -14,6 +14,6 @@ export const upsertThread = (post, opNo) => {
     if(val !== null) formData.append(key, val);
   }
 
-  return opNo ? axios.put(`/threads/${opNo}`, formData, {headers: {"Content-Type": "multipart/form-data"}}) : axios.post('/threads', formData, {headers: {"Content-Type": "multipart/form-data"}});
+  return opNo !== null ? axios.put(`/threads/${opNo}`, formData, {headers: {"Content-Type": "multipart/form-data"}}) : axios.post('/threads', formData, {headers: {"Content-Type": "multipart/form-data"}});
 }
 

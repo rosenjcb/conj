@@ -12,7 +12,7 @@ import { parseError } from '../util/error';
 
 export function ThreadPage() {
 
-  const thread = useSelector(state => state.thread);
+  const thread = useSelector(state => state.thread).current;
   const dispatch = useDispatch();
 
   const { id } = useParams();
@@ -23,7 +23,7 @@ export function ThreadPage() {
 
   const threadRef = useRef([]);
 
-  const hashedIndex = thread.current.findIndex((p) => p.id === hash);
+  const hashedIndex = thread.findIndex((p) => p.id === hash);
 
   const [localReplyCount, setLocalReplyCount] = useState(0);
 
@@ -33,9 +33,9 @@ export function ThreadPage() {
     }
   },[hashedIndex])
 
-  useEffect(() => {
+  useEffect(async() => {
     try {
-      const res = axios.get(`/threads/${id}`);
+      const res = await axios.get(`/threads/${id}`);
       if(res.data === "") {
         window.location="/";
       }
@@ -46,15 +46,17 @@ export function ThreadPage() {
   },[id, dispatch]);
 
   useEffect(() => {
-    const lastPostRef = threadRef.current[thread.current.length - 1];
-    if(lastPostRef !== undefined && localReplyCount > 0) {
-      lastPostRef.scrollIntoView({"behavior": "smooth"});
+    if(threadRef.current && threadRef.current.length > 0) {
+      const lastPostRef = threadRef.current[thread.length - 1];
+      if(lastPostRef !== undefined && localReplyCount > 0) {
+        lastPostRef.scrollIntoView({"behavior": "smooth"});
+      }
     }
   },[localReplyCount, thread]);
 
   return(
     <Root>
-      <Thread handleUpdateThread={() => setLocalReplyCount(localReplyCount + 1)} hashedIndex={hashedIndex} threadRef={threadRef} preview={false} thread={thread.current}/>
+      {thread.length > 0 ? <Thread handleUpdateThread={() => setLocalReplyCount(localReplyCount + 1)} hashedIndex={hashedIndex} threadRef={threadRef} preview={false} thread={thread}/> : null }
     </Root>
   )
 }
