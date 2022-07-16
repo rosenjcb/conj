@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-// axios.defaults.baseURL = 'https://localhost:6006';
 export const me = () => axios.get('/api/me');
 
 export const login = (accountDetails) => {

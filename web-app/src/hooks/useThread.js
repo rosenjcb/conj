@@ -1,41 +1,34 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-// import axios from 'axios';
-
-// axios.defaults.baseURL = 'https://localhost:6006';
-
-// export const useThread = (path, post) => {
-
-//     const slugs = path.split('/')
-//     const id = slugs[2];
-
-//     const res = path.length === 3 ? await axios.put(`/threads/${id}`, post) : await axios.post('/threads', post);
-
-//     // const [response, setResponse] = useState(null);
-//     // const [error, setError] = useState('');
-//     // const [loading, setloading] = useState(true);
-
-//     const fetchData = () => {
-//         axios
-//             .post('/threads', post)
-//             .then((res) => {
-//                 setResponse(res.data);
-//             })
-//             .catch((err) => {
-//                 setError(err);
-//             })
-//             .finally(() => {
-//                 setloading(false);
-//             });
-//     };
-
-//     useEffect(() => {
-//         fetchData()
-//     }, []);
-
-//     return { res.data };
-// }
 
 export const useThread = () => {
     const location = useLocation();
+
+    const pathSlugs = location.pathname.split("/"); 
+
+    // const finalSlug = pathSlugs[slugCount - 1].match(/(\d+)/);
+
+    if(pathSlugs.length < 2) {
+        return {
+            board: null,
+            threadNo: null,
+            replyNo: null
+        };
+    }
+
+    const board = pathSlugs[1] === "boards" ? pathSlugs[2] : null;
+
+    const threadSlug = pathSlugs[3] === "thread" ? pathSlugs[4] : null;
+
+    const threadNo = parseInt(threadSlug) ?? 0;
+
+    const hash = location.hash.substring(1);
+
+    const replyNo = hash ? Number(hash) : null;
+
+    return {
+        board: board,
+        threadNo: threadNo,
+        replyNo 
+    };
 }

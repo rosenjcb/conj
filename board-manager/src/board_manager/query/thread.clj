@@ -3,7 +3,7 @@
             [board-manager.model.post :as m.post]
             [board-manager.model.thread :as m.thread]
             [board-manager.query.account :as q.account]
-            [board-manager.query.counter :as q.counter]
+            [board-manager.query.board :as q.board]
             [board-manager.query.db.redis :as db.redis]
             [board-manager.query.db.s3 :as db.s3]
             [clojure.java.io :as io]
@@ -11,13 +11,10 @@
             [clojure.tools.logging :as log]
             [java-time :as t]))
 
-
 (def ^:const min-character-count 15)
 (def ^:const max-character-count 5000)
-
 (def ^:const max-name-count 30)
 (def ^:const max-subject-count 50)
-
 (def ^:const max-thread-count 30)
 
 (defn fetch-threads! 
@@ -25,10 +22,14 @@
    (fetch-threads! redis-conn board {}))
   ([redis-conn board {:keys [sort? preview-length]}]
    (let [threads (db.redis/get redis-conn board)]
-     (->> threads
-          (map (if preview-length (partial m.thread/preview preview-length) identity))
-          (#(if sort? (m.thread/sort %) %)) ;;ugly af - needs to be changed
-          vec))))
+     (if threads
+      (some->> threads
+                (map (if preview-length (partial m.thread/preview preview-length) identity))
+                (#(if sort? (m.thread/sort %) %)) ;;ugly af - needs to be changed
+                vec)
+       (do
+        (db.redis/set redis-conn board [])
+        [])))))
 
 (defn- validate-subject
   [subject]
@@ -138,7 +139,7 @@
   [db-conn s3-client redis-conn board account req]
   (let [account-id (:id account)
         db-account (q.account/find-account-by-id! db-conn account-id)
-        post-count (q.counter/get-count! db-conn)
+        post-count (q.board/get-count! db-conn board)
         thread (m.thread/req&id->thread req post-count)
         op (first thread)
         ;; _ (validate-thread-time db-account)
@@ -148,7 +149,7 @@
         uploaded-image (upload-image s3-client image) 
         enriched-thread (vector (assoc op :image uploaded-image :time (t/zoned-date-time)))] 
     (add-thread-to-board! redis-conn s3-client board enriched-thread)
-    (q.counter/increment-counter db-conn)
+    (q.board/increment-counter! db-conn board)
     (q.account/update-last-thread! db-conn account-id)
     enriched-thread))
 
@@ -163,7 +164,7 @@
   (let [account-id (:id account)
         db-account (q.account/find-account-by-id! db-conn account-id)
         ;; _ (validate-reply-time db-account)
-        post-count (q.counter/get-count! db-conn)
+        post-count (q.board/get-count! db-conn board)
         post (m.post/req&id->post post-body post-count)
         _ (validate-add-post post)
         image (m.post/image post)
@@ -173,7 +174,7 @@
         enriched-post (assoc post :image uploaded-image :time (t/zoned-date-time))
         updated-thread (m.thread/add-post enriched-post old-thread)] 
     (update-thread! redis-conn board thread-id updated-thread)
-    (q.counter/increment-counter db-conn)
+    (q.board/increment-counter! db-conn board)
     (q.account/update-last-reply! db-conn account-id)
     updated-thread))
 

@@ -8,6 +8,8 @@ import { Link } from 'react-router-dom';
 import chroma from 'chroma-js';
 import { BiMessageDetail } from 'react-icons/bi'; 
 import { Reply } from './Reply';
+import { useThread } from '../hooks/useThread';
+import { useEffect } from 'react';
 
 const WithText = ({direction, component, text}) => {
   return (
@@ -49,11 +51,13 @@ export const Post = (props) => {
 
   const dispatch = useDispatch();
 
+  const { threadNo } = useThread();
+
   const toggleFullScreen = () => {
     setFullScreen(!fullScreen);
   }
 
-  const { post, opNo, handleRef, highlight, preview, replyCount } = props;
+  const { post, handleRef, highlight, preview, replyCount, opNo } = props;
 
   const { name, subject, id, comment, image, time } = post;
 
