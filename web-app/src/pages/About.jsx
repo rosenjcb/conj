@@ -76,6 +76,6 @@ const DetailsContainer = styled.div`
   margin: 0 auto;
 `;
 
-const Paragraph = styled.p`
-  text-align: left;
-`;
+// const Paragraph = styled.p`
+//   text-align: left;
+// `;

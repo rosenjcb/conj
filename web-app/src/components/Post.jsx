@@ -53,7 +53,7 @@ export const Post = (props) => {
     setFullScreen(!fullScreen);
   }
 
-  const { post, opNo, handleRef, highlight, preview, replyCount } = props;
+  const { post, handleRef, highlight, preview, replyCount, opNo } = props;
 
   const { name, subject, id, comment, image, time } = post;
 

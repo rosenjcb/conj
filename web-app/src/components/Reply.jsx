@@ -5,14 +5,14 @@ import { RoundButton, RoundImage } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost } from '../slices/postSlice';
-import { swapThread } from '../slices/threadSlice';
+import { updateThread } from '../slices/threadSlice';
 import { upsertThread } from '../api/thread';
 import chroma from 'chroma-js';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';
-import { useLocation } from 'react-router-dom/cjs/react-router-dom';
 import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
+import { useThread } from '../hooks/useThread';
 import { Login } from './Login';
 import { me as callMe } from '../api/account'
 
@@ -22,6 +22,7 @@ export const Reply = (props) => {
   const { className, isNewThread } = props;
 
   const post = useSelector(state => state.post);
+  const thread = useSelector(state => state.thread);
   
   const dispatch = useDispatch();
 
@@ -30,27 +31,23 @@ export const Reply = (props) => {
     dispatch(updateEntry({key: key, value: e.target.value}));
   }
 
-  const location = useLocation();
+  const {board, threadNo } = useThread();
 
   const history = useHistory();
 
-  const pathSlugs = location.pathname.split("/"); 
-
-  const finalSlug = pathSlugs[pathSlugs.length - 1].match(/(\d+)/);
-
-  const board = pathSlugs[pathSlugs.length - 1];
-
-  const opNo = parseInt(finalSlug);
-
   const submitPost = async(values, actions) => {
     try {
-      const res = await upsertThread(post, opNo);
-      dispatch(swapThread(res.data));
+      const res = await upsertThread(board, threadNo, post);
+      const updatedThread = res.data;
       dispatch(resetPost());
-      const op = res.data[0];
-      const newPost = res.data[res.data.length - 1];
-      if(!opNo) {
+      if(threadNo === null) {
+        const op = updatedThread[0];
+        const newPost = updatedThread[updatedThread.length - 1];
+        // dispatch(swapThread(updatedThread));
         history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
+      } else {
+        console.log(thread)
+        dispatch(updateThread(updatedThread));
       }
     } catch(e) {
       toast.error(parseError(e));

@@ -1,62 +1,57 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Thread } from '../components/Thread';
 import { useParams } from 'react-router'
-import axios from 'axios'
 import { swapThread } from '../slices/threadSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import { useLocation } from 'react-router-dom';
 import chroma from 'chroma-js';
 import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
+import { useThread } from '../hooks/useThread';
+import { fetchThread } from '../api/thread';
 
 export function ThreadPage() {
 
-  const thread = useSelector(state => state.thread).current;
+  const {current, localReplyCount} = useSelector(state => state.thread);
+
   const dispatch = useDispatch();
 
   const { id } = useParams();
 
-  const location = useLocation();
-
-  const hash = Number(location.hash.substr(1)) ?? -1;
+  const {board, threadNo, replyNo} = useThread();
 
   const threadRef = useRef([]);
 
-  const hashedIndex = thread.findIndex((p) => p.id === hash);
-
-  const [localReplyCount, setLocalReplyCount] = useState(0);
+  const replyIndex = replyNo && current ? current.findIndex((p) => p.id === replyNo) : -1;
 
   useEffect(() => {
-    if(hashedIndex !== undefined && threadRef.current[hashedIndex]) {
-      threadRef.current[hashedIndex].scrollIntoView();
+    if(replyIndex && threadRef.current[replyIndex]) {
+      threadRef.current[replyIndex].scrollIntoView();
     }
-  },[hashedIndex])
+  },[replyIndex])
 
   useEffect(async() => {
     try {
-      const res = await axios.get(`/threads/${id}`);
+      const res = await fetchThread(board, threadNo);
       if(res.data === "") {
         window.location="/";
       }
       dispatch(swapThread(res.data));
     } catch(e) {
-      toast.error(e.message);
+      toast.error(parseError(e));
     }
   },[id, dispatch]);
 
   useEffect(() => {
-    if(threadRef.current && threadRef.current.length > 0) {
-      const lastPostRef = threadRef.current[thread.length - 1];
-      if(lastPostRef !== undefined && localReplyCount > 0) {
-        lastPostRef.scrollIntoView({"behavior": "smooth"});
-      }
+    const lastPostRef = threadRef.current[current.length - 1];
+    if(lastPostRef !== undefined && localReplyCount > 0) {
+      lastPostRef.scrollIntoView({"behavior": "smooth"});
     }
-  },[localReplyCount, thread]);
+  },[localReplyCount, current]);
 
   return(
     <Root>
-      {thread.length > 0 ? <Thread handleUpdateThread={() => setLocalReplyCount(localReplyCount + 1)} hashedIndex={hashedIndex} threadRef={threadRef} preview={false} thread={thread}/> : null }
+      { current.length > 0 ? <Thread replyIndex={replyIndex} threadRef={threadRef} preview={false} thread={current}/> : null }
     </Root>
   )
 }

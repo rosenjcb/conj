@@ -62,11 +62,6 @@ const AppRoot = styled.div`
   flex-direction: column;
   justify-content: center;
   min-height: 100vh;
-  // min-height: calc(100vh - 13px);
-  // padding-top: 5px;
-  // padding-bottom: 8px;
-  // padding-left: 5px;
-  // padding-right: 5px;
 `;
 
 export default App;

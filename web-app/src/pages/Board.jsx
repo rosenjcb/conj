@@ -7,23 +7,27 @@ import {  Avatar } from '../components';
 import * as _ from 'lodash';
 import { fetchThreads } from '../api/thread';
 import toast from 'react-hot-toast'
+import { useThread } from '../hooks/useThread';
 import { parseError } from '../util/error';
 
 export const BoardPage = () => {
 
   const [threads, setThreads] = useState([]);
 
+  const { board } = useThread();
+
   useEffect(() => {
     async function fetchAndSetThreads() {
       try {
-        const res = await fetchThreads();
+        const res = await fetchThreads(board);
         setThreads(res.data);
       } catch(e) {
-        toast.error(e.message);
+        setThreads(null);
+        toast.error(parseError(e));
       }
     }
     fetchAndSetThreads();
-  },[]);
+  },[board]);
 
   return(
     <BoardRoot>
@@ -48,9 +52,9 @@ const ThreadPreview = (props) => {
 
   return(
     <ThreadPreviewRoot>
-      { threads.length > 0 
+      { threads && threads.length > 0 
         ? _.orderBy(threads, o => o[o.length - 1].id, ["desc"]).map((thread, index) => <Thread board={''} key={index} preview={true} thread={thread}/>)
-        : <Header>No threads yet. Make one?</Header>}
+        : <Header>{threads ? "No threads yet. Make one?" : "This board does not exist"}</Header>}
     </ThreadPreviewRoot>
   )
 }

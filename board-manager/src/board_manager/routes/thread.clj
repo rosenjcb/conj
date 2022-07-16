@@ -1,23 +1,34 @@
 (ns board-manager.routes.thread
-  (:require 
-    [board-manager.middleware :as middleware] 
-    [board-manager.query.thread :as query.thread]
-    [clojure.tools.logging :as log] 
-    [ring.util.response :as response]))
+  (:require [board-manager.middleware :as middleware]
+            [board-manager.query.board :as query.board]
+            [board-manager.query.thread :as query.thread]
+            [clojure.tools.logging :as log]
+            [reitit.coercion.malli :as malli.coercion]
+            [ring.util.response :as response]))
 
 (defn peek-threads! [req]
-  (let [redis-conn (get-in req [:components :redis-conn])]
-    (response/response (query.thread/fetch-threads! redis-conn true))))
+  (let [db-conn (get-in req [:components :db-conn])
+        redis-conn (get-in req [:components :redis-conn])
+        board (get-in req [:path-params :board])
+        board-exists? ((set (query.board/list-boards! db-conn)) board)
+        threads (query.thread/fetch-threads! redis-conn board {:sort? true})]
+    (when board-exists?
+      (log/infof "hi"))
+    (if threads
+      (response/response threads)
+      (response/not-found (format "Board %s does not exist" board)))))
 
 (defn create-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
         db-conn (get-in req [:components :db-conn])
         s3-client (get-in req [:components :s3-client])
         multipart-params (:multipart-params req)
+        board (get-in req [:path-params :board])
         account (:account req)]
     (try 
+      (log/info "Creating new thread")
       (->> multipart-params 
-           (query.thread/create-thread! db-conn s3-client redis-conn account)
+           (query.thread/create-thread! db-conn s3-client redis-conn board account)
            response/response)
       (catch Exception e
         (log/infof "Error: %s" e)
@@ -26,9 +37,9 @@
 
 (defn get-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
-        path-params (:path-params req)
-        id (:id path-params)
-        thread (query.thread/find-thread-by-id! redis-conn id)]
+        id (get-in req [:parameters :path :id])
+        board (get-in req [:parameters :path :board])
+        thread (query.thread/find-thread-by-id! redis-conn board id)]
     (if thread
       (response/response thread)
       (response/not-found (format "No thread found with the id %s" id)))))
@@ -39,11 +50,11 @@
         account (:account req)
         db-conn (get-in req [:components :db-conn])
         multipart-params (:multipart-params req)
-        path-params (:path-params req)
-        id (:id path-params)]
+        id (get-in req [:parameters :path :id])
+        board (get-in req [:parameters :path :board])]
     (try
       (->> multipart-params 
-           (query.thread/add-post! db-conn s3-client redis-conn account id)
+           (query.thread/add-post! db-conn s3-client redis-conn account board id)
            response/response)
       (catch Exception e
         (log/infof "%s" (.getMessage e))
@@ -52,9 +63,10 @@
 (defn kill-thread! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
         s3-client (get-in req [:components :s3-client])
-        thread-id (get-in req [:path-params :id])]
+        thread-id (get-in req [:parameters :path :id])
+        board (get-in req [:parameters :path :board])]
     (try
-      (query.thread/delete-thread-by-id! redis-conn s3-client thread-id)
+      (query.thread/delete-thread-by-id! redis-conn s3-client board thread-id)
       (response/response (format "Thread No. %s has been deleted" thread-id))
       (catch Exception e
         (log/infof "%s" (.getMessage e))
@@ -62,27 +74,43 @@
 
 (defn nuke-threads! [req]
   (let [redis-conn (get-in req [:components :redis-conn])
-        s3-client (get-in req [:components :s3-client])]
-    (query.thread/delete-all-threads! redis-conn s3-client)
-    (response/response "Threads deleted")))
+        s3-client (get-in req [:components :s3-client])
+        board (get-in req [:path-params :board])]
+    (query.thread/delete-all-threads! redis-conn s3-client board)
+    (response/response (format "Threads deleted from board %s" board))))
+
+(defn list-boards! [req]
+  (let [db-conn (get-in req [:components :db-conn])]
+    (response/response (query.board/list-boards! db-conn))))
+
+(def thread-req
+  [:map
+   [:board string?]
+   [:id int?]])
 
 (def thread-routes
-  [["/threads"
+  [["/boards"
+    {:get list-boards!}]
+   ["/boards/:board"
    {:get peek-threads! 
     :post {:summary "Create a Thread" 
            :middleware [[middleware/wrap-auth]]
-           :handler create-thread!}}]
-    ["/threads/:id"
+           :handler create-thread!}
+    :delete {:summary "Nukes the entire board"
+             :middleware [[middleware/wrap-auth]]
+             :handler nuke-threads!}}]
+    ["/boards/:board/threads/:id"
      {:get {:summary "Get a thread by id"
+            :parameters {:path thread-req}
+            :coercion malli.coercion/coercion
             :handler get-thread!}
       :put {:summary "Inserts a post into a thread by id"
+            :parameters {:path thread-req}
+            :coercion malli.coercion/coercion
             :middleware [[middleware/wrap-auth]]
-            :handler put-thread!}}]
-   ["/kill/:id"
-    {:get {:summary "Kills/deletes a thread (in redis cache) by id"
-           ;;  :middleware [[middleware/wrap-admin]]
-           :handler kill-thread!}}]
-   ["/nuke"
-    {:get {:summary "Nukes the entire board"
-           ;; :middleware [[middleware/wrap-admin]]
-           :handler nuke-threads!}}]])
+            :handler put-thread!}
+      :delete {:summary "Deletes a thread"
+               :parameters {:path thread-req}
+               :coercion malli.coercion/coercion
+               :middleware [[middleware/wrap-auth]]
+               :handler kill-thread!}}]])

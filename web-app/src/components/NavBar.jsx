@@ -1,13 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { Login } from './Login';
+import { me as callMe } from '../api/account'
+import { fetchBoards } from '../api/board';
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
 
 export const WithNavBar = ({component}) => {
 
+  const [me, setMe] = useState(null);
+  const [boards, setBoards] = useState([]);
 
+  useEffect(() => {
+    async function getAuth() {
+      try { 
+        const res = await callMe();
+        setMe(res);
+      } catch(e) {
+        setMe(null);
+      }
+    }
+    async function getBoards() {
+      try {
+        const res = await fetchBoards();
+        setBoards(res.data);
+      } catch (e) {
+        setBoards(null);
+      }
+    }
+    getAuth();
+    getBoards();
+  },[]);
 
   const detectMobile = () => {
     // console.log(window.innerWidth);
@@ -18,7 +41,7 @@ export const WithNavBar = ({component}) => {
 
     return (
     <BoardRoot>
-      { !isMobile ? <BoardDrawer/> : null }
+      { !isMobile ? <BoardDrawer boards={boards}/> : null }
       <Page>
         <HomeNavBar>
           <HamburgerMenu/>
@@ -32,17 +55,19 @@ export const WithNavBar = ({component}) => {
   )
 }
 
-const BoardDrawer = () => {
+const BoardDrawer = (props) => {
+
+  const { boards } = props; 
 
   const history = useHistory();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Search text')
   }
 
-  const handleClick = () => {
-    history.push("/boards/b")
+  const handleClick = (board) => {
+    console.log(board);
+    history.push(`/boards/${board}`)
   }
 
   return(
@@ -52,11 +77,7 @@ const BoardDrawer = () => {
       </TitleContainer>
       <Content>
         <BoardList>
-          <BoardItem onClick={handleClick}>/b/ - random</BoardItem>
-          <BoardItem>/sp/ - sports</BoardItem>
-          <BoardItem>/int/ - international</BoardItem>
-          <BoardItem>/g/ - technology</BoardItem>
-          <BoardItem>/a/ - anime</BoardItem>
+          {boards.map(board => <BoardItem onClick={() => handleClick(board)}>/{board}/</BoardItem>)}          
         </BoardList>
         <SearchForm onSubmit={handleSubmit}>
           <Input type="text"/>

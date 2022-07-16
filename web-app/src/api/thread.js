@@ -1,19 +1,21 @@
 import axios from 'axios';
 
-// axios.defaults.baseURL = 'https://localhost:6006';
-export const updateThread = (post, id) => axios.put(`/threads/${id}`, post);
+export const updateThread = (board, threadNo, post) => axios.put(`/api/boards/${board}/threads/${threadNo}`, post, { headers: {"Content-Type": "multipart/form-data"}});
 
-export const createThread = (post) => axios.post('/threads', post);
+export const createThread = (board, post) => axios.post(`/api/boards/${board}`, post, { headers: {"Content-Type": "multipart/form-data"}});
 
-export const fetchThreads = () => axios.get('/threads');
+export const fetchThreads = (board) => axios.get(`/api/boards/${board}`);
 
-export const upsertThread = (post, opNo) => {
+export const fetchThread = (board, threadNo) => axios.get(`/api/boards/${board}/threads/${threadNo}`);
+
+export const upsertThread = async(board, threadNo, post) => {
   var formData = new FormData();
   for (let [key, val] of Object.entries(post)) {
-    // append each item to the formData (converted to JSON strings)
     if(val !== null) formData.append(key, val);
   }
 
-  return opNo !== null ? axios.put(`/threads/${opNo}`, formData, {headers: {"Content-Type": "multipart/form-data"}}) : axios.post('/threads', formData, {headers: {"Content-Type": "multipart/form-data"}});
+  return threadNo !== null
+    ? updateThread(board, threadNo, formData)
+    : createThread(board, formData);
 }
 

@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Formik, Field} from 'formik';
 import { login, signup } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { ErrorText } from './index';
 import { parseError } from '../util/error';
 import chroma from 'chroma-js';
 import { AccentButton, Link } from './index';
