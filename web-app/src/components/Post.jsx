@@ -8,8 +8,6 @@ import { Link } from 'react-router-dom';
 import chroma from 'chroma-js';
 import { BiMessageDetail } from 'react-icons/bi'; 
 import { Reply } from './Reply';
-import { useThread } from '../hooks/useThread';
-import { useEffect } from 'react';
 
 const WithText = ({direction, component, text}) => {
   return (
@@ -50,8 +48,6 @@ export const Post = (props) => {
   const [fullScreen, setFullScreen] = useState(false);
 
   const dispatch = useDispatch();
-
-  const { threadNo } = useThread();
 
   const toggleFullScreen = () => {
     setFullScreen(!fullScreen);
@@ -166,7 +162,7 @@ const YellowRibbon = styled.div`
   border-radius: 2px;
   top: -1rem;
   left: -24px;
-  background-color: ${props => props.highlight ? props.theme.newTheme.colors.warning : "inherit"};
+  background-color: ${props => props.highlight ? props.theme.colors.warning : "inherit"};
   pointer-events: none;
   opacity: 0.3;
 `;
@@ -212,7 +208,7 @@ const CenteredImage = styled(Image)`
 
 const Header = styled.h1`
   text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
   font-size: 1.5em;
   padding: 0;
   margin: 0;
@@ -230,11 +226,11 @@ const HeaderRoot = styled.div`
   padding-right: 1rem;
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1).hex()};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten(1).hex()};
 `;
 
 const ContentRoot = styled.div`
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).hex()};
+  background-color: ${props => chroma(props.theme.colors.primary).hex()};
   display: block;
   // width: 100%;
   width: calc(100% - 3rem);
@@ -268,7 +264,7 @@ const PostLink = styled(Link)`
   color: white;
 
   &:hover {
-      color: ${props => props.theme.newTheme.colors.primary};
+      color: ${props => props.theme.colors.primary};
   }
 `;
 

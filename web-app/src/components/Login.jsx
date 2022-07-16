@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Formik, Field} from 'formik';
 import { login, signup } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { ErrorText } from './index';
 import { parseError } from '../util/error';
 import chroma from 'chroma-js';
 import { AccentButton, Link } from './index';
@@ -115,8 +114,8 @@ const WelcomeMessage  = styled.div`
 
 const Header = styled.div`
   width: 100%;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
-  color: ${props => props.theme.newTheme.colors.white};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.5).hex()};
+  color: ${props => props.theme.colors.white};
   font-weight: 700;
   font-size: 131%; 
   text-align: center;
@@ -126,7 +125,7 @@ const Header = styled.div`
 
 const Root = styled.div`
   margin: 0 auto;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.5).hex()};
   text-align: center;
   width: 500px;
   border-radius: 8px 8px;
@@ -153,7 +152,7 @@ const Label = styled.label`
   justify-content: flex-start;
   font-size: 12px;
   margin-bottom: 8px;
-  color: ${props => props.theme.newTheme.colors.grey};
+  color: ${props => props.theme.colors.grey};
 `;
 
 const TextField = styled.input`

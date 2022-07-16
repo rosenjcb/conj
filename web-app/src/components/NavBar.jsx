@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { Login } from './Login';
 import { me as callMe } from '../api/account'
 import { fetchBoards } from '../api/board';
 import chroma from 'chroma-js';
@@ -40,7 +39,7 @@ export const WithNavBar = ({component}) => {
 
   const isMobile = detectMobile();
 
-  const navBar = (
+    return (
     <BoardRoot>
       { !isMobile ? <BoardDrawer boards={boards}/> : null }
       <Page>
@@ -54,8 +53,6 @@ export const WithNavBar = ({component}) => {
       </Page>
     </BoardRoot>
   )
-
-  return me ? navBar : <Login/>;
 }
 
 const BoardDrawer = (props) => {
@@ -121,11 +118,11 @@ const SearchForm = styled.form`
 `;
 
 const Input = styled.input`
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten().hex()};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten().hex()};
   border-radius: 80px;
   font-size: 2rem;
   width: 60%;
-  color: ${props => chroma(props.theme.newTheme.colors.white)};
+  color: ${props => chroma(props.theme.colors.white)};
   margin-bottom: 10px;
   padding: 0;
 `;
@@ -143,7 +140,7 @@ const BoardList = styled.ul`
   flex-direction: column;
   align-items: center;
   gap: 15px;
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
   margin: 0;
   padding-left: 10px;
   padding-right: 10px;
@@ -153,20 +150,20 @@ const BoardList = styled.ul`
 
 const Header = styled.h1`
   text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
   font-size: 1.5em;
   padding: 0;
   margin: 0;
 `;
 
 const BoardItem = styled(Header)`
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1).hex()};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten(1).hex()};
   border-radius: 12px; 
   padding: 8px;
   user-select: none;
 
   &:hover {
-    background-color: ${props => chroma(props.theme.newTheme.colors.primary).darken(0.25).hex()};
+    background-color: ${props => chroma(props.theme.colors.primary).darken(0.25).hex()};
     cursor: pointer;
   }
 `;
@@ -174,7 +171,7 @@ const BoardItem = styled(Header)`
 const BoardDrawerRoot = styled.div`
   min-height: 100vh;
   width: 300px;
-  background-color: ${props => props.theme.newTheme.colors.primary};
+  background-color: ${props => props.theme.colors.primary};
   border-right: 1px solid black; 
 `;
 
@@ -186,14 +183,14 @@ const BoardRoot = styled.div`
   width: 100%;
   max-height: 100vh;
   height: 100%;
-  background-color ${props => chroma(props.theme.newTheme.colors.primary).darken(0.3)};
+  background-color ${props => chroma(props.theme.colors.primary).darken(0.3)};
 `;
 
 const TitleContainer = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  border-bottom: 1px solid ${props => chroma(props.theme.newTheme.colors.primary).darken(0.23).hex()};
+  border-bottom: 1px solid ${props => chroma(props.theme.colors.primary).darken(0.23).hex()};
   height: 92px;
   text-align: center;
 `
@@ -204,9 +201,9 @@ const HomeNavBar = styled.div`
   gap: 10px;
   flex-direction: row;
   width: calc(100% - 20px);
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.7)};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.7)};
   // border-bottom: 1px solid black;
-  border-bottom: 1px solid ${props => chroma(props.theme.newTheme.colors.primary).hex()};
+  border-bottom: 1px solid ${props => chroma(props.theme.colors.primary).hex()};
   min-height: calc(92px - 20px);
   padding: 10px;
   align-items: center;
@@ -216,7 +213,7 @@ const Text = styled.p`
   font-weight: 500; 
   font-size: 1rem;
   line-height: 1.5rem;
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
   font-family: 'Open Sans', sans-serif;
   padding: 0;
   margin: 0;
@@ -224,7 +221,7 @@ const Text = styled.p`
 
 const GreyText = styled(Text)`
   text-align: center;
-  color: ${props => props.theme.newTheme.colors.grey};
+  color: ${props => props.theme.colors.grey};
 `;
 
 const HamburgerMenu = styled(FiMenu)`

@@ -142,7 +142,7 @@
         post-count (q.board/get-count! db-conn board)
         thread (m.thread/req&id->thread req post-count)
         op (first thread)
-        ;; _ (validate-thread-time db-account)
+        _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         ;; id (m.thread/id op)
         image (m.thread/image op)
@@ -163,7 +163,7 @@
   [db-conn s3-client redis-conn account board thread-id post-body]
   (let [account-id (:id account)
         db-account (q.account/find-account-by-id! db-conn account-id)
-        ;; _ (validate-reply-time db-account)
+        _ (validate-reply-time db-account)
         post-count (q.board/get-count! db-conn board)
         post (m.post/req&id->post post-body post-count)
         _ (validate-add-post post)

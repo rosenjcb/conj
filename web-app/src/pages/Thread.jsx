@@ -61,7 +61,7 @@ const Root = styled.div`
   padding: 1.5rem;
   width: calc(100% - 3rem);
   margin: 0 auto;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.5).hex()};
   overflow-y: scroll;
 
   &::-webkit-scrollbar {

@@ -1,11 +1,11 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import { Formik, Form, Field } from 'formik';
 import { RoundButton, RoundImage } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost } from '../slices/postSlice';
-import { swapThread, updateThread } from '../slices/threadSlice';
+import { updateThread } from '../slices/threadSlice';
 import { upsertThread } from '../api/thread';
 import chroma from 'chroma-js';
 import { BiImageAdd } from 'react-icons/bi';
@@ -13,6 +13,8 @@ import { AiFillDelete } from 'react-icons/ai';
 import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
 import { useThread } from '../hooks/useThread';
+import { Login } from './Login';
+import { me as callMe } from '../api/account'
 
 
 export const Reply = (props) => {
@@ -29,7 +31,7 @@ export const Reply = (props) => {
     dispatch(updateEntry({key: key, value: e.target.value}));
   }
 
-  const {board, threadNo, replyNo } = useThread();
+  const {board, threadNo } = useThread();
 
   const history = useHistory();
 
@@ -52,8 +54,27 @@ export const Reply = (props) => {
     };
   }
 
-  return(
-    <Formik
+  const [me, setMe] = useState(null);
+
+  useEffect(() => {
+    async function setAuth() {
+        try { 
+          const res = await callMe();
+          setMe(res);
+        } catch(e) {
+          setMe(null);
+        }
+      }
+    setAuth();
+  },[]);
+
+  if(!me) {
+    return(
+      <Login />
+    )
+  } else {
+    return(
+      <Formik
       initialValues={post}
       onSubmit={submitPost}>
         {(props) => (
@@ -68,7 +89,8 @@ export const Reply = (props) => {
           </StyledForm>
         )}
       </Formik>
-  )
+    )
+  }
 }
 
 export const StyledForm = styled(Form)`
@@ -78,7 +100,7 @@ export const StyledForm = styled(Form)`
   padding-bottom: 1.5rem;
   padding-top: 1.5rem;
   width: 100%;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(1.5).hex()};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten(1.5).hex()};
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
@@ -134,7 +156,7 @@ const ActionsContainer = styled.div`
 
 
 const CommentBody = styled(Field)`
-  color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
+  color: ${props => chroma(props.theme.colors.white).darken(0.8).hex()};
   font-size: 1.25rem;
   word-break: break-word;
   background-color: inherit;
@@ -149,7 +171,7 @@ const CommentBody = styled(Field)`
 `;
 
 const SubjectInput = styled(Field).attrs(props => ({type: "text"}))`
-  color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
+  color: ${props => chroma(props.theme.colors.white).darken(0.8).hex()};
   font-size: 2.5rem;
   background-color: inherit;
   resize: none;
@@ -162,7 +184,7 @@ const SubjectInput = styled(Field).attrs(props => ({type: "text"}))`
   border: none;
 
   ::placeholder {
-    color: ${props => chroma(props.theme.newTheme.colors.white).darken(0.8).hex()};
+    color: ${props => chroma(props.theme.colors.white).darken(0.8).hex()};
   }
 `;
 
@@ -183,7 +205,7 @@ const IconContainer = styled.div`
 const DeleteIcon = styled(AiFillDelete)`
   width: 24px;
   height: 24px;
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
 `;
 
 const UploadImageIcon = styled(BiImageAdd)`

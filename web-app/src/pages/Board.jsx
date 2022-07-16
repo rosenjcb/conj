@@ -27,7 +27,7 @@ export const BoardPage = () => {
       }
     }
     fetchAndSetThreads();
-  },[]);
+  },[board]);
 
   return(
     <BoardRoot>
@@ -69,7 +69,7 @@ const ThreadPreviewRoot = styled.ul`
 
 const Header = styled.h1`
   text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
   font-size: 1.5em;
   padding: 0;
   margin: 0;
@@ -91,7 +91,7 @@ const BoardRoot = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: ${props => chroma(props.theme.newTheme.colors.primary).brighten(0.5).hex()};
+  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.5).hex()};
 
   overflow-y: scroll;
   scrollbar-width: none;

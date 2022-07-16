@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export const useThread = () => {
@@ -20,7 +19,7 @@ export const useThread = () => {
 
     const threadSlug = pathSlugs[3] === "thread" ? pathSlugs[4] : null;
 
-    const threadNo = parseInt(threadSlug) ?? 0;
+    const threadNo = threadSlug ? parseInt(threadSlug) ?? 0 : null; 
 
     const hash = location.hash.substring(1);
 

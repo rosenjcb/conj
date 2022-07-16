@@ -50,7 +50,7 @@ const Faq = ({question, answer}) => {
 }
 
 const StyledA = styled.a`
-  color: ${props => props.theme.newTheme.colors.accent};
+  color: ${props => props.theme.colors.accent};
 `;
 
 const FaqRoot = styled.li`
@@ -68,7 +68,7 @@ const Root = styled.div`
   min-width: 100wh;
   text-align: center;
   overflow-y: scroll;
-  color: ${props => props.theme.newTheme.colors.white};
+  color: ${props => props.theme.colors.white};
 `;
 
 const DetailsContainer = styled.div`
@@ -76,6 +76,6 @@ const DetailsContainer = styled.div`
   margin: 0 auto;
 `;
 
-const Paragraph = styled.p`
-  text-align: left;
-`;
+// const Paragraph = styled.p`
+//   text-align: left;
+// `;
