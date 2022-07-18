@@ -8,11 +8,12 @@ import { WithNavBar } from './components/NavBar';
 import { AboutPage } from './pages/About';
 import { BoardPage } from './pages/Board';
 import { Toaster } from 'react-hot-toast';
+import chroma from 'chroma-js';
 
 export const theme = {
   colors: {
-    primary: "#23262a",
-    accent: "#6A77FC",
+    primary: "#512B8F",
+    accent: "#FFC75F",
     success: "",
     failure: "",
     error: "",
@@ -57,11 +58,15 @@ function App() {
 }
 
 const AppRoot = styled.div`
-  background-color: ${props => props.theme.colors.accent};
+  // background-color: ${props => props.theme.colors.accent};
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-height: 100vh;
+  background: linear-gradient(112deg, transparent 0, transparent 20%, ${props => chroma(props.theme.colors.primary).alpha(0.1).hex()} 30%, ${props => chroma(props.theme.colors.primary).alpha(0.1).hex()} 70%, transparent 80%, transparent 100%);
 `;
 
 export default App;
+
+// primary: "#512B8F",
+  //accent: "#FFC75f",

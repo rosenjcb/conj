@@ -30,10 +30,10 @@ export const processPostText = (opNo, text) => {
     }
 
     if(i !== 0) nodes.push(<br key={i}/>);
-    nodes.push(<span key={i}>{line}</span>);
+    nodes.push(line);
   }
 
-  return <span>{nodes}</span>;
+  return <div>{nodes}</div>;
 }
 
 const discoverHashLink = (opNo, reply) => {

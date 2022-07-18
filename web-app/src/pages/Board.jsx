@@ -91,7 +91,6 @@ const BoardRoot = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.5).hex()};
 
   overflow-y: scroll;
   scrollbar-width: none;

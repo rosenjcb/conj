@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components';
-import { Text, ErrorText, Avatar } from './index';
+import { Text, PrimaryText, Avatar, HR } from './index';
 import { processPostText } from '../util/post';
 import { useDispatch } from 'react-redux';
 import { insertPostLink } from '../slices/postSlice';
@@ -13,7 +13,7 @@ const WithText = ({direction, component, text}) => {
   return (
     <WithTextRoot direction={direction}>
       {component} 
-      <Header>{text}</Header>
+      <IconText>{text}</IconText>
     </WithTextRoot>
   )
 }
@@ -86,42 +86,26 @@ export const Post = (props) => {
 const OriginalPost = (props) => {
   const { postHref, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
 
-  const fullSizeContent = (
-    <OriginalContentRoot>
-      <HeaderText>{subject}</HeaderText>
-      <CenteredImage fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
-      <Text align="left">
-        {processPostText(opNo, comment)}
-      </Text>
-    </OriginalContentRoot>
-  ) 
-
-  const slimContent = (
-    <ContentRoot>
-      <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> 
-      <Text align="left">
-        <ErrorText>{subject}</ErrorText>
-        {processPostText(opNo, comment)}
-      </Text>
-    </ContentRoot>
-  )
-
   return(
     <PostRoot key={id} ref={handleRef}>
-      { preview ? slimContent : fullSizeContent }
-      <HeaderRoot>
         <UserInfo>
           <Avatar src="/pepe_icon.jpg"/>
           <TextContainer>
-            <Text>{name}</Text>
+            <Text bold size={"medium"}>{name}</Text>
             <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
-            <Text>{formattedTime}</Text>
           </TextContainer>
         </UserInfo>
-        <ActionsContainer>
-          <WithText component={<Link to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></Link>} direction="row" text={replyCount}/>
-        </ActionsContainer>
-      </HeaderRoot>
+      <OriginalContentRoot>
+        <Text align={"center"} size={"x-large"} color={"primary"}>{subject}</Text>
+        <CenteredImage fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
+        <Text align="left">
+          {processPostText(opNo, comment)}
+        </Text>
+      </OriginalContentRoot>
+      <ActionsContainer>
+        <WithText component={<Link to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></Link>} direction="row" text={replyCount}/>
+        <Text bold>{formattedTime}</Text>
+      </ActionsContainer>
       { !preview ? <ThreadReply/> : null }
     </PostRoot>
   )
@@ -136,20 +120,16 @@ const ReplyPost = (props) => {
       <ContentRoot>
         { image && image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }
         <Text align="left">
-          <ErrorText>{subject}</ErrorText>
+          <Text size={"large"} color={"primary"}>{subject}</Text>
           {processPostText(opNo, comment)}
         </Text>
       </ContentRoot>
-      <HeaderRoot>
-        <UserInfo>
-          <Avatar src="/pepe_icon.jpg"/>
-          <TextContainer>
-            <Text>{name}</Text>
-            <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
-            <Text>{formattedTime}</Text>
-          </TextContainer>
-        </UserInfo>
-      </HeaderRoot>
+      <UserInfo>
+        <Avatar src="/pepe_icon.jpg"/>
+        <Text>{name}</Text>
+        <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
+        <Text>{formattedTime}</Text>
+      </UserInfo>
     </PostRoot>
   )
 }
@@ -173,9 +153,9 @@ const WithTextRoot = styled.div`
 `;
 
 const MessageDetail = styled(BiMessageDetail)`
-  color: white;
-  width: 48px;
-  height: 48px;
+  color: ${props => chroma(props.theme.colors.grey).darken().hex()};
+  width: 36px;
+  height: 36px;
 `;
 
 const TextContainer = styled.div`
@@ -189,13 +169,14 @@ const UserInfo = styled.div`
   justify-content: flex-start;
   align-items: center;
   gap: 20px;
+  margin-bottom: 10px;
 `;
 
 const Image = styled.img`
   aspect-ratio: 16 / 9;
-  width: fit-content;
-  width: ${props => !props.fullScreen ? "200px;" : "100%"};
-  height: ${props => !props.fullScreen ? "112px;" : "100%"};
+  width: ${props => props.fullScreen ? "100%" : "fit-content"};
+  max-width: 100%;
+  height: ${props => props.fullScreen ? "100%" : "400px"};
   border-radius: 8px;
   margin-right: 10px;
   float: left;
@@ -208,8 +189,16 @@ const CenteredImage = styled(Image)`
 
 const Header = styled.h1`
   text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.colors.white};
+  color: ${props => props.theme.colors.black};
   font-size: 1.5em;
+  padding: 0;
+  margin: 0;
+`;
+
+const IconText = styled.p`
+  color: ${props => chroma(props.theme.colors.grey).darken().hex()};
+  text-align: center;
+  font-size: 1.25rem;
   padding: 0;
   margin: 0;
 `;
@@ -222,46 +211,50 @@ const HeaderRoot = styled.div`
   align-items: center;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-  background-color: ${props => chroma(props.theme.colors.primary).brighten(1).hex()};
+  background-color: ${props => props.theme.colors.white};
 `;
 
 const ContentRoot = styled.div`
-  background-color: ${props => chroma(props.theme.colors.primary).hex()};
+  background-color: ${props => props.theme.colors.white};
   display: block;
-  // width: 100%;
-  width: calc(100% - 3rem);
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  padding: 1.5rem;
+  width: 100%;
 `;
 
 const OriginalContentRoot = styled(ContentRoot)`
   scroll-behavior: smooth;
   display: flex;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 2rem;
   flex-direction: column;
-  // width: 100%;
 `
 
 const PostRoot = styled.div`
+	box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   scroll-behavior: smooth;
   display: flex;
   position: relative;
   flex-direction: column;
   justify-content: flex-start;
   flex-flow: wrap;
-  align-items: center;
-  width: 100%;
+  width: calc(100% - 3rem);
+  margin: 0 auto;
   margin-bottom: 5rem;
+  background-color: ${props => props.theme.colors.white};
+  border-radius: 8px;
+  padding: 1.5rem;
+  gap: 1rem;
 `;
 
 const PostLink = styled(Link)`
-  color: white;
+  color: black;
+  text-decoration: none;
+  font-weight: 500; 
+  font-size: 1rem;
+  line-height: 1.5rem;
+  color: ${props => props.theme.colors.black};
+  font-family: 'Open Sans', sans-serif;
+  padding: 0;
+  margin: 0;
 
   &:hover {
       color: ${props => props.theme.colors.primary};
@@ -277,10 +270,19 @@ const ThreadReply = styled(Reply)`
 const ActionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
+  width: 100%;
   flex-direction: row;
   align-items: center;
 `;
 
-const HeaderText = styled(ErrorText)`
-  font-size: 2.5rem;
+// const HeaderText = styled(Text)`
+//   font-size: 2.5rem;
+// `;
+
+const TextContent = styled.div`
+  display: inline-flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  width: calc(100% - 32px - 3rem);
+  align-items: flex-start;
 `;

@@ -33,7 +33,6 @@ export const WithNavBar = ({component}) => {
   },[]);
 
   const detectMobile = () => {
-    // console.log(window.innerWidth);
     return window.innerWidth < 768;
   }
 
@@ -75,14 +74,12 @@ const BoardDrawer = (props) => {
       <TitleContainer>
         <Header>Boards</Header>
       </TitleContainer>
-      <Content>
-        <BoardList>
-          {boards.map(board => <BoardItem onClick={() => handleClick(board)}>/{board}/</BoardItem>)}          
-        </BoardList>
-        <SearchForm onSubmit={handleSubmit}>
-          <Input type="text"/>
-        </SearchForm>
-      </Content>
+      <BoardList>
+        {boards.map(board => <BoardItem onClick={() => handleClick(board)}>/{board}/</BoardItem>)}          
+      </BoardList>
+      <SearchForm onSubmit={handleSubmit}>
+        <Input type="text"/>
+      </SearchForm>
     </BoardDrawerRoot>
   )
 }
@@ -92,11 +89,11 @@ const Page = styled.div`
   justify-content: flex-start;
   flex-direction: column;
   @media all and (min-width: 1024px) {
-    width: 30%;
+    width: 40%;
   }
   
   @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 30%;
+    width: 100%%;
   }
   
   @media all and (min-width: 480px) and (max-width: 768px) {
@@ -129,9 +126,9 @@ const Input = styled.input`
 
 const Content = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex-direction column;
-  height: calc(100vh - 93px);
+  background-color: ${props => props.theme.colors.grey};
 `;
 
 const BoardList = styled.ul`
@@ -144,35 +141,37 @@ const BoardList = styled.ul`
   margin: 0;
   padding-left: 10px;
   padding-right: 10px;
-  padding-top: 3em;
   padding-bottom: 3em;
 `;
 
 const Header = styled.h1`
   text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.colors.white};
+  color: ${props => props.theme.colors.black};
   font-size: 1.5em;
   padding: 0;
   margin: 0;
 `;
 
 const BoardItem = styled(Header)`
-  background-color: ${props => chroma(props.theme.colors.primary).brighten(1).hex()};
+  background-color: ${props => props.theme.colors.white};
+  color: ${props => props.theme.colors.black};
   border-radius: 12px; 
   padding: 8px;
   user-select: none;
 
   &:hover {
-    background-color: ${props => chroma(props.theme.colors.primary).darken(0.25).hex()};
+    background-color: ${props => chroma(props.theme.colors.white).darken(0.25).hex()};
     cursor: pointer;
   }
 `;
 
 const BoardDrawerRoot = styled.div`
-  min-height: 100vh;
   width: 300px;
-  background-color: ${props => props.theme.colors.primary};
-  border-right: 1px solid black; 
+  background-color: ${props => props.theme.colors.grey};
+  height: fit-content;
+  border-radius: 8px;
+  margin-top: 1rem;
+  margin-right: 1rem;
 `;
 
 const BoardRoot = styled.div`
@@ -183,14 +182,13 @@ const BoardRoot = styled.div`
   width: 100%;
   max-height: 100vh;
   height: 100%;
-  background-color ${props => chroma(props.theme.colors.primary).darken(0.3)};
 `;
 
 const TitleContainer = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  border-bottom: 1px solid ${props => chroma(props.theme.colors.primary).darken(0.23).hex()};
+  // border-bottom: 1px solid ${props => chroma(props.theme.colors.primary).darken(0.23).hex()};
   height: 92px;
   text-align: center;
 `
