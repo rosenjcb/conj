@@ -5,6 +5,12 @@ import { me as callMe } from '../api/account'
 import { fetchBoards } from '../api/board';
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
+import { VscCommentDiscussion } from 'react-icons/vsc'
+import {RiDiscussFill} from 'react-icons/ri';
+import { BsFillBarChartFill } from 'react-icons/bs';
+import { Text } from './index';
+import { useThread } from '../hooks/useThread';
+
 
 export const WithNavBar = ({component}) => {
 
@@ -40,14 +46,12 @@ export const WithNavBar = ({component}) => {
 
     return (
     <BoardRoot>
-      { !isMobile ? <BoardDrawer boards={boards}/> : null }
+      <HomeNavBar>
+        <HamburgerMenu/>
+        <Header>conj.app</Header>
+      </HomeNavBar>
       <Page>
-        <HomeNavBar>
-          <HamburgerMenu/>
-          <Header>/b/ - random</Header>
-          <GreyText>|</GreyText>
-          <Header>Make fun posts here!</Header>
-        </HomeNavBar>
+        { !isMobile ? <BoardDrawer boards={boards}/> : null }
         {component}
       </Page>
     </BoardRoot>
@@ -59,6 +63,8 @@ const BoardDrawer = (props) => {
   const { boards } = props; 
 
   const history = useHistory();
+
+  const { board } = useThread(); 
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -72,10 +78,11 @@ const BoardDrawer = (props) => {
   return(
     <BoardDrawerRoot>
       <TitleContainer>
-        <Header>Boards</Header>
+        <Header>Most Popular Boards</Header>
       </TitleContainer>
       <BoardList>
-        {boards.map(board => <BoardItem onClick={() => handleClick(board)}>/{board}/</BoardItem>)}          
+        <BoardRow><BoardIcon/><BarChartIcon/></BoardRow>
+        {boards.map(b => <HighlightBoardRow selected={b === board}><BoardItem onClick={() => handleClick(b)}>/{b}/</BoardItem><Text size={"large"} color={"black"} bold>69</Text></HighlightBoardRow>)}
       </BoardList>
       <SearchForm onSubmit={handleSubmit}>
         <Input type="text"/>
@@ -87,7 +94,8 @@ const BoardDrawer = (props) => {
 const Page = styled.div`
   display: flex;
   justify-content: flex-start;
-  flex-direction: column;
+  flex-direction: row;
+  height: calc(100vh - 92px);
   @media all and (min-width: 1024px) {
     width: 40%;
   }
@@ -115,11 +123,9 @@ const SearchForm = styled.form`
 `;
 
 const Input = styled.input`
-  background-color: ${props => chroma(props.theme.colors.primary).brighten().hex()};
   border-radius: 80px;
   font-size: 2rem;
   width: 60%;
-  color: ${props => chroma(props.theme.colors.white)};
   margin-bottom: 10px;
   padding: 0;
 `;
@@ -144,6 +150,25 @@ const BoardList = styled.ul`
   padding-bottom: 3em;
 `;
 
+const BoardRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  flex-direction: row;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 9000px;
+`;
+
+const HighlightBoardRow = styled(BoardRow)`
+  background-color: ${props => props.selected ? chroma(props.theme.colors.primary).brighten(2.5).hex() : "inherit"};
+  &:hover {
+    background-color: ${props => chroma(props.theme.colors.primary).brighten(2.5).hex()};
+    cursor: pointer;
+  }
+`;
+
 const Header = styled.h1`
   text-align: ${props => props.align ?? "center"};
   color: ${props => props.theme.colors.black};
@@ -153,21 +178,14 @@ const Header = styled.h1`
 `;
 
 const BoardItem = styled(Header)`
-  background-color: ${props => props.theme.colors.white};
   color: ${props => props.theme.colors.black};
   border-radius: 12px; 
   padding: 8px;
   user-select: none;
-
-  &:hover {
-    background-color: ${props => chroma(props.theme.colors.white).darken(0.25).hex()};
-    cursor: pointer;
-  }
 `;
 
 const BoardDrawerRoot = styled.div`
   width: 300px;
-  background-color: ${props => props.theme.colors.grey};
   height: fit-content;
   border-radius: 8px;
   margin-top: 1rem;
@@ -176,8 +194,9 @@ const BoardDrawerRoot = styled.div`
 
 const BoardRoot = styled.div`
   display: flex;
-  justify-content: center;
-  flex-direction: row;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
   margin: 0 auto;
   width: 100%;
   max-height: 100vh;
@@ -198,32 +217,33 @@ const HomeNavBar = styled.div`
   justify-content: flex-start;
   gap: 10px;
   flex-direction: row;
-  width: calc(100% - 20px);
-  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.7)};
-  // border-bottom: 1px solid black;
-  border-bottom: 1px solid ${props => chroma(props.theme.colors.primary).hex()};
-  min-height: calc(92px - 20px);
-  padding: 10px;
+  background-color: ${props => props.theme.colors.white};
+  height: fit-content;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
   align-items: center;
-`;
 
-const Text = styled.p`
-  font-weight: 500; 
-  font-size: 1rem;
-  line-height: 1.5rem;
-  color: ${props => props.theme.colors.white};
-  font-family: 'Open Sans', sans-serif;
-  padding: 0;
-  margin: 0;
-`;
-
-const GreyText = styled(Text)`
-  text-align: center;
-  color: ${props => props.theme.colors.grey};
+  @media all and (min-width: 1024px) {
+    width: 60%;
+    padding-left: 20%;
+    padding-right: 20%;
+  }
+  
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    width: 100%;
+  }
+  
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    width: 100%;
+  }
+  
+  @media all and (max-width: 480px) { 
+    width: 100%;
+  }
 `;
 
 const HamburgerMenu = styled(FiMenu)`
-  color: white;
+  color: ${props => props.theme.colors.black};
   width: 48px;
   height: 48px;
   padding-right: 10px;
@@ -243,4 +263,43 @@ const HamburgerMenu = styled(FiMenu)`
   @media all and (max-width: 480px) { 
     visibility: visible;
   }
+`;
+
+const BoardIcon = styled(RiDiscussFill)`
+  color: ${props => props.theme.colors.primary};
+  width: 48px;
+  height: 48px;
+`;
+
+const BarChartIcon = styled(BsFillBarChartFill)`
+  color: ${props => props.theme.colors.primary};
+  width: 48px;
+  height: 48px;
+`;
+
+const ToolTip = styled.span`
+  visibility: ${props => props.visibility ? "visible" : "hidden"};
+  width: 100%;
+  background-color: ${props => props.theme.colors.grey};
+  color: white;
+  font-weight: 650;
+  text-align: center;
+  border-radius: 6px;
+  padding: 10px;
+  position: relative;
+  z-index: 1;
+  bottom: 60px;
+  left: 15%;
+  margin-left: -100px;
+
+  &:after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: ${props => props.theme.colors.grey} transparent transparent transparent;
+  };
 `;

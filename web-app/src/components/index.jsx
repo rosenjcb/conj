@@ -35,19 +35,19 @@ const sizeCompute = (size) => {
   let res = null;
   switch(size) {
     case "small": 
-      res = "0.5rem";
+      res = "0.75rem";
       break;
     case "medium": 
       res = "1rem";
       break;
     case "large": 
-      res = "1.5rem";
+      res = "1.25rem";
       break;
     case "x-large": 
-      res = "2rem";
+      res = "1.5rem";
       break;
     case "xx-large": 
-      res = "2.5rem";
+      res = "2rem";
       break;
   }
   return res;

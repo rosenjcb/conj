@@ -96,15 +96,15 @@ const OriginalPost = (props) => {
           </TextContainer>
         </UserInfo>
       <OriginalContentRoot>
-        <Text align={"center"} size={"x-large"} color={"primary"}>{subject}</Text>
+        <Text align={"left"} size={"x-large"} color={"primary"}>{subject}</Text>
         <CenteredImage fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
-        <Text align="left">
+        <Text align="left" size={"large"}>
           {processPostText(opNo, comment)}
         </Text>
       </OriginalContentRoot>
       <ActionsContainer>
-        <WithText component={<Link to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></Link>} direction="row" text={replyCount}/>
-        <Text bold>{formattedTime}</Text>
+        <WithText component={<ThreadLink to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></ThreadLink>} direction="row" text={replyCount}/>
+        <Text size={"large"} color={"grey"} bold>{formattedTime}</Text>
       </ActionsContainer>
       { !preview ? <ThreadReply/> : null }
     </PostRoot>
@@ -117,22 +117,35 @@ const ReplyPost = (props) => {
   return(
     <PostRoot highlight={highlight}>
       <YellowRibbon highlight={highlight} ref={handleRef}/>
+      <FalseBorder/>
       <ContentRoot>
         { image && image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }
         <Text align="left">
-          <Text size={"large"} color={"primary"}>{subject}</Text>
+          { subject ? <Text size={"large"} color={"primary"}>{subject}</Text> : null }
           {processPostText(opNo, comment)}
         </Text>
       </ContentRoot>
-      <UserInfo>
-        <Avatar src="/pepe_icon.jpg"/>
-        <Text>{name}</Text>
-        <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
+      <BottomRow>
+        <ReplyUserInfo>
+          <Avatar src="/pepe_icon.jpg"/>
+          <TextContainer>
+            <Text>{name}</Text>
+            <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
+          </TextContainer>
+        </ReplyUserInfo>
         <Text>{formattedTime}</Text>
-      </UserInfo>
+      </BottomRow>
     </PostRoot>
   )
 }
+
+const BottomRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+`;
 
 const YellowRibbon = styled.div`
   scroll-behavior: smooth;
@@ -144,16 +157,23 @@ const YellowRibbon = styled.div`
   left: -24px;
   background-color: ${props => props.highlight ? props.theme.colors.warning : "inherit"};
   pointer-events: none;
-  opacity: 0.3;
+  opacity: ${props => props.highlight ? 0.3 : 0};
 `;
 
 const WithTextRoot = styled.div`
   display: flex;
   flex-direction: ${props => props.direction ?? "row"};
+  color: ${props => chroma(props.theme.colors.grey).darken().hex()};
+
+  &:hover {
+    color: ${props => chroma(props.theme.colors.black).brighten().hex()};
+  }
+
 `;
 
 const MessageDetail = styled(BiMessageDetail)`
-  color: ${props => chroma(props.theme.colors.grey).darken().hex()};
+  // color: ${props => chroma(props.theme.colors.grey).darken().hex()};
+  color: inherit;
   width: 36px;
   height: 36px;
 `;
@@ -170,6 +190,12 @@ const UserInfo = styled.div`
   align-items: center;
   gap: 20px;
   margin-bottom: 10px;
+  width: 100%;
+`;
+
+const ReplyUserInfo = styled(UserInfo)`
+  justify-content: space-between;
+  width: fit-content;
 `;
 
 const Image = styled.img`
@@ -196,7 +222,7 @@ const Header = styled.h1`
 `;
 
 const IconText = styled.p`
-  color: ${props => chroma(props.theme.colors.grey).darken().hex()};
+  // color: ${props => chroma(props.theme.colors.grey).darken().hex()};
   text-align: center;
   font-size: 1.25rem;
   padding: 0;
@@ -229,19 +255,16 @@ const OriginalContentRoot = styled(ContentRoot)`
 `
 
 const PostRoot = styled.div`
-	box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   scroll-behavior: smooth;
   display: flex;
   position: relative;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: flex-start;
   flex-flow: wrap;
   width: calc(100% - 3rem);
   margin: 0 auto;
-  margin-bottom: 5rem;
   background-color: ${props => props.theme.colors.white};
-  border-radius: 8px;
-  padding: 1.5rem;
+  margin: 1.5rem;
   gap: 1rem;
 `;
 
@@ -255,10 +278,6 @@ const PostLink = styled(Link)`
   font-family: 'Open Sans', sans-serif;
   padding: 0;
   margin: 0;
-
-  &:hover {
-      color: ${props => props.theme.colors.primary};
-  }
 `;
 
 const ThreadReply = styled(Reply)`
@@ -285,4 +304,16 @@ const TextContent = styled.div`
   flex-direction: column;
   width: calc(100% - 32px - 3rem);
   align-items: flex-start;
+`;
+
+const ThreadLink = styled(Link)`
+  color: inherit;
+`;
+
+const FalseBorder = styled.div`
+  width: 1px;
+  height: 50px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: black;
 `;

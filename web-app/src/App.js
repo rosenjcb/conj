@@ -62,7 +62,7 @@ const AppRoot = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 100vh;
+  height: 100vh;
   background: linear-gradient(112deg, transparent 0, transparent 20%, ${props => chroma(props.theme.colors.primary).alpha(0.1).hex()} 30%, ${props => chroma(props.theme.colors.primary).alpha(0.1).hex()} 70%, transparent 80%, transparent 100%);
 `;
 
