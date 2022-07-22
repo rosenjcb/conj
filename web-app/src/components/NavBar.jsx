@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { me as callMe } from '../api/account'
+import { me as callMe, logout } from '../api/account'
 import { fetchBoards } from '../api/board';
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
@@ -10,6 +10,8 @@ import {RiDiscussFill} from 'react-icons/ri';
 import { BsFillBarChartFill } from 'react-icons/bs';
 import { Text } from './index';
 import { useThread } from '../hooks/useThread';
+import { SquareButton } from './index';
+
 
 
 export const WithNavBar = ({component}) => {
@@ -44,11 +46,17 @@ export const WithNavBar = ({component}) => {
 
   const isMobile = detectMobile();
 
-    return (
+  const handleLogout = async() => {
+    await logout();
+    window.location.reload();
+  }
+
+  return (
     <BoardRoot>
       <HomeNavBar>
         <HamburgerMenu/>
         <Header>conj.app</Header>
+        <SquareButton onClick={handleLogout}>Logout</SquareButton>
       </HomeNavBar>
       <Page>
         { !isMobile ? <BoardDrawer boards={boards}/> : null }
@@ -214,7 +222,7 @@ const TitleContainer = styled.div`
 
 const HomeNavBar = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 10px;
   flex-direction: row;
   background-color: ${props => props.theme.colors.white};
