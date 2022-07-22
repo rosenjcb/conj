@@ -6,10 +6,6 @@
   [:vector
    [:map m.post/schema]])
 
-(def id :id)
-
-(def image :image)
-
 #_{:clj-kondo/ignore [:redefined-var]}
 (defn sort [threads] 
   (when threads
@@ -27,3 +23,10 @@
 
 (defn add-post [post thread]
   (conj thread post))
+
+(defn locked? [thread]
+  (let [op (first thread)]
+    (:locked op)))
+
+(defn op [thread]
+  (first thread))

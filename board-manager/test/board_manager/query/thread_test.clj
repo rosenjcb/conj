@@ -1,5 +1,6 @@
 (ns board-manager.query.thread-test
   (:require [board-manager.model.thread :as m.thread]
+            [board-manager.query.db.redis :as db.redis]
             [board-manager.query.thread :as q.thread]
             [clojure.test :refer [deftest is testing]]
             [java-time :as t]))
@@ -19,6 +20,10 @@
 (def unsorted-threads (vec (map #(assoc-in basic-thread [0 :id] %) [101 99 87 22 94 105])))
 
 (def sorted-threads (vec (map #(assoc-in basic-thread [0 :id] %) [105 101 99 94 87 22])))
+
+(def max-thread (->> (repeat (+ q.thread/max-post-count 1) base-request)
+                     (map-indexed (fn [i v] (assoc v :id (+ i (:id v)))))
+                     (into [])))
 
 (defn- subtract-minutes [min time]
   (let [instant (t/local-date-time time)]
@@ -85,3 +90,11 @@
   (testing "Unsorted threads sorts to sorted threads"
     (let [actual-sorted-threads (m.thread/sort unsorted-threads)]
       (is (= actual-sorted-threads sorted-threads)))))
+
+(deftest thread-locks 
+  (testing "Threads over the post limit are locked, those aren't are left unchanged."
+    (with-redefs [db.redis/set (constantly nil)
+                  q.thread/fetch-threads! (constantly nil)]
+      (let [expected-thread (assoc-in max-thread [0 :locked] true)]
+        (is (= expected-thread (#'q.thread/update-thread! nil nil nil max-thread)))
+        (is (= basic-thread (#'q.thread/update-thread! nil nil nil basic-thread)))))))
