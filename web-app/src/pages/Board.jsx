@@ -59,9 +59,13 @@ const ThreadPreview = (props) => {
   )
 }
 
-const ThreadPreviewRoot = styled.ul`
+const ThreadPreviewRoot = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
   width: calc(100% - 3rem);
   height: calc(100vh - 96px);
+  gap: 5rem;
   padding: 1.5rem;
   margin: 0;
 `;
@@ -91,7 +95,6 @@ const BoardRoot = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.5).hex()};
 
   overflow-y: scroll;
   scrollbar-width: none;

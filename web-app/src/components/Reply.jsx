@@ -100,7 +100,7 @@ export const StyledForm = styled(Form)`
   padding-bottom: 1.5rem;
   padding-top: 1.5rem;
   width: 100%;
-  background-color: ${props => chroma(props.theme.colors.primary).brighten(1.5).hex()};
+  background-color: ${props => props.theme.colors.white};
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
@@ -156,7 +156,6 @@ const ActionsContainer = styled.div`
 
 
 const CommentBody = styled(Field)`
-  color: ${props => chroma(props.theme.colors.white).darken(0.8).hex()};
   font-size: 1.25rem;
   word-break: break-word;
   background-color: inherit;
@@ -171,7 +170,7 @@ const CommentBody = styled(Field)`
 `;
 
 const SubjectInput = styled(Field).attrs(props => ({type: "text"}))`
-  color: ${props => chroma(props.theme.colors.white).darken(0.8).hex()};
+  color: ${props => props.theme.colors.black};
   font-size: 2.5rem;
   background-color: inherit;
   resize: none;
@@ -184,13 +183,15 @@ const SubjectInput = styled(Field).attrs(props => ({type: "text"}))`
   border: none;
 
   ::placeholder {
-    color: ${props => chroma(props.theme.colors.white).darken(0.8).hex()};
+    color: ${props => props.theme.colors.grey};
   }
 `;
 
 const PreviewImageRoot = styled.div`
   display: inline-block;
   position: relative;
+  max-width: 80%;
+  margin: 0 auto;
 `;
 
 const IconContainer = styled.div`
@@ -200,16 +201,22 @@ const IconContainer = styled.div`
   width: fit-content;
   margin: 0;
   padding: 0;
-`
+`;
 
 const DeleteIcon = styled(AiFillDelete)`
   width: 24px;
   height: 24px;
-  color: ${props => props.theme.colors.white};
+  color: ${props => props.theme.colors.primary};
 `;
 
 const UploadImageIcon = styled(BiImageAdd)`
-  color: white;
+  color: ${props => props.theme.colors.primary};
   width: 3rem;
   height: 3rem;
+`;
+
+const ImageContainer = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
 `;

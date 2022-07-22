@@ -4,8 +4,8 @@ import chroma from 'chroma-js';
 export const HR = styled.hr`
   width: ${props => props.width ?? "100%"};
   border: none;
-  height: 4px;
-  background-color ${props => chroma(props.theme.colors.primary).brighten(1.5).hex()};
+  height: 2px;
+  background-color ${props => props.theme.colors.grey};
   border-radius: 8px;
 `;
 
@@ -31,25 +31,46 @@ export const RarityImage = styled.img`
     border: 6px ridge ${props => pickColor(props.rarity)};
 `;
 
-export const ErrorText = styled.p`
-  color: #ed4245;
-  margin: 0 auto;
-  word-wrap: break-word;
-`;
+const sizeCompute = (size) => {
+  let res = null;
+  switch(size) {
+    case "small": 
+      res = "0.75rem";
+      break;
+    case "medium": 
+      res = "1rem";
+      break;
+    case "large": 
+      res = "1.25rem";
+      break;
+    case "x-large": 
+      res = "1.5rem";
+      break;
+    case "xx-large": 
+      res = "2rem";
+      break;
+  }
+  return res;
+}
 
-export const Text = styled.div`
-  font-weight: 500; 
-  font-size: 1rem;
+const computeColor = (colors, selectedColor) => {
+  return colors[selectedColor]  ?? colors['black'];
+}
+
+export const Text = styled.p`
+  font-weight: ${props => props.bold ? 700 : 500}; 
+  font-size: ${props => sizeCompute(props.size) ?? "1rem"};
+  text-align: ${props => props.align ?? 'left'};
+  font-family: "Inter",arial,sans-serif;
   line-height: 1.5rem;
-  color: ${props => props.theme.colors.white};
-  font-family: 'Open Sans', sans-serif;
+  color: ${props => computeColor(props.theme.colors, props.color)};
   padding: 0;
   margin: 0;
 `;
 
 export const RoundButton = styled.button`
   color: ${props => chroma(props.theme.colors.white)};
-  background-color: ${props => chroma(props.theme.colors.primary).brighten().hex()};
+  background-color: ${props => props.theme.colors.primary};
   border: none;
   border-radius: 9000px; 
   font-size: 1.5rem;
@@ -58,7 +79,7 @@ export const RoundButton = styled.button`
   padding-right: 20px;
 
   &:hover {
-    background-color: ${props => chroma(props.theme.colors.primary).hex()};
+    background-color: ${props => chroma(props.theme.colors.primary).darken().hex()};
   }
 `;
 
@@ -74,22 +95,23 @@ export const AccentButton = styled(RoundButton)`
 `;
 
 export const RoundImage = styled.img`
-  max-width: 200px;
+  max-width: 100%;
+  margin: 0 auto;
   aspect-ratio: 16/9;
   border-radius: 8px;
 `;
 
 export const Avatar = styled.img`
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
 `;
 
 export const Link = styled.a`
-  color: ${props => props.theme.colors.white};
+  color: ${props => props.theme.colors.black};
 `;
 
 
 export const TitlePoint = styled.h2`
-  color:  ${props => props.theme.colors.white};
+  color:  ${props => props.theme.colors.black};
 `;
