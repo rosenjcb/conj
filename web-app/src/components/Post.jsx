@@ -8,6 +8,10 @@ import { Link } from 'react-router-dom';
 import chroma from 'chroma-js';
 import { BiMessageDetail } from 'react-icons/bi'; 
 import { Reply } from './Reply';
+import Modal from 'react-modal';
+
+Modal.defaultStyles.overlay.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+
 
 const WithText = ({direction, component, text}) => {
   return (
@@ -17,6 +21,21 @@ const WithText = ({direction, component, text}) => {
     </WithTextRoot>
   )
 }
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '0',
+    border: 'none',
+    borderRadius: '0px',
+    background: 'none'
+  },
+};
 
 const handlePostDate = (time) => {
   const now = new Date();
@@ -49,10 +68,13 @@ export const Post = (props) => {
 
   const dispatch = useDispatch();
 
-  const toggleFullScreen = () => {
-    setFullScreen(!fullScreen);
+  const openFullScreen = () => {
+    setFullScreen(true);
   }
 
+  const closeFullScreen = () => {
+    setFullScreen(false);
+  }
   const { post, handleRef, highlight, preview, replyCount, opNo } = props;
 
   const { name, subject, id, comment, image, time } = post;
@@ -71,20 +93,28 @@ export const Post = (props) => {
   const formattedTime = handlePostDate(time);
 
   return (
-    isOriginalPost
-      ? 
-        <OriginalPost key={post.id} preview={preview} highlight={false} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
-                                   toggleFullScreen={toggleFullScreen} id={id} name={name} handleClick={handleClick}
-                                   opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image} replyCount={replyCount}/> 
-      : 
-        <ReplyPost key={post.id} highlight={highlight} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
-                                    toggleFullScreen={toggleFullScreen} id={id} name={name} handleClick={handleClick}
-                                    opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image}/>
+    <div>
+      <Modal
+        style={customStyles}
+        isOpen={fullScreen}
+        onRequestClose={closeFullScreen}>
+          <CenteredImage fullScreen={true} src={image.location}/>
+        </Modal>
+      { isOriginalPost
+        ? 
+          <OriginalPost key={post.id} preview={preview} highlight={false} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
+                                      openFullScreen={openFullScreen} closeFullScreen={closeFullScreen} id={id} name={name} handleClick={handleClick}
+                                      opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image} replyCount={replyCount}/> 
+        : 
+          <ReplyPost key={post.id} highlight={highlight} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
+                                      openFullScreen={openFullScreen} closeTFullScreen={closeFullScreen} id={id} name={name} handleClick={handleClick}
+                                      opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image}/> }
+    </div>
   )
 }
 
 const OriginalPost = (props) => {
-  const { postHref, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
+  const { postHref, handleRef, fullScreen, openFullScreen, closeFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
 
   return(
     <PostRoot key={id} ref={handleRef}>
@@ -97,7 +127,7 @@ const OriginalPost = (props) => {
       </UserInfo>
       <OriginalContentRoot>
         <Text align={"left"} size={"x-large"} color={"primary"}>{subject}</Text>
-        <CenteredImage fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
+        <CenteredImage fullScreen={fullScreen} onClick={() => openFullScreen()} src={image.location}/>
         {processPostText(opNo, comment)}
       </OriginalContentRoot>
       <ActionsContainer>
@@ -110,14 +140,14 @@ const OriginalPost = (props) => {
 }
 
 const ReplyPost = (props) => {
-  const { postHref, highlight, handleRef, fullScreen, toggleFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
+  const { postHref, highlight, handleRef, fullScreen, openFullScreen, closeFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
 
   return(
     <PostRoot highlight={highlight}>
       <FalseBorder/>
       <PostBody>
         <ContentRoot>
-          { image && image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }
+          { image && image.location ? <Image fullScreen={fullScreen} onClick={() => openFullScreen()} src={image.location}/> : null }
           { subject ? <Text size={"large"} color={"primary"}>{subject}</Text> : null }
           {processPostText(opNo, comment)}
         </ContentRoot>
@@ -205,10 +235,8 @@ const ReplyUserInfo = styled(UserInfo)`
 `;
 
 const Image = styled.img`
-  aspect-ratio: 16 / 9;
-  width: ${props => props.fullScreen ? "100%" : "fit-content"};
   max-width: 100%;
-  height: ${props => props.fullScreen ? "100%" : "400px"};
+  max-height: 100%;
   border-radius: 8px;
   margin-right: 10px;
   float: left;
@@ -217,7 +245,7 @@ const Image = styled.img`
 const CenteredImage = styled(Image)`
   float: none;
   margin: 0 auto;
-`
+`;
 
 const Header = styled.h1`
   text-align: ${props => props.align ?? "center"};
