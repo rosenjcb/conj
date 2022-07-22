@@ -16,6 +16,7 @@
 (def ^:const max-name-count 30)
 (def ^:const max-subject-count 50)
 (def ^:const max-thread-count 30)
+(def ^:const max-post-count 30)
 
 (defn fetch-threads! 
   ([redis-conn board] 
@@ -144,8 +145,7 @@
         op (first thread)
         _ (validate-thread-time db-account)
         _ (validate-create-thread op)
-        ;; id (m.thread/id op)
-        image (m.thread/image op)
+        image (m.post/image op)
         uploaded-image (upload-image s3-client image) 
         enriched-thread (vector (assoc op :image uploaded-image :time (t/zoned-date-time)))] 
     (add-thread-to-board! redis-conn s3-client board enriched-thread)
@@ -153,22 +153,35 @@
     (q.account/update-last-thread! db-conn account-id)
     enriched-thread))
 
-(defn update-thread! [redis-conn board thread-id updated-thread]
-  (let [threads (fetch-threads! redis-conn board)
-        new-threads (map #(if (= (m.post/id (first %)) thread-id) updated-thread %) threads)]
-    (db.redis/set redis-conn board new-threads)))
+;; Can now test;
+(defn ^:private ^:test update-thread! [redis-conn board thread-id updated-thread]
+  (let [old-threads (fetch-threads! redis-conn board)
+        final-thread (if (> (count updated-thread) max-post-count) (assoc-in updated-thread [0 :locked] true) updated-thread)
+        new-threads (map #(if (= (m.post/id (first %)) thread-id) final-thread %) old-threads)]
+    (db.redis/set redis-conn board new-threads)
+    final-thread))
+
+(defn ^:private ^:test validate-thread-lock 
+  [board thread]
+  (let [post-count (count thread)
+        overflow? (> post-count max-post-count)
+        error-base (format "Thread %s on board /%s/ is locked." (m.post/id (first thread)) board)
+        error-addition (format " Thread count is over the limit: %s/%s" post-count max-post-count)]
+    (when (m.thread/locked? thread)
+      (throw (Exception. (str error-base (when overflow? error-addition)))))))
 
 (defn add-post!
   "Grabs a thread by its id, adds a post to it, and saves it to the database"  
   [db-conn s3-client redis-conn account board thread-id post-body]
   (let [account-id (:id account)
+        old-thread (find-thread-by-id! redis-conn board thread-id)
+        _ (validate-thread-lock board old-thread)
         db-account (q.account/find-account-by-id! db-conn account-id)
         _ (validate-reply-time db-account)
         post-count (q.board/get-count! db-conn board)
         post (m.post/req&id->post post-body post-count)
         _ (validate-add-post post)
         image (m.post/image post)
-        old-thread (find-thread-by-id! redis-conn board thread-id)
         _ (when (nil? old-thread) (throw (Exception. "Thread does not exist")))
         uploaded-image (when image (upload-image s3-client image))
         enriched-post (assoc post :image uploaded-image :time (t/zoned-date-time))
