@@ -33,7 +33,7 @@ export const processPostText = (opNo, text) => {
     nodes.push(line);
   }
 
-  return <div>{nodes}</div>;
+  return <div style={{width: '100%'}}>{nodes}</div>;
 }
 
 const discoverHashLink = (opNo, reply) => {

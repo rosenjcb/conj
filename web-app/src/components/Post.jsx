@@ -88,19 +88,17 @@ const OriginalPost = (props) => {
 
   return(
     <PostRoot key={id} ref={handleRef}>
-        <UserInfo>
-          <Avatar src="/pepe_icon.jpg"/>
-          <TextContainer>
-            <Text bold size={"medium"}>{name}</Text>
-            <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
-          </TextContainer>
-        </UserInfo>
+      <UserInfo>
+        <Avatar src="/pepe_icon.jpg"/>
+        <TextContainer>
+          <Text bold size={"medium"}>{name}</Text>
+          <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
+        </TextContainer>
+      </UserInfo>
       <OriginalContentRoot>
         <Text align={"left"} size={"x-large"} color={"primary"}>{subject}</Text>
         <CenteredImage fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/>
-        <Text align="left" size={"large"}>
-          {processPostText(opNo, comment)}
-        </Text>
+        {processPostText(opNo, comment)}
       </OriginalContentRoot>
       <ActionsContainer>
         <WithText component={<ThreadLink to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></ThreadLink>} direction="row" text={replyCount}/>
@@ -116,28 +114,36 @@ const ReplyPost = (props) => {
 
   return(
     <PostRoot highlight={highlight}>
-      <YellowRibbon highlight={highlight} ref={handleRef}/>
       <FalseBorder/>
-      <ContentRoot>
-        { image && image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }
-        <Text align="left">
+      <PostBody>
+        <ContentRoot>
+          { image && image.location ? <Image fullScreen={fullScreen} onClick={() => toggleFullScreen()} src={image.location}/> : null }
           { subject ? <Text size={"large"} color={"primary"}>{subject}</Text> : null }
           {processPostText(opNo, comment)}
-        </Text>
-      </ContentRoot>
-      <BottomRow>
-        <ReplyUserInfo>
-          <Avatar src="/pepe_icon.jpg"/>
-          <TextContainer>
-            <Text>{name}</Text>
-            <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
-          </TextContainer>
-        </ReplyUserInfo>
-        <Text>{formattedTime}</Text>
-      </BottomRow>
+        </ContentRoot>
+        <BottomRow>
+          <ReplyUserInfo>
+            <Avatar src="/pepe_icon.jpg"/>
+            <TextContainer>
+              <Text>{name}</Text>
+              <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
+            </TextContainer>
+          </ReplyUserInfo>
+          <Text>{formattedTime}</Text>
+        </BottomRow>
+      </PostBody>
     </PostRoot>
   )
 }
+
+const PostBody = styled.div`
+  display: flex;
+  justify-content: column;
+  flex-direction: flex-start;
+  flex-flow: wrap;
+  gap: 2rem;
+  width: calc(100% - 1px - 1rem);
+`;
 
 const BottomRow = styled.div`
   display: flex;
@@ -242,17 +248,20 @@ const HeaderRoot = styled.div`
 
 const ContentRoot = styled.div`
   background-color: ${props => props.theme.colors.white};
-  display: block;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
+  gap: 2rem;
 `;
 
 const OriginalContentRoot = styled(ContentRoot)`
   scroll-behavior: smooth;
   display: flex;
   justify-content: flex-start;
-  gap: 2rem;
   flex-direction: column;
-`
+`;
 
 const PostRoot = styled.div`
   scroll-behavior: smooth;
@@ -312,8 +321,5 @@ const ThreadLink = styled(Link)`
 
 const FalseBorder = styled.div`
   width: 1px;
-  height: 50px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  background-color: black;
+  background-color: ${props => chroma(props.theme.colors.grey).darken().hex()};
 `;
