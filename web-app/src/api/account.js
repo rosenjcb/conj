@@ -8,7 +8,7 @@ export const login = (accountDetails) => {
 
 export const logout = () => {
   return axios.get('/api/logout');
-}
+};
 
 export const signup = (accountDetails) => {
   return axios.post('/api/accounts', accountDetails);

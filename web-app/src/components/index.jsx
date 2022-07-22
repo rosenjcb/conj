@@ -83,6 +83,12 @@ export const RoundButton = styled.button`
   }
 `;
 
+export const SquareButton = styled(RoundButton)`
+  border-radius: 4px;
+  font-size: 1rem;
+`;
+
+
 export const AccentButton = styled(RoundButton)`
   background-color: ${props => props.theme.colors.accent};
   color: ${props => props.theme.colors.white};
