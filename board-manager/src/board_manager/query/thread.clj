@@ -16,7 +16,7 @@
 (def ^:const max-name-count 30)
 (def ^:const max-subject-count 50)
 (def ^:const max-thread-count 30)
-(def ^:const max-post-count 30)
+(def ^:const max-post-count 300)
 
 (defn fetch-threads! 
   ([redis-conn board] 
