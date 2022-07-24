@@ -97,7 +97,7 @@
            :middleware [[middleware/wrap-auth]]
            :handler create-thread!}
     :delete {:summary "Nukes the entire board"
-             :middleware [[middleware/wrap-auth]]
+             :middleware [[middleware/wrap-admin]]
              :handler nuke-threads!}}]
     ["/boards/:board/threads/:id"
      {:get {:summary "Get a thread by id"
@@ -112,5 +112,5 @@
       :delete {:summary "Deletes a thread"
                :parameters {:path thread-req}
                :coercion malli.coercion/coercion
-               :middleware [[middleware/wrap-auth]]
+               :middleware [[middleware/wrap-admin]]
                :handler kill-thread!}}]])
