@@ -7,13 +7,9 @@
             [ring.util.response :as response]))
 
 (defn peek-threads! [req]
-  (let [db-conn (get-in req [:components :db-conn])
-        redis-conn (get-in req [:components :redis-conn])
+  (let [redis-conn (get-in req [:components :redis-conn])
         board (get-in req [:path-params :board])
-        board-exists? ((set (query.board/list-boards! db-conn)) board)
         threads (query.thread/fetch-threads! redis-conn board {:sort? true})]
-    (when board-exists?
-      (log/infof "hi"))
     (if threads
       (response/response threads)
       (response/not-found (format "Board %s does not exist" board)))))
@@ -97,7 +93,7 @@
            :middleware [[middleware/wrap-auth]]
            :handler create-thread!}
     :delete {:summary "Nukes the entire board"
-             :middleware [[middleware/wrap-auth]]
+             :middleware [[middleware/wrap-admin]]
              :handler nuke-threads!}}]
     ["/boards/:board/threads/:id"
      {:get {:summary "Get a thread by id"
@@ -112,5 +108,5 @@
       :delete {:summary "Deletes a thread"
                :parameters {:path thread-req}
                :coercion malli.coercion/coercion
-               :middleware [[middleware/wrap-auth]]
+               :middleware [[middleware/wrap-admin]]
                :handler kill-thread!}}]])
