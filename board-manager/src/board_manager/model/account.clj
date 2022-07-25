@@ -7,7 +7,8 @@
    [:pass string?]
    [:last_post inst?]
    [:last_thread inst?]
-   [:role [:enum "user" "admin"]]])
+   [:role [:enum "user" "admin"]]
+   [:username string?]])
 
 (def id :id)
 
@@ -24,3 +25,5 @@
 (def ^:const user-role "user")
 
 (def ^:const admin-role "admin")
+
+(def username :username)

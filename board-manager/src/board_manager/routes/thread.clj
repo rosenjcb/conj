@@ -79,10 +79,25 @@
   (let [db-conn (get-in req [:components :db-conn])]
     (response/response (query.board/list-boards! db-conn))))
 
-(def thread-req
+(def thread-path
   [:map
    [:board string?]
    [:id int?]])
+
+(def post-body
+  [:map
+   [:subject string?
+    :comment string?
+    :image string?]])
+
+(def thread-body
+  [:map
+    [:subject {:optional true} string?]
+    [:comment {:optional true} string?]
+    [:image [:map
+             [:filename string?]
+             [:tempfile any?]]
+     :isAnonymous boolean?]])
 
 (def thread-routes
   [["/boards"
@@ -91,22 +106,25 @@
    {:get peek-threads! 
     :post {:summary "Create a Thread" 
            :middleware [[middleware/wrap-auth]]
+           :coercion malli.coercion/coercion
+           :parameters {:form-params thread-body}
            :handler create-thread!}
     :delete {:summary "Nukes the entire board"
              :middleware [[middleware/wrap-admin]]
              :handler nuke-threads!}}]
     ["/boards/:board/threads/:id"
      {:get {:summary "Get a thread by id"
-            :parameters {:path thread-req}
+            :parameters {:path thread-path}
             :coercion malli.coercion/coercion
             :handler get-thread!}
       :put {:summary "Inserts a post into a thread by id"
-            :parameters {:path thread-req}
+            :parameters {:path thread-path
+                         :form-params post-body}
             :coercion malli.coercion/coercion
             :middleware [[middleware/wrap-auth]]
             :handler put-thread!}
       :delete {:summary "Deletes a thread"
-               :parameters {:path thread-req}
+               :parameters {:path thread-path}
                :coercion malli.coercion/coercion
                :middleware [[middleware/wrap-admin]]
                :handler kill-thread!}}]])
