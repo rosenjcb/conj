@@ -7,13 +7,9 @@
             [ring.util.response :as response]))
 
 (defn peek-threads! [req]
-  (let [db-conn (get-in req [:components :db-conn])
-        redis-conn (get-in req [:components :redis-conn])
+  (let [redis-conn (get-in req [:components :redis-conn])
         board (get-in req [:path-params :board])
-        board-exists? ((set (query.board/list-boards! db-conn)) board)
         threads (query.thread/fetch-threads! redis-conn board {:sort? true})]
-    (when board-exists?
-      (log/infof "hi"))
     (if threads
       (response/response threads)
       (response/not-found (format "Board %s does not exist" board)))))
