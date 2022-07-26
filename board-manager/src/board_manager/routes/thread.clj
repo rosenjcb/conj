@@ -107,7 +107,7 @@
     :post {:summary "Create a Thread" 
            :middleware [[middleware/wrap-auth]]
            :coercion malli.coercion/coercion
-           :parameters {:form-params thread-body}
+           :parameters {:multipart-params thread-body}
            :handler create-thread!}
     :delete {:summary "Nukes the entire board"
              :middleware [[middleware/wrap-admin]]
@@ -119,7 +119,7 @@
             :handler get-thread!}
       :put {:summary "Inserts a post into a thread by id"
             :parameters {:path thread-path
-                         :form-params post-body}
+                         :multipart-params post-body}
             :coercion malli.coercion/coercion
             :middleware [[middleware/wrap-auth]]
             :handler put-thread!}

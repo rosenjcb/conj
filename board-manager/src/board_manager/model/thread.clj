@@ -19,7 +19,7 @@
   "Takes a given API request and generates a new thread"
   [req name id]
   (let [{:strs [subject comment image isAnonymous]} req]
-    [{:id id :name name :subject subject :comment comment :image image :isAnonymous isAnonymous}]))
+    [{:id id :name name :subject subject :comment comment :image image :isAnonymous (boolean (Boolean/valueOf isAnonymous))}]))
 
 (defn anonymous?
   [thread]

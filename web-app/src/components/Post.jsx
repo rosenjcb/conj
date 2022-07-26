@@ -98,7 +98,7 @@ export const Post = (props) => {
         style={customStyles}
         isOpen={fullScreen}
         onRequestClose={closeFullScreen}>
-          <CenteredImage fullScreen={true} src={image.location}/>
+          { image ? <CenteredImage fullScreen={true} src={image.location}/> : null}
         </Modal>
       { isOriginalPost
         ? 
@@ -114,7 +114,7 @@ export const Post = (props) => {
 }
 
 const OriginalPost = (props) => {
-  const { postHref, handleRef, fullScreen, openFullScreen, closeFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
+  const { postHref, handleRef, fullScreen, openFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
 
   return(
     <PostRoot key={id} ref={handleRef}>
@@ -140,7 +140,7 @@ const OriginalPost = (props) => {
 }
 
 const ReplyPost = (props) => {
-  const { postHref, highlight, handleRef, fullScreen, openFullScreen, closeFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
+  const { postHref, highlight, fullScreen, openFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
 
   return(
     <PostRoot highlight={highlight}>
@@ -247,31 +247,12 @@ const CenteredImage = styled(Image)`
   margin: 0 auto;
 `;
 
-const Header = styled.h1`
-  text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.colors.black};
-  font-size: 1.5em;
-  padding: 0;
-  margin: 0;
-`;
-
 const IconText = styled.p`
   // color: ${props => chroma(props.theme.colors.grey).darken().hex()};
   text-align: center;
   font-size: 1.25rem;
   padding: 0;
   margin: 0;
-`;
-
-const HeaderRoot = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  width: calc(100% - 2rem);
-  align-items: center;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  background-color: ${props => props.theme.colors.white};
 `;
 
 const ContentRoot = styled.div`
@@ -329,18 +310,6 @@ const ActionsContainer = styled.div`
   width: 100%;
   flex-direction: row;
   align-items: center;
-`;
-
-// const HeaderText = styled(Text)`
-//   font-size: 2.5rem;
-// `;
-
-const TextContent = styled.div`
-  display: inline-flex;
-  justify-content: flex-start;
-  flex-direction: column;
-  width: calc(100% - 32px - 3rem);
-  align-items: flex-start;
 `;
 
 const ThreadLink = styled(Link)`

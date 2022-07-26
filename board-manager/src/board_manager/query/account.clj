@@ -6,7 +6,7 @@
     [java-time :as t]))
 
 (defn- q-account-by-id [id]
-  {:select [:id :email :last_reply :last_thread :role]
+  {:select [:id :email :last_reply :last_thread :role :username]
    :from [:account]
    :where [:= m.account/id id]})
 
