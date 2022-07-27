@@ -230,6 +230,7 @@ const HomeNavBar = styled.div`
   padding-top: 1rem;
   padding-bottom: 1rem;
   align-items: center;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 
   @media all and (min-width: 1024px) {
     width: 60%;
