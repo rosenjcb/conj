@@ -146,7 +146,7 @@
         anonymous? (m.thread/anonymous? thread)
         name (if anonymous? "Anonymous" username)
         op (first thread)
-        ;; _ (validate-thread-time db-account)
+        _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         image (m.post/image op)
         uploaded-image (upload-image s3-client image)
