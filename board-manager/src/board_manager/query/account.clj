@@ -6,7 +6,7 @@
     [java-time :as t]))
 
 (defn- q-account-by-id [id]
-  {:select [:id :email :last_reply :last_thread :role]
+  {:select [:id :email :last_reply :last_thread :role :username]
    :from [:account]
    :where [:= m.account/id id]})
 
@@ -15,10 +15,10 @@
    :from [:account]
    :where [:= m.account/email email]})
 
-(defn- q-add-account [{:keys [email pass]}]
+(defn- q-add-account [{:keys [email pass username]}]
   {:insert-into [:account]
-   :columns [:email :pass]
-   :values [[email pass]]})
+   :columns [:email :pass :username :role]
+   :values [[email pass username m.account/user-role]]})
 
 (defn- q-update-last-reply [account-id]
   {:update [:account]
@@ -28,6 +28,11 @@
 (defn- q-update-last-thread [account-id]
   {:update [:account]
    :set {:last_thread (t/sql-timestamp)}
+   :where [:= m.account/id account-id]})
+
+(defn- q-update-account [update account-id]
+  {:update [:account]
+   :set update
    :where [:= m.account/id account-id]})
 
 (defn find-account-by-id! [db-conn id]
@@ -44,3 +49,6 @@
 
 (defn update-last-thread! [db-conn account-id]
   (sql/execute-one! (db-conn) (sql.helper/format (q-update-last-thread account-id))))
+
+(defn update-account! [db-conn update account-id]
+  (sql/execute-one! (db-conn) (sql.helper/format (q-update-account update account-id))))

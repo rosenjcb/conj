@@ -15,11 +15,16 @@
   (let [no-op (drop 1 t)]
   (conj (take-last length no-op) (first t))))
 
-(defn req&id->thread
+(defn ->thread
   "Takes a given API request and generates a new thread"
-  [req id]
-    (let [{:strs [name subject comment image]} req]
-      [{:id id :name name :subject subject :comment comment :image image}]))
+  [req name id]
+  (let [{:strs [subject comment image isAnonymous]} req]
+    [{:id id :name name :subject subject :comment comment :image image :isAnonymous (boolean (Boolean/valueOf isAnonymous))}]))
+
+(defn anonymous?
+  [thread]
+  (->> (first thread)
+        m.post/isAnonymous))
 
 (defn add-post [post thread]
   (conj thread post))

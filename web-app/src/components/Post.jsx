@@ -98,7 +98,7 @@ export const Post = (props) => {
         style={customStyles}
         isOpen={fullScreen}
         onRequestClose={closeFullScreen}>
-          <CenteredImage fullScreen={true} src={image.location}/>
+          { image ? <CenteredImage fullScreen={true} src={image.location}/> : null}
         </Modal>
       { isOriginalPost
         ? 
@@ -114,7 +114,7 @@ export const Post = (props) => {
 }
 
 const OriginalPost = (props) => {
-  const { postHref, handleRef, fullScreen, openFullScreen, closeFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
+  const { postHref, handleRef, fullScreen, openFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
 
   return(
     <PostRoot key={id} ref={handleRef}>
@@ -140,7 +140,7 @@ const OriginalPost = (props) => {
 }
 
 const ReplyPost = (props) => {
-  const { postHref, highlight, handleRef, fullScreen, openFullScreen, closeFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
+  const { postHref, highlight, fullScreen, openFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
 
   return(
     <PostRoot highlight={highlight}>

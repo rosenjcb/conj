@@ -3,14 +3,12 @@
             [board-manager.query.account :as q.account]
             [buddy.hashers :as hashers] 
             [buddy.sign.jwt :as jwt]
-            [buddy.sign.util :as buddy.util]
             [buddy.core.keys :as ks]
             [clojure.tools.logging :as log]
             [clojure.java.io :as io]
             [com.stuartsierra.component :as component]
             [java-time :as t]
-            [board-manager.query.refresh-token :as q.refresh-token]
-            [buddy.sign.jws :as jws]))
+            [board-manager.query.refresh-token :as q.refresh-token]))
 
 
 (defn- encrypt [auth-service pass]

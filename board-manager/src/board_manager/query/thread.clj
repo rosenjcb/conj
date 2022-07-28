@@ -18,6 +18,8 @@
 (def ^:const max-thread-count 30)
 (def ^:const max-post-count 30)
 
+(def ^:const s3-folder "conj-images")
+
 (defn fetch-threads! 
   ([redis-conn board] 
    (fetch-threads! redis-conn board {}))
@@ -93,13 +95,12 @@
 
 (defn- upload-image
   [s3-client {:keys [filename tempfile]}]
-  (db.s3/upload-object s3-client "conj-images" filename (io/input-stream tempfile)))
+  (db.s3/upload-object s3-client s3-folder filename (io/input-stream tempfile)))
 
 (defn- delete-image 
   [s3-client filename]
-  (db.s3/delete-object s3-client "conj-images" filename))
+  (db.s3/delete-object s3-client s3-folder filename))
 
-;;Could test
 (defn find-thread-by-id!
   [redis-conn board id]
   (let [threads (db.redis/get redis-conn board)]
@@ -110,7 +111,6 @@
         new-threads (filter #((complement =) thread-id (m.post/id (first %))) threads)]
       (db.redis/set redis-conn board new-threads)))
 
-;; Wish I could test this but it's too side effect heavy.
 (defn delete-thread-by-id! [redis-conn s3-client board thread-id]
   (let [thread (find-thread-by-id! redis-conn board thread-id)]
     (if thread
@@ -140,20 +140,22 @@
   [db-conn s3-client redis-conn board account req]
   (let [account-id (:id account)
         db-account (q.account/find-account-by-id! db-conn account-id)
+        username (m.account/username db-account)
         post-count (q.board/get-count! db-conn board)
-        thread (m.thread/req&id->thread req post-count)
+        thread (m.thread/->thread req username post-count)
+        anonymous? (m.thread/anonymous? thread)
+        name (if anonymous? "Anonymous" username)
         op (first thread)
         _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         image (m.post/image op)
-        uploaded-image (upload-image s3-client image) 
-        enriched-thread (vector (assoc op :image uploaded-image :time (t/zoned-date-time)))] 
+        uploaded-image (upload-image s3-client image)
+        enriched-thread (vector (assoc op :image uploaded-image :time (t/zoned-date-time) :name name))] 
     (add-thread-to-board! redis-conn s3-client board enriched-thread)
     (q.board/increment-counter! db-conn board)
     (q.account/update-last-thread! db-conn account-id)
     enriched-thread))
 
-;; Can now test;
 (defn ^:private ^:test update-thread! [redis-conn board thread-id updated-thread]
   (let [old-threads (fetch-threads! redis-conn board)
         final-thread (if (> (count updated-thread) max-post-count) (assoc-in updated-thread [0 :locked] true) updated-thread)
@@ -175,16 +177,19 @@
   [db-conn s3-client redis-conn account board thread-id post-body]
   (let [account-id (:id account)
         old-thread (find-thread-by-id! redis-conn board thread-id)
+        anonymous? (m.thread/anonymous? old-thread)
         _ (validate-thread-lock board old-thread)
         db-account (q.account/find-account-by-id! db-conn account-id)
+        username (m.account/username db-account)
+        name (if anonymous? "Anonymous" username)
         _ (validate-reply-time db-account)
         post-count (q.board/get-count! db-conn board)
-        post (m.post/req&id->post post-body post-count)
+        post (m.post/->post post-body username post-count)
         _ (validate-add-post post)
         image (m.post/image post)
         _ (when (nil? old-thread) (throw (Exception. "Thread does not exist")))
         uploaded-image (when image (upload-image s3-client image))
-        enriched-post (assoc post :image uploaded-image :time (t/zoned-date-time))
+        enriched-post (assoc post :image uploaded-image :time (t/zoned-date-time) :name name)
         updated-thread (m.thread/add-post enriched-post old-thread)] 
     (update-thread! redis-conn board thread-id updated-thread)
     (q.board/increment-counter! db-conn board)
