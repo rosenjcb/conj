@@ -24,8 +24,6 @@ export const theme = {
   }
 }
 
-
-
 function App() {
   const thread = useSelector(state => state.thread);
 
