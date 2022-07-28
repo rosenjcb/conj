@@ -213,10 +213,8 @@ const UploadImageIcon = styled(BiImageAdd)`
   color: ${props => props.theme.colors.primary};
   width: 3rem;
   height: 3rem;
-`;
 
-const ImageContainer = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
+  &:hover {
+    cursor: pointer;
+  }
 `;

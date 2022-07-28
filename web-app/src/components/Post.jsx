@@ -183,19 +183,6 @@ const BottomRow = styled.div`
   align-items: center;
 `;
 
-const YellowRibbon = styled.div`
-  scroll-behavior: smooth;
-  width: calc(100% + 48px);
-  height: calc(100% + 2rem);
-  position: absolute;
-  border-radius: 2px;
-  top: -1rem;
-  left: -24px;
-  background-color: ${props => props.highlight ? props.theme.colors.warning : "inherit"};
-  pointer-events: none;
-  opacity: ${props => props.highlight ? 0.3 : 0};
-`;
-
 const WithTextRoot = styled.div`
   display: flex;
   flex-direction: ${props => props.direction ?? "row"};
@@ -240,19 +227,15 @@ const Image = styled.img`
   border-radius: 8px;
   margin-right: 10px;
   float: left;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const CenteredImage = styled(Image)`
   float: none;
   margin: 0 auto;
-`;
-
-const Header = styled.h1`
-  text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.colors.black};
-  font-size: 1.5em;
-  padding: 0;
-  margin: 0;
 `;
 
 const IconText = styled.p`
@@ -261,17 +244,6 @@ const IconText = styled.p`
   font-size: 1.25rem;
   padding: 0;
   margin: 0;
-`;
-
-const HeaderRoot = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  width: calc(100% - 2rem);
-  align-items: center;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  background-color: ${props => props.theme.colors.white};
 `;
 
 const ContentRoot = styled.div`
@@ -329,18 +301,6 @@ const ActionsContainer = styled.div`
   width: 100%;
   flex-direction: row;
   align-items: center;
-`;
-
-// const HeaderText = styled(Text)`
-//   font-size: 2.5rem;
-// `;
-
-const TextContent = styled.div`
-  display: inline-flex;
-  justify-content: flex-start;
-  flex-direction: column;
-  width: calc(100% - 32px - 3rem);
-  align-items: flex-start;
 `;
 
 const ThreadLink = styled(Link)`
