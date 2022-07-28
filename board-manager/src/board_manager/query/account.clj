@@ -52,16 +52,3 @@
 
 (defn update-account! [db-conn update account-id]
   (sql/execute-one! (db-conn) (sql.helper/format (q-update-account update account-id))))
-
-(comment
-  (require '[user])
-  (keys user/sys)
-  (keys (:redis-conn user/sys))
-  (print (:db-conn user/sys))
-  (get user/sys :api :db-conn)
-  (def db-conn (:db-conn user/sys))
-  (print db-conn)
-  (type db-conn)
-  (update-account! db-conn {:username "jacobr248"} 1)
-  )
-
