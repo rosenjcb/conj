@@ -27,7 +27,7 @@
            (query.thread/create-thread! db-conn s3-client redis-conn board account)
            response/response)
       (catch Exception e
-        (log/infof "Error: %s" e)
+        (log/errorf e "Error for req: %s" req)
         (->> (str (.getMessage e))
              response/bad-request)))))
 
