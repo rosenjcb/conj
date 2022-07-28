@@ -5,14 +5,11 @@ import { me as callMe, logout } from '../api/account'
 import { fetchBoards } from '../api/board';
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
-import { VscCommentDiscussion } from 'react-icons/vsc'
 import {RiDiscussFill} from 'react-icons/ri';
 import { BsFillBarChartFill } from 'react-icons/bs';
 import { Text } from './index';
 import { useThread } from '../hooks/useThread';
 import { SquareButton } from './index';
-
-
 
 export const WithNavBar = ({component}) => {
 
@@ -90,7 +87,7 @@ const BoardDrawer = (props) => {
       </TitleContainer>
       <BoardList>
         <BoardRow><BoardIcon/><BarChartIcon/></BoardRow>
-        {boards.map(b => <HighlightBoardRow selected={b === board}><BoardItem onClick={() => handleClick(b)}>/{b}/</BoardItem><Text size={"large"} color={"black"} bold>69</Text></HighlightBoardRow>)}
+        {boards != null ? boards.map(b => <HighlightBoardRow selected={b === board}><BoardItem onClick={() => handleClick(b)}>/{b}/</BoardItem><Text size={"large"} color={"black"} bold>69</Text></HighlightBoardRow>) : <Text bold size={"large"}>No Boards Found</Text>}
       </BoardList>
       <SearchForm onSubmit={handleSubmit}>
         <Input type="text"/>
@@ -151,7 +148,6 @@ const BoardList = styled.ul`
   flex-direction: column;
   align-items: center;
   gap: 15px;
-  color: ${props => props.theme.colors.white};
   margin: 0;
   padding-left: 10px;
   padding-right: 10px;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import * as chroma from 'chroma-js';
+import { Text } from '../components';
 import { Reply } from '../components/Reply';
 import { Thread } from '../components/Thread';
 import {  Avatar } from '../components';
@@ -54,7 +54,7 @@ const ThreadPreview = (props) => {
     <ThreadPreviewRoot>
       { threads && threads.length > 0 
         ? _.orderBy(threads, o => o[o.length - 1].id, ["desc"]).map((thread, index) => <Thread board={''} key={index} preview={true} thread={thread}/>)
-        : <Header>{threads ? "No threads yet. Make one?" : "This board does not exist"}</Header>}
+        : <Text bold size={'xx-large'}>{threads ? "No threads yet. Make one?" : "This board does not exist"}</Text>}
     </ThreadPreviewRoot>
   )
 }
@@ -73,7 +73,7 @@ const ThreadPreviewRoot = styled.div`
 
 const Header = styled.h1`
   text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.colors.white};
+  color: ${props => props.theme.colors.black};
   font-size: 1.5em;
   padding: 0;
   margin: 0;
