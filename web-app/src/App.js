@@ -56,7 +56,6 @@ function App() {
 }
 
 const AppRoot = styled.div`
-  // background-color: ${props => props.theme.colors.accent};
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -65,6 +64,3 @@ const AppRoot = styled.div`
 `;
 
 export default App;
-
-// primary: "#512B8F",
-  //accent: "#FFC75f",

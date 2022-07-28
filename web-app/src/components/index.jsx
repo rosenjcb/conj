@@ -80,6 +80,7 @@ export const RoundButton = styled.button`
 
   &:hover {
     background-color: ${props => chroma(props.theme.colors.primary).darken().hex()};
+    cursor: pointer;
   }
 `;
 
@@ -97,6 +98,7 @@ export const AccentButton = styled(RoundButton)`
 
   &:hover {
     background-color: ${props => chroma(props.theme.colors.accent).darken().hex()};
+    cursor: pointer;
   }
 `;
 
@@ -111,12 +113,15 @@ export const Avatar = styled.img`
   width: 64px;
   height: 64px;
   border-radius: 50%;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 export const Link = styled.a`
   color: ${props => props.theme.colors.black};
 `;
-
 
 export const TitlePoint = styled.h2`
   color:  ${props => props.theme.colors.black};
