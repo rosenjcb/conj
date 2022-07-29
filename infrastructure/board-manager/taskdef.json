@@ -9,7 +9,7 @@
         "logDriver": "awslogs",
         "secretOptions": null,
         "options": {
-          "awslogs-group": "/ecs/pepechan",
+          "awslogs-group": "/ecs/conj",
           "awslogs-region": "us-west-2",
           "awslogs-stream-prefix": "ecs"
         }
@@ -37,7 +37,7 @@
       "memoryReservation": null,
       "volumesFrom": [],
       "stopTimeout": null,
-      "image": "267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest",
+      "image": "267892765183.dkr.ecr.us-west-2.amazonaws.com/conj:latest",
       "startTimeout": null,
       "firelensConfiguration": null,
       "dependsOn": null,
@@ -54,7 +54,7 @@
       "dockerLabels": null,
       "systemControls": null,
       "privileged": null,
-      "name": "pepechan-container"
+      "name": "conj-container"
     }
   ],
   "placementConstraints": [],
@@ -64,8 +64,8 @@
     "EC2",
     "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:us-west-2:267892765183:task-definition/pepechan:30",
-  "family": "pepechan",
+  "taskDefinitionArn": "arn:aws:ecs:us-west-2:267892765183:task-definition/conj:30",
+  "family": "conj",
   "requiresAttributes": [
     {
       "targetId": null,
