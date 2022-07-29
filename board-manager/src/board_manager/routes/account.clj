@@ -51,7 +51,6 @@
       (some-> (q.account/update-account! db update account-id)
               (dissoc :pass)
               response/response)
-      (response/response (q.account/update-account! db update account-id))
       (catch Exception e
         (log/errorf e "Error found for account id %s" account-id)
         (response/bad-request "Couldn't update your account for one reason or another.")))))
