@@ -10,6 +10,11 @@
    :from [:account]
    :where [:= m.account/id id]})
 
+(defn- q-accounts-by-ids [ids]
+  {:select [:id :email :last_reply :last_thread :role :username]
+   :from [:account]
+   :where [:in m.account/id ids]})
+
 (defn- q-account-by-email [email]
   {:select :*
    :from [:account]
@@ -37,6 +42,9 @@
 
 (defn find-account-by-id! [db-conn id]
   (sql/execute-one! (db-conn) (sql.helper/format (q-account-by-id id))))
+
+(defn find-accounts-by-ids! [db-conn ids]
+  (sql/execute! (db-conn) (sql.helper/format (q-accounts-by-ids ids))))
 
 (defn find-account-by-email! [db-conn email]
   (sql/execute-one! (db-conn) (sql.helper/format (q-account-by-email email))))
