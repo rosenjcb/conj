@@ -37,10 +37,10 @@ phases:
       - mv ./target/board-manager-0.1.0-SNAPSHOT-standalone.jar .
       - aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 267892765183.dkr.ecr.us-west-2.amazonaws.com
       # - aws ecr get-login-password --region us-west-2 --profile rosenjcb | docker login --username AWS --password-stdin 267892765183.dkr.ecr.us-west-2.amazonaws.com
-      - docker build -t pepechan .
-      - docker tag pepechan:latest 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest 
-      - docker push 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest
-      - printf '[{"name":"%s","imageUri":"%s"}]' pepechan-service 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest > imagedefinitions.json
+      - docker build -t conj .
+      - docker tag conj:latest 267892765183.dkr.ecr.us-west-2.amazonaws.com/conj:latest 
+      - docker push 267892765183.dkr.ecr.us-west-2.amazonaws.com/conj:latest
+      - printf '[{"name":"%s","imageUri":"%s"}]' conj-service 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest > imagedefinitions.json
 
 artifacts:
   files:
