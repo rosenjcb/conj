@@ -40,7 +40,7 @@ phases:
       - docker build -t conj .
       - docker tag conj:latest 267892765183.dkr.ecr.us-west-2.amazonaws.com/conj:latest 
       - docker push 267892765183.dkr.ecr.us-west-2.amazonaws.com/conj:latest
-      - printf '[{"name":"%s","imageUri":"%s"}]' conj-service 267892765183.dkr.ecr.us-west-2.amazonaws.com/pepechan:latest > imagedefinitions.json
+      - printf '[{"name":"%s","imageUri":"%s"}]' conj-service 267892765183.dkr.ecr.us-west-2.amazonaws.com/conj:latest > imagedefinitions.json
 
 artifacts:
   files:
