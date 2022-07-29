@@ -19,7 +19,7 @@ phases:
       - echo Test started on `date`
       - LEIN_ROOT=true 
       - cd ./web-app
-      - yarn && yarn test
+      - yarn --ignore-engines && yarn test
       - cd ../board-manager
       - lein test
       - cd $CODEBUILD_SRC_DIR
