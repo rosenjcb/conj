@@ -5,5 +5,5 @@ Resources:
       Properties:
         TaskDefinition: "arn:aws:ecs:us-west-2:267892765183:task-definition/conj"
         LoadBalancerInfo:
-          ContainerName: "pepechan-container"
+          ContainerName: "conj-container"
           ContainerPort: 8080 
