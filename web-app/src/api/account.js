@@ -13,3 +13,7 @@ export const logout = () => {
 export const signup = (accountDetails) => {
   return axios.post('/api/accounts', accountDetails);
 };
+
+export const updateMe = (me) => {
+  return axios.put('/api/me', me);
+}
