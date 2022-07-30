@@ -1,6 +1,6 @@
-FROM java:openjdk-8-jre
+# FROM java:openjdk-8-jre
 # FROM eclipse-temurin:11-jre
-# FROM openjdk:11-jre
+FROM openjdk:11-jre
 MAINTAINER Jacob Rosenzweig <rosenjcb@gmail.com>
 
 WORKDIR /
