@@ -63,15 +63,15 @@
                         [ring/ring-mock "0.3.2"]]
          :migratus {:store :database
                     :migration-dir "migrations"
-                    :db "postgres://pepechan-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com:5432/postgres?user=postgres&password=Frameshare8*8"}
+                    :db "postgres://conj-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com:5432/postgres?user=postgres&password=Frameshare8*8"}
          :source-paths ["dev"]
          :env {:passphrase "Frameshare8*8"
-               :db-host "pepechan-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com"
+               :db-host "conj-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com"
                :db-user "postgres"
                :db-pass "Frameshare8*8"
                :db-port 5432
                :db-name "postgres"
-               :redis-host "35.167.219.188"
+               :redis-host "conj-redis-cluster.ghplor.ng.0001.usw2.cache.amazonaws.com"
                :redis-port 6379
                :host "0.0.0.0"
                :port 8080}}})
