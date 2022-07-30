@@ -64,7 +64,7 @@
     "EC2",
     "FARGATE"
   ],
-  "taskDefinitionArn": "arn:aws:ecs:us-west-2:267892765183:task-definition/conj:30",
+  "taskDefinitionArn": "arn:aws:ecs:us-west-2:267892765183:task-definition/conj:3",
   "family": "conj",
   "requiresAttributes": [
     {
@@ -123,7 +123,7 @@
   "networkMode": "awsvpc",
   "runtimePlatform": null,
   "cpu": "512",
-  "revision": 30,
+  "revision": 3,
   "status": "ACTIVE",
   "inferenceAccelerators": null,
   "proxyConfiguration": null,
