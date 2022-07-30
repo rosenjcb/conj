@@ -1,4 +1,5 @@
-FROM java:openjdk-8-jre
+# FROM java:openjdk-11-jre
+FROM openjdk:11
 MAINTAINER Jacob Rosenzweig <rosenjcb@gmail.com>
 
 WORKDIR /
