@@ -3,7 +3,7 @@ Resources:
   - TargetService:
       Type: AWS::ECS::Service
       Properties:
-        TaskDefinition: "arn:aws:ecs:us-west-2:267892765183:task-definition/conj"
+        TaskDefinition: "arn:aws:ecs:us-west-2:267892765183:task-definition/conj:6"
         LoadBalancerInfo:
           ContainerName: "conj-container"
           ContainerPort: 8080 
