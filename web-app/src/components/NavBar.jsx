@@ -11,6 +11,27 @@ import { Text } from './index';
 import { useThread } from '../hooks/useThread';
 import { SquareButton } from './index';
 import { detectMobile } from '../util/window';
+import  Drawer from 'rc-drawer';
+import ReactModal from 'react-modal';
+import { Header } from './index';
+
+const customStyle = {
+  overlay: {
+    inset: 0,
+    zIndex: 2,
+  },
+  content: {
+    inset: 0,
+    right: 0,
+    padding: 0,
+    margin: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'white',
+    borderRadius: '0px',
+    border: 'none'
+  },
+};
 
 export const WithNavBar = ({component}) => {
 
@@ -38,6 +59,8 @@ export const WithNavBar = ({component}) => {
     getBoards();
   },[]);
 
+  const history = useHistory();
+
   const isMobile = detectMobile();
 
   const handleLogout = async() => {
@@ -45,15 +68,33 @@ export const WithNavBar = ({component}) => {
     window.location.reload();
   }
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  }
+
+  const openDrawer = () => {
+    setDrawerOpen(true);
+  }
+
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+  }
+
+  const redirectHome = () => {
+    history.push("/");
+  }
+
   return (
     <BoardRoot>
       <HomeNavBar>
-        <HamburgerMenu/>
-        <Header>conj.app</Header>
+        <HamburgerMenu onClick={toggleDrawer}/>
+        <Header bold onClick={redirectHome}>conj.app</Header>
         <SquareButton onClick={handleLogout}>Logout</SquareButton>
       </HomeNavBar>
       <Page>
-        { !isMobile ? <BoardDrawer boards={boards}/> : null }
+        { !isMobile ? <BoardDrawer boards={boards}/> : <ReactModal style={customStyle} isOpen={drawerOpen} onRequestClose={closeDrawer}><BoardDrawer boards={boards}/></ReactModal>}
         {component}
       </Page>
     </BoardRoot>
@@ -80,7 +121,7 @@ const BoardDrawer = (props) => {
   return(
     <BoardDrawerRoot>
       <TitleContainer>
-        <Header>Most Popular Boards</Header>
+        <Header bold>Most Popular Boards</Header>
       </TitleContainer>
       <BoardList>
         <BoardRow><BoardIcon/><BarChartIcon/></BoardRow>
@@ -97,27 +138,25 @@ const Page = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: row;
-  margin-top: 5vh;
-  margin-bottom: 1vh;
-  height: calc(100vh - 92px - 5vh - 1vh);
-  min-width: 500px;
+  margin: 0 auto;
+  margin-top: 10rem;
+  margin-bottom: 1rem;
+  height: calc(100vh - 92px - 5rem);
 
   @media all and (min-width: 1024px) {
     width: 40%;
   }
   
   @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 100%%;
+    width: 85%;
   }
   
   @media all and (min-width: 480px) and (max-width: 768px) {
-    visibility: visible;
-    width: 100%;
+    width: 85%;
    }
   
   @media all and (max-width: 480px) { 
-    visibility: visible;
-    width: 100%;
+    width: 85%;
   }
 `;
 
@@ -174,15 +213,7 @@ const HighlightBoardRow = styled(BoardRow)`
   }
 `;
 
-const Header = styled.h1`
-  text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.colors.black};
-  font-size: 1.5em;
-  padding: 0;
-  margin: 0;
-`;
-
-const BoardItem = styled(Header)`
+const BoardItem = styled(Header).attrs(props => ({bold: true}))`
   color: ${props => props.theme.colors.black};
   border-radius: 12px; 
   padding: 8px;
@@ -194,7 +225,7 @@ const BoardDrawerRoot = styled.div`
   justify-content: flex-start;
   flex-direction: column;
   gap: 2rem;
-  width: 300px;
+  min-width: 300px;
   height: fit-content;
   border-radius: 8px;
   margin-right: 1rem;
@@ -232,6 +263,7 @@ const HomeNavBar = styled.div`
   padding-bottom: 1rem;
   align-items: center;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  height: 3rem;
 
   @media all and (min-width: 1024px) {
     width: 60%;
