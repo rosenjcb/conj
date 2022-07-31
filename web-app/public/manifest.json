@@ -1,14 +1,14 @@
 {
-  "short_name": "Pepechan",
-  "name": "Pepechan",
+  "short_name": "Conj",
+  "name": "Conj",
   "icons": [
     {
-      "src": "logo192.jpeg",
+      "src": "logo192.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.jpeg",
+      "src": "logo512.png",
       "type": "image/png",
       "sizes": "512x512"
     }

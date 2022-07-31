@@ -1,6 +1,7 @@
 # FROM java:openjdk-8-jre
 # FROM eclipse-temurin:11-jre
-FROM openjdk:11-jre
+# FROM openjdk:11-jre
+FROM 267892765183.dkr.ecr.us-west-2.amazonaws.com/openjdk
 MAINTAINER Jacob Rosenzweig <rosenjcb@gmail.com>
 
 WORKDIR /

@@ -115,7 +115,7 @@ export function Login() {
               <RoundButton type="submit">Login</RoundButton> 
               <RoundButton type="button" onClick={() => handleSignup(props.values)}>Signup</RoundButton> 
             </SubmitOptions>
-            <Link href="/about">What's Conj?</Link>
+            {/* <Link href="/about">Why do I need an account?</Link> */}
           </StyledForm>
       )}
       </Formik>

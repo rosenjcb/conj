@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Helmet from 'react-helmet';
 import { ThreadPage } from './pages/Thread';
 import { useSelector } from 'react-redux';
@@ -36,7 +36,8 @@ function App() {
         <Router forceRefresh>
           <Switch>
             <Route exact path="/">
-              <WithNavBar component={<AboutPage/>}/>
+              {/* <WithNavBar component={<AboutPage/>}/> */}
+              <Redirect to="/boards/random"/>
             </Route>
             <Route exact path="/boards/:board">
               <WithNavBar component={<BoardPage/>}/>

@@ -246,7 +246,6 @@ const TitleContainer = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  // border-bottom: 1px solid ${props => chroma(props.theme.colors.primary).darken(0.23).hex()};
   text-align: center;
 `
 
