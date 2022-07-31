@@ -10,6 +10,7 @@ import { BsFillBarChartFill } from 'react-icons/bs';
 import { Text } from './index';
 import { useThread } from '../hooks/useThread';
 import { SquareButton } from './index';
+import { detectMobile } from '../util/window';
 
 export const WithNavBar = ({component}) => {
 
@@ -36,10 +37,6 @@ export const WithNavBar = ({component}) => {
     getAuth();
     getBoards();
   },[]);
-
-  const detectMobile = () => {
-    return window.innerWidth < 768;
-  }
 
   const isMobile = detectMobile();
 
@@ -87,7 +84,7 @@ const BoardDrawer = (props) => {
       </TitleContainer>
       <BoardList>
         <BoardRow><BoardIcon/><BarChartIcon/></BoardRow>
-        {boards != null ? boards.map(b => <HighlightBoardRow selected={b === board}><BoardItem onClick={() => handleClick(b)}>/{b}/</BoardItem><Text size={"large"} color={"black"} bold>69</Text></HighlightBoardRow>) : <Text bold size={"large"}>No Boards Found</Text>}
+        {boards != null ? boards.map(b => <HighlightBoardRow selected={b === board}><BoardItem onClick={() => handleClick(b)}>/{b}/</BoardItem><Text size={"large"} align="right" color={"black"} bold>10+</Text></HighlightBoardRow>) : <Text bold size={"large"}>No Boards Found</Text>}
       </BoardList>
       <SearchForm onSubmit={handleSubmit}>
         <Input type="text"/>
@@ -100,7 +97,11 @@ const Page = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: row;
-  height: calc(100vh - 92px);
+  margin-top: 5vh;
+  margin-bottom: 1vh;
+  height: calc(100vh - 92px - 5vh - 1vh);
+  min-width: 500px;
+
   @media all and (min-width: 1024px) {
     width: 40%;
   }
@@ -189,10 +190,13 @@ const BoardItem = styled(Header)`
 `;
 
 const BoardDrawerRoot = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 2rem;
   width: 300px;
   height: fit-content;
   border-radius: 8px;
-  margin-top: 1rem;
   margin-right: 1rem;
 `;
 
@@ -212,12 +216,13 @@ const TitleContainer = styled.div`
   justify-content: center;
   flex-direction: column;
   // border-bottom: 1px solid ${props => chroma(props.theme.colors.primary).darken(0.23).hex()};
-  height: 92px;
   text-align: center;
 `
 
 const HomeNavBar = styled.div`
   display: flex;
+  position: fixed;
+  z-index: 1;
   justify-content: space-between;
   gap: 10px;
   flex-direction: row;

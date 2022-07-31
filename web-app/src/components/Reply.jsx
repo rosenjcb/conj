@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import { Formik, Form, Field } from 'formik';
-import { RoundButton, RoundImage } from './index';
+import { Checkbox, RoundButton, RoundImage, Text } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost } from '../slices/postSlice';
@@ -46,7 +46,6 @@ export const Reply = (props) => {
         // dispatch(swapThread(updatedThread));
         history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
       } else {
-        console.log(thread)
         dispatch(updateThread(updatedThread));
       }
     } catch(e) {
@@ -54,7 +53,7 @@ export const Reply = (props) => {
     };
   }
 
-  const [me, setMe] = useState(null);
+  const [me, setMe] = useState({});
 
   useEffect(() => {
     async function setAuth() {
@@ -68,9 +67,21 @@ export const Reply = (props) => {
     setAuth();
   },[]);
 
-  if(!me) {
+  const [check, setChecked] = useState(post.is_anonymous);
+
+  const toggleCheck = () => {
+    setChecked(!check);
+    console.log(check);
+    dispatch(updateEntry({key: 'is_anonymous', value: check}));
+  }
+
+  if(me === {}) {
     return(
-      <Login />
+      <div/>
+    )
+  } else if(me === null) {
+    return(
+      <Login/>
     )
   } else {
     return(
@@ -83,14 +94,17 @@ export const Reply = (props) => {
             <CommentBody name="comment" as="textarea" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
             {post.image ? <PreviewImage src={URL.createObjectURL(post.image)}/> : null}
             <ActionsContainer>
-              <UploadImage/>
-              <RoundButton type="submit">Post</RoundButton>
+              <OptionsContainer>
+                <UploadImage/>
+                <Checkbox checked={check} onClick={toggleCheck} label="Anonymous?"/>
+              </OptionsContainer>
+              <RoundButton type="submit">Conj</RoundButton>
             </ActionsContainer>
           </StyledForm>
         )}
       </Formik>
     )
-  }
+    }
 }
 
 export const StyledForm = styled(Form)`
@@ -217,4 +231,12 @@ const UploadImageIcon = styled(BiImageAdd)`
   &:hover {
     cursor: pointer;
   }
+`;
+
+const OptionsContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 `;

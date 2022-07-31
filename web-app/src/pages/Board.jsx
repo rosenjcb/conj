@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Text } from '../components';
+import { AnonymousAvatar, Text } from '../components';
 import { Reply } from '../components/Reply';
 import { Thread } from '../components/Thread';
 import {  Avatar } from '../components';
@@ -40,7 +40,7 @@ export const BoardPage = () => {
 const HomeReply = () => {
     return (
         <HomeReplyRoot>
-            <Avatar src="/pepe_icon.jpg"/>
+            <AnonymousAvatar/>
             <Reply isNewThread/>
         </HomeReplyRoot>
     )
@@ -54,7 +54,7 @@ const ThreadPreview = (props) => {
     <ThreadPreviewRoot>
       { threads && threads.length > 0 
         ? _.orderBy(threads, o => o[o.length - 1].id, ["desc"]).map((thread, index) => <Thread board={''} key={index} preview={true} thread={thread}/>)
-        : <Text bold size={'xx-large'}>{threads ? "No threads yet. Make one?" : "This board does not exist"}</Text>}
+        : <Text bold size="xx-large" align="center">{threads ? "No threads yet. Make one?" : "This board does not exist"}</Text>}
     </ThreadPreviewRoot>
   )
 }
@@ -67,15 +67,6 @@ const ThreadPreviewRoot = styled.div`
   height: calc(100vh - 96px);
   gap: 5rem;
   padding: 1.5rem;
-  margin: 0;
-`;
-
-
-const Header = styled.h1`
-  text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.colors.black};
-  font-size: 1.5em;
-  padding: 0;
   margin: 0;
 `;
 
