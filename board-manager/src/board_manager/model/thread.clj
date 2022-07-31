@@ -18,13 +18,13 @@
 (defn ->thread
   "Takes a given API request and generates a new thread"
   [req name id]
-  (let [{:strs [subject comment image isAnonymous]} req]
-    [{:id id :name name :subject subject :comment comment :image image :isAnonymous (boolean (Boolean/valueOf isAnonymous))}]))
+  (let [{:strs [subject comment image is_anonymous]} req]
+    [{:id id :name name :subject subject :comment comment :image image :is_anonymous (boolean (Boolean/valueOf is_anonymous))}]))
 
 (defn anonymous?
   [thread]
   (->> (first thread)
-        m.post/isAnonymous))
+        m.post/is_anonymous))
 
 (defn add-post [post thread]
   (conj thread post))

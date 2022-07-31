@@ -7,7 +7,7 @@
     [:image {:optional true} map?]
     [:comment string?]
     [:time inst?]
-    [:isAnonymous {:optional true} boolean?]])
+    [:is_anonymous {:optional true} boolean?]])
 
 (defn model->data [t])
 (defn data->model [d])
@@ -30,4 +30,4 @@
 #_{:clj-kondo/ignore [:redefined-var]}
 (def name :name)
 
-(def isAnonymous :isAnonymous)
+(def is_anonymous :is_anonymous)
