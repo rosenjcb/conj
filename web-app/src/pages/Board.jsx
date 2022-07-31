@@ -62,11 +62,10 @@ const ThreadPreviewRoot = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  width: calc(100% - 3rem);
   height: calc(100vh - 96px);
+  width: 100%;
   gap: 5rem;
-  padding: 1.5rem;
-  margin: 0;
+  margin: 0 auto;
 `;
 
 const HomeReplyRoot = styled.div`

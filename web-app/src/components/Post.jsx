@@ -99,7 +99,7 @@ export const Post = (props) => {
         isOpen={fullScreen}
         onRequestClose={closeFullScreen}>
           { image ? <CenteredImage fullScreen={true} src={image.location}/> : null}
-        </Modal>
+      </Modal>
       { isOriginalPost
         ? 
           <OriginalPost key={post.id} preview={preview} highlight={false} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 

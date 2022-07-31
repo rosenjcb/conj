@@ -5,7 +5,7 @@ import { login, signup } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { parseError } from '../util/error';
 import chroma from 'chroma-js';
-import { AccentButton, Link } from './index';
+import { AccentButton, Link, Header } from './index';
 import toast from 'react-hot-toast';
 
 
@@ -56,7 +56,7 @@ export function Login() {
   
   return (
     <Root>
-      <Header>Login</Header>
+      <Header bold size="large">Login</Header>
       <Formik
         initialValues={{
           email: '',
@@ -66,14 +66,14 @@ export function Login() {
       >
         {(props) => (
           <StyledForm onSubmit={props.handleSubmit}>
-            <WelcomeMessage>Welcome to Pepechan!</WelcomeMessage>
+            <Header size="medium" bold>Welcome to Conj!</Header>
             <Field label="EMAIL" type="email" autocomplete="email" name="email" placeholder="user@domain.com" component={InputField}/>
             <Field label="PASSWORD" type="password" autocomplete="current-password" name="pass" secret={true} component={InputField}/>
             <SubmitOptions>
               <AccentButton type="submit">Login</AccentButton> 
               <AccentButton type="button" onClick={() => handleSignup(props.values)}>Signup</AccentButton> 
             </SubmitOptions>
-            <Link href="/about">Why do I need an account?</Link>
+            <Link href="/about">What's Conj?</Link>
           </StyledForm>
       )}
       </Formik>
@@ -112,20 +112,9 @@ const WelcomeMessage  = styled.div`
   font-size: 80%;
 `;
 
-const Header = styled.div`
-  width: 100%;
-  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.5).hex()};
-  color: ${props => props.theme.colors.white};
-  font-weight: 700;
-  font-size: 131%; 
-  text-align: center;
-  border-radius: 8px 8px;
-  margin-top: 1rem;
-`;
-
 const Root = styled.div`
   margin: 0 auto;
-  background-color: ${props => chroma(props.theme.colors.primary).brighten(0.5).hex()};
+  background-color: ${props => chroma(props.theme.colors.white)};
   text-align: center;
   width: 500px;
   border-radius: 8px 8px;
@@ -150,13 +139,13 @@ const Root = styled.div`
 const Label = styled.label`
   display: flex;
   justify-content: flex-start;
-  font-size: 12px;
+  font-size: 1rem;
   margin-bottom: 8px;
-  color: ${props => props.theme.colors.grey};
+  color: ${props => props.theme.colors.black};
 `;
 
 const TextField = styled.input`
   -webkit-text-security: ${props => props.secret ? "circle" : "none"};
   border-radius: 8px;
-  border-color: transparent;
+  border-color: ${props => props.theme.colors.grey};
 `;
