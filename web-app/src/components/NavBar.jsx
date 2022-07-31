@@ -11,7 +11,6 @@ import { Text } from './index';
 import { useThread } from '../hooks/useThread';
 import { SquareButton } from './index';
 import { detectMobile } from '../util/window';
-import  Drawer from 'rc-drawer';
 import ReactModal from 'react-modal';
 import { Header } from './index';
 
