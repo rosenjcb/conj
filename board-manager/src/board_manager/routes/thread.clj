@@ -97,7 +97,7 @@
     [:image [:map
              [:filename string?]
              [:tempfile any?]]
-     :isAnonymous boolean?]])
+     :is_anonymous boolean?]])
 
 (def thread-routes
   [["/boards"
