@@ -69,9 +69,9 @@ export const WithNavBar = ({component}) => {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const toggleDrawer = () => {
-    setDrawerOpen(!drawerOpen);
-  }
+  // const toggleDrawer = () => {
+  //   setDrawerOpen(!drawerOpen);
+  // }
 
   const openDrawer = () => {
     setDrawerOpen(true);
@@ -88,7 +88,7 @@ export const WithNavBar = ({component}) => {
   return (
     <BoardRoot>
       <HomeNavBar>
-        <HamburgerMenu onClick={toggleDrawer}/>
+        <HamburgerMenu onClick={openDrawer}/>
         <Header bold onClick={redirectHome}>conj.app</Header>
         <SquareButton onClick={handleLogout}>Logout</SquareButton>
       </HomeNavBar>
@@ -136,26 +136,27 @@ const BoardDrawer = (props) => {
 const Page = styled.div`
   display: flex;
   justify-content: flex-start;
+  padding-top: 5rem;
   flex-direction: row;
   margin: 0 auto;
-  margin-top: 10rem;
   margin-bottom: 1rem;
-  height: calc(100vh - 92px - 5rem);
+  gap: 3rem;
+  max-height: calc(100vh - 5rem);
 
   @media all and (min-width: 1024px) {
     width: 40%;
   }
   
   @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 85%;
+    width: 100%;
   }
   
   @media all and (min-width: 480px) and (max-width: 768px) {
-    width: 85%;
+    width: 100%;
    }
   
   @media all and (max-width: 480px) { 
-    width: 85%;
+    width: 100%;
   }
 `;
 
@@ -257,12 +258,9 @@ const HomeNavBar = styled.div`
   gap: 10px;
   flex-direction: row;
   background-color: ${props => props.theme.colors.white};
-  height: fit-content;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
   align-items: center;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  height: 3rem;
+  height: 5rem;
 
   @media all and (min-width: 1024px) {
     width: 60%;

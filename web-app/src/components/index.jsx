@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import chroma from 'chroma-js';
 import { BsFillPersonFill } from 'react-icons/bs';
+import { BiArrowBack } from 'react-icons/bi';
 
 export const HR = styled.hr`
   width: ${props => props.width ?? "100%"};
@@ -173,4 +174,17 @@ const CheckBoxContainer = styled.div`
 const StyledCheckbox = styled.input.attrs(props => ({type: "checkbox"}))`
   min-height: 24px;
   min-width: 24px;
+`;
+
+export const Back = styled(BiArrowBack)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
