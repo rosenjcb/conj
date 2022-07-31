@@ -72,7 +72,7 @@ export const Reply = (props) => {
   const toggleCheck = () => {
     setChecked(!check);
     console.log(check);
-    dispatch(updateEntry({key: 'is_anonymous', value: check}));
+    dispatch(updateEntry({key: 'is_anonymous', value: !check}));
   }
 
   if(me === {}) {
@@ -96,7 +96,7 @@ export const Reply = (props) => {
             <ActionsContainer>
               <OptionsContainer>
                 <UploadImage/>
-                <Checkbox checked={check} onClick={toggleCheck} label="Anonymous?"/>
+                { threadNo === null ?  <Checkbox checked={check} onClick={toggleCheck} label="Anonymous?"/> : null }
               </OptionsContainer>
               <RoundButton type="submit">Conj</RoundButton>
             </ActionsContainer>

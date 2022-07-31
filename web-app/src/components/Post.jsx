@@ -159,7 +159,7 @@ const ReplyPost = (props) => {
               <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
             </TextContainer>
           </ReplyUserInfo>
-          <Text>{formattedTime}</Text>
+          <Text align="right">{formattedTime}</Text>
         </BottomRow>
       </PostBody>
     </PostRoot>

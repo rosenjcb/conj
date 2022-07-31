@@ -40,7 +40,6 @@ export const BoardPage = () => {
 const HomeReply = () => {
     return (
         <HomeReplyRoot>
-            <AnonymousAvatar/>
             <Reply isNewThread/>
         </HomeReplyRoot>
     )
@@ -77,8 +76,7 @@ const HomeReplyRoot = styled.div`
     align-items: flex-start;
     margin-top: 10px;
     margin-bottom: 3rem;
-    margin-left: 5%; 
-    width: 85%;
+    width: 100%;
     gap: 10px;
 `;
 
