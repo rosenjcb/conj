@@ -1,12 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  name: "Anonymous",
   subject: "",
   comment: "",
   image: null, 
   hidden: true,
-  threadNo: null
+  threadNo: null,
+  is_anonymous: false
 }
 
 export const postSlice = createSlice({

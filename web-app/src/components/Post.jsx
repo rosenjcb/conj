@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import styled from 'styled-components';
-import { Text, PrimaryText, Avatar, HR } from './index';
+import { Text, PrimaryText, Avatar, HR, AnonymousAvatar } from './index';
 import { processPostText } from '../util/post';
 import { useDispatch } from 'react-redux';
 import { insertPostLink } from '../slices/postSlice';
 import { Link } from 'react-router-dom';
 import chroma from 'chroma-js';
-import { BiMessageDetail } from 'react-icons/bi'; 
+import { BiMessageDetail, BsFillPersonFill } from 'react-icons/bi'; 
 import { Reply } from './Reply';
 import Modal from 'react-modal';
 
@@ -99,7 +99,7 @@ export const Post = (props) => {
         isOpen={fullScreen}
         onRequestClose={closeFullScreen}>
           { image ? <CenteredImage fullScreen={true} src={image.location}/> : null}
-        </Modal>
+      </Modal>
       { isOriginalPost
         ? 
           <OriginalPost key={post.id} preview={preview} highlight={false} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
@@ -119,20 +119,20 @@ const OriginalPost = (props) => {
   return(
     <PostRoot key={id} ref={handleRef}>
       <UserInfo>
-        <Avatar src="/pepe_icon.jpg"/>
+        <AnonymousAvatar/>
         <TextContainer>
-          <Text bold size={"medium"}>{name}</Text>
+          <Text bold size="medium">{name}</Text>
           <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
         </TextContainer>
       </UserInfo>
       <OriginalContentRoot>
-        <Text align={"left"} size={"x-large"} color={"primary"}>{subject}</Text>
+        <Text align="left" width="100%" size="x-large" color="primary">{subject}</Text>
         <CenteredImage fullScreen={fullScreen} onClick={() => openFullScreen()} src={image.location}/>
         {processPostText(opNo, comment)}
       </OriginalContentRoot>
       <ActionsContainer>
         <WithText component={<ThreadLink to={location => `${location.pathname}/thread/${opNo}`}><MessageDetail/></ThreadLink>} direction="row" text={replyCount}/>
-        <Text size={"large"} color={"grey"} bold>{formattedTime}</Text>
+        <Text size="large" color="grey" align="right" bold>{formattedTime}</Text>
       </ActionsContainer>
       { !preview ? <ThreadReply/> : null }
     </PostRoot>
@@ -148,18 +148,18 @@ const ReplyPost = (props) => {
       <PostBody>
         <ContentRoot>
           { image && image.location ? <Image fullScreen={fullScreen} onClick={() => openFullScreen()} src={image.location}/> : null }
-          { subject ? <Text size={"large"} color={"primary"}>{subject}</Text> : null }
+          { subject ? <Text size="large" color="primary">{subject}</Text> : null }
           {processPostText(opNo, comment)}
         </ContentRoot>
         <BottomRow>
           <ReplyUserInfo>
-            <Avatar src="/pepe_icon.jpg"/>
+            <AnonymousAvatar/>
             <TextContainer>
               <Text>{name}</Text>
               <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
             </TextContainer>
           </ReplyUserInfo>
-          <Text>{formattedTime}</Text>
+          <Text align="right">{formattedTime}</Text>
         </BottomRow>
       </PostBody>
     </PostRoot>
@@ -275,6 +275,7 @@ const PostRoot = styled.div`
   background-color: ${props => props.theme.colors.white};
   margin: 1.5rem;
   gap: 1rem;
+  text-align: left;
 `;
 
 const PostLink = styled(Link)`

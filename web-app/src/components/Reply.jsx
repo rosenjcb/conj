@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import { Formik, Form, Field } from 'formik';
-import { RoundButton, RoundImage } from './index';
+import { Checkbox, RoundButton, RoundImage, Text } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost } from '../slices/postSlice';
@@ -15,7 +15,27 @@ import { parseError } from '../util/error';
 import { useThread } from '../hooks/useThread';
 import { Login } from './Login';
 import { me as callMe } from '../api/account'
+import ReactModal from 'react-modal';
 
+
+const customStyle = {
+  overlay: {
+    zIndex: 2,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '0',
+    border: 'none',
+    borderRadius: '0px',
+    background: 'none'
+  },
+};
 
 export const Reply = (props) => {
 
@@ -46,7 +66,6 @@ export const Reply = (props) => {
         // dispatch(swapThread(updatedThread));
         history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
       } else {
-        console.log(thread)
         dispatch(updateThread(updatedThread));
       }
     } catch(e) {
@@ -54,7 +73,7 @@ export const Reply = (props) => {
     };
   }
 
-  const [me, setMe] = useState(null);
+  const [me, setMe] = useState({});
 
   useEffect(() => {
     async function setAuth() {
@@ -68,44 +87,90 @@ export const Reply = (props) => {
     setAuth();
   },[]);
 
-  if(!me) {
+  const [check, setChecked] = useState(post.is_anonymous);
+
+  const handleClick = () => {
+    if(me === null) {
+      openLogin();
+    }
+  }
+
+  const [loginOpen, setLoginOpen] = useState(false)
+
+  const closeLogin = () => setLoginOpen(false);
+
+  const openLogin = () => setLoginOpen(true);
+
+  const toggleCheck = () => {
+    setChecked(!check);
+    console.log(check);
+    dispatch(updateEntry({key: 'is_anonymous', value: !check}));
+  }
+
+  if(me === {}) {
     return(
-      <Login />
+      <div/>
     )
   } else {
     return(
-      <Formik
-      initialValues={post}
-      onSubmit={submitPost}>
-        {(props) => (
-          <StyledForm className={className}>
-            { isNewThread ? <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/> : null }
-            <CommentBody name="comment" as="textarea" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
-            {post.image ? <PreviewImage src={URL.createObjectURL(post.image)}/> : null}
-            <ActionsContainer>
-              <UploadImage/>
-              <RoundButton type="submit">Post</RoundButton>
-            </ActionsContainer>
-          </StyledForm>
-        )}
-      </Formik>
+      <ReplyRoot>
+        { me === null ? <ReactModal style={customStyle} isOpen={loginOpen} onRequestClose={closeLogin}><Login/></ReactModal> : null}
+        <Formik
+        initialValues={post}
+        onSubmit={submitPost}>
+          {(props) => (
+            <StyledForm className={className} onClick={handleClick}>
+              { isNewThread ? <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/> : null }
+              <CommentBody name="comment" as="textarea" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
+              {post.image ? <PreviewImage src={URL.createObjectURL(post.image)}/> : null}
+              <ActionsContainer>
+                <OptionsContainer>
+                  <UploadImage/>
+                  { threadNo === null ?  <Checkbox checked={check} onClick={toggleCheck} label="Anonymous?"/> : null }
+                </OptionsContainer>
+                <RoundButton type="submit">Conj</RoundButton>
+              </ActionsContainer>
+            </StyledForm>
+          )}
+        </Formik>
+      </ReplyRoot>
     )
   }
 }
 
-export const StyledForm = styled(Form)`
-  border-radius: 8px;
-  padding-right: 1rem;
+const ReplyRoot = styled.div`
+  width: 100%;
   padding-left: 1rem;
+  padding-right: 1rem;
+  background-color: ${props => props.theme.colors.white};
+
+  @media all and (min-width: 1024px) {
+    border-radius: 8px;
+  }
+  
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    border-radius: 8px;
+  }
+  
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    border-radius: 8px;
+  }
+  
+  @media all and (max-width: 480px) { 
+    border-radius: 0px;
+  }
+`
+
+export const StyledForm = styled(Form)`
   padding-bottom: 1.5rem;
   padding-top: 1.5rem;
   width: 100%;
-  background-color: ${props => props.theme.colors.white};
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+
 `;
 
 const PreviewImage = ({src}) => {
@@ -217,4 +282,12 @@ const UploadImageIcon = styled(BiImageAdd)`
   &:hover {
     cursor: pointer;
   }
+`;
+
+const OptionsContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 `;

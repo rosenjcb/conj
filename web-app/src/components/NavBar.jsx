@@ -10,6 +10,27 @@ import { BsFillBarChartFill } from 'react-icons/bs';
 import { Text } from './index';
 import { useThread } from '../hooks/useThread';
 import { SquareButton } from './index';
+import { detectMobile } from '../util/window';
+import ReactModal from 'react-modal';
+import { Header } from './index';
+
+const customStyle = {
+  overlay: {
+    inset: 0,
+    zIndex: 2,
+  },
+  content: {
+    inset: 0,
+    right: 0,
+    padding: 0,
+    margin: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'white',
+    borderRadius: '0px',
+    border: 'none'
+  },
+};
 
 export const WithNavBar = ({component}) => {
 
@@ -37,9 +58,7 @@ export const WithNavBar = ({component}) => {
     getBoards();
   },[]);
 
-  const detectMobile = () => {
-    return window.innerWidth < 768;
-  }
+  const history = useHistory();
 
   const isMobile = detectMobile();
 
@@ -48,15 +67,33 @@ export const WithNavBar = ({component}) => {
     window.location.reload();
   }
 
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // const toggleDrawer = () => {
+  //   setDrawerOpen(!drawerOpen);
+  // }
+
+  const openDrawer = () => {
+    setDrawerOpen(true);
+  }
+
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+  }
+
+  const redirectHome = () => {
+    history.push("/");
+  }
+
   return (
     <BoardRoot>
       <HomeNavBar>
-        <HamburgerMenu/>
-        <Header>conj.app</Header>
+        <HamburgerMenu onClick={openDrawer}/>
+        <Header bold onClick={redirectHome}>conj.app</Header>
         <SquareButton onClick={handleLogout}>Logout</SquareButton>
       </HomeNavBar>
       <Page>
-        { !isMobile ? <BoardDrawer boards={boards}/> : null }
+        { !isMobile ? <BoardDrawer boards={boards}/> : <ReactModal style={customStyle} isOpen={drawerOpen} onRequestClose={closeDrawer}><BoardDrawer boards={boards}/></ReactModal>}
         {component}
       </Page>
     </BoardRoot>
@@ -83,11 +120,11 @@ const BoardDrawer = (props) => {
   return(
     <BoardDrawerRoot>
       <TitleContainer>
-        <Header>Most Popular Boards</Header>
+        <Header bold>Most Popular Boards</Header>
       </TitleContainer>
       <BoardList>
         <BoardRow><BoardIcon/><BarChartIcon/></BoardRow>
-        {boards != null ? boards.map(b => <HighlightBoardRow selected={b === board}><BoardItem onClick={() => handleClick(b)}>/{b}/</BoardItem><Text size={"large"} color={"black"} bold>69</Text></HighlightBoardRow>) : <Text bold size={"large"}>No Boards Found</Text>}
+        {boards != null ? boards.map(b => <HighlightBoardRow selected={b === board}><BoardItem onClick={() => handleClick(b)}>/{b}/</BoardItem><Text size={"large"} align="right" color={"black"} bold>10+</Text></HighlightBoardRow>) : <Text bold size={"large"}>No Boards Found</Text>}
       </BoardList>
       <SearchForm onSubmit={handleSubmit}>
         <Input type="text"/>
@@ -99,23 +136,26 @@ const BoardDrawer = (props) => {
 const Page = styled.div`
   display: flex;
   justify-content: flex-start;
+  padding-top: 5rem;
   flex-direction: row;
-  height: calc(100vh - 92px);
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  gap: 3rem;
+  max-height: calc(100vh - 5rem);
+
   @media all and (min-width: 1024px) {
     width: 40%;
   }
   
   @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 100%%;
+    width: 100%;
   }
   
   @media all and (min-width: 480px) and (max-width: 768px) {
-    visibility: visible;
     width: 100%;
    }
   
   @media all and (max-width: 480px) { 
-    visibility: visible;
     width: 100%;
   }
 `;
@@ -173,15 +213,7 @@ const HighlightBoardRow = styled(BoardRow)`
   }
 `;
 
-const Header = styled.h1`
-  text-align: ${props => props.align ?? "center"};
-  color: ${props => props.theme.colors.black};
-  font-size: 1.5em;
-  padding: 0;
-  margin: 0;
-`;
-
-const BoardItem = styled(Header)`
+const BoardItem = styled(Header).attrs(props => ({bold: true}))`
   color: ${props => props.theme.colors.black};
   border-radius: 12px; 
   padding: 8px;
@@ -189,10 +221,13 @@ const BoardItem = styled(Header)`
 `;
 
 const BoardDrawerRoot = styled.div`
-  width: 300px;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  gap: 2rem;
+  min-width: 300px;
   height: fit-content;
   border-radius: 8px;
-  margin-top: 1rem;
   margin-right: 1rem;
 `;
 
@@ -211,22 +246,20 @@ const TitleContainer = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  // border-bottom: 1px solid ${props => chroma(props.theme.colors.primary).darken(0.23).hex()};
-  height: 92px;
   text-align: center;
 `
 
 const HomeNavBar = styled.div`
   display: flex;
+  position: fixed;
+  z-index: 1;
   justify-content: space-between;
   gap: 10px;
   flex-direction: row;
   background-color: ${props => props.theme.colors.white};
-  height: fit-content;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
   align-items: center;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  height: 5rem;
 
   @media all and (min-width: 1024px) {
     width: 60%;
