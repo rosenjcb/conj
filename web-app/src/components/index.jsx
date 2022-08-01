@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 import chroma from 'chroma-js';
+import { BsFillPersonFill } from 'react-icons/bs';
+import { BiArrowBack } from 'react-icons/bi';
 
 export const HR = styled.hr`
   width: ${props => props.width ?? "100%"};
@@ -31,25 +33,33 @@ export const RarityImage = styled.img`
     border: 6px ridge ${props => pickColor(props.rarity)};
 `;
 
-const sizeCompute = (size) => {
-  let res = null;
+const sizeCompute = (tag, size) => {
+  let res = "1rem";
+  let multiplier = 1;
+  switch(tag) {
+    case "p":
+      break;
+    case "h1":
+      multiplier = 2;
+      break;
+  };
   switch(size) {
     case "small": 
-      res = "0.75rem";
+      res = `${0.75 * multiplier}rem`;
       break;
     case "medium": 
-      res = "1rem";
+      res = `${1 * multiplier}rem`;
       break;
     case "large": 
-      res = "1.25rem";
+      res = `${1.25 * multiplier}rem`;
       break;
     case "x-large": 
-      res = "1.5rem";
+      res = `${1.5 * multiplier}rem`;
       break;
     case "xx-large": 
-      res = "2rem";
+      res = `${2 * multiplier}rem`;
       break;
-  }
+  };
   return res;
 }
 
@@ -59,13 +69,23 @@ const computeColor = (colors, selectedColor) => {
 
 export const Text = styled.p`
   font-weight: ${props => props.bold ? 700 : 500}; 
-  font-size: ${props => sizeCompute(props.size) ?? "1rem"};
+  font-size: ${props => props.size ? sizeCompute("p", props.size) : sizeCompute("p", "medium")};
   text-align: ${props => props.align ?? 'left'};
   font-family: "Inter",arial,sans-serif;
-  line-height: 1.5rem;
+  color: ${props => computeColor(props.theme.colors, props.color)};
+  width: 100%;
+  padding: 0;
+  margin: 0;
+`;
+
+export const Header = styled.h1`
+  font-weight: ${props => props.bold ? 700 : 500};
+  text-align ${props => props.align ?? 'center'};
+  font-family: "Inter",arial,sans-serif;
   color: ${props => computeColor(props.theme.colors, props.color)};
   padding: 0;
   margin: 0;
+  font-size: ${props => props.size ? sizeCompute("h1", props.size) : sizeCompute("h1", "medium")};
 `;
 
 export const RoundButton = styled.button`
@@ -119,10 +139,52 @@ export const Avatar = styled.img`
   }
 `;
 
+export const AnonymousAvatar = styled(BsFillPersonFill)`
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
 export const Link = styled.a`
   color: ${props => props.theme.colors.black};
 `;
 
-export const TitlePoint = styled.h2`
-  color:  ${props => props.theme.colors.black};
+export const Checkbox = ({label, onClick, checked}) => {
+
+  return(
+    <CheckBoxContainer>
+      <StyledCheckbox checked={checked} onClick={onClick}/>
+      {label ? <Text bold size="medium">{label}</Text> : null }
+    </CheckBoxContainer>
+  )
+}
+
+const CheckBoxContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  max-width: 100px;
+  align-items: center;
+`;
+
+const StyledCheckbox = styled.input.attrs(props => ({type: "checkbox"}))`
+  min-height: 24px;
+  min-width: 24px;
+`;
+
+export const Back = styled(BiArrowBack)`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;

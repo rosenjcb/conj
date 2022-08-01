@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import Helmet from 'react-helmet';
 import { ThreadPage } from './pages/Thread';
 import { useSelector } from 'react-redux';
@@ -37,7 +37,8 @@ function App() {
         <Router forceRefresh>
           <Switch>
             <Route exact path="/">
-              <WithNavBar component={<AboutPage/>}/>
+              {/* <WithNavBar component={<AboutPage/>}/> */}
+              <Redirect to="/boards/random"/>
             </Route>
             <Route exact path="/boards/:board">
               <WithNavBar component={<BoardPage/>}/>
@@ -65,6 +66,7 @@ const AppRoot = styled.div`
   justify-content: center;
   height: 100vh;
   background: linear-gradient(112deg, transparent 0, transparent 20%, ${props => chroma(props.theme.colors.primary).alpha(0.1).hex()} 30%, ${props => chroma(props.theme.colors.primary).alpha(0.1).hex()} 70%, transparent 80%, transparent 100%);
+  overflow-x: hidden;
 `;
 
 export default App;

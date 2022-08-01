@@ -1,0 +1,82 @@
+# AWSTemplateFormatVersion: 2010-09-09
+# Description: ---
+# Metadata: 
+
+# Parameters: 
+
+# Mappings: 
+
+# Conditions: 
+
+# Resources:
+#   pepechanCluster:
+#     Type: AWS::ECS::Cluster
+#     Properties:
+#       ClusterName: pepechan-cluster
+#   pepechanELB:
+#     Type: AWS::ElasticLoadBalancing::LoadBalancer
+#     Properties:
+#       Scheme: internet-facing 
+#       SecurityGroups:
+#         - pepech-1449
+#       Subnets:
+#         - subnet-03b49b315c275fff7
+#         - subnet-04713596303007d6f
+#         - subnet-0d01b5a8acbfc18f5
+#         - subnet-0f21b05837d94f882	
+#       Listeners:
+#         - LoadBalancerPort: 80
+#           InstancePort: 8080
+#           Protocol: HTTP
+#           InstanceProtocol: HTTP
+#       HealthCheck:
+#         Target: HTTP:80/ping
+#         HealthyThreshold: '2'
+#         Interval: '10'
+#         Timeout: '600'
+#         UnhealthyThreshold: '3'
+#     pepechanService:
+#       Type: AWS::ECS::Service
+#       Properties:
+#     pepechanRedis:
+#       Type: AWS::ECS::Service
+#       Properties:
+#     pepechanDB:
+#       Type: AWS::RDS::DBInstance
+#       Properties:
+#         AllocatedStorage: 
+#         DBInstanceClass: 
+#         AllowMajorVersionUpgrade: true|false
+#         AutoMinorVersionUpgrade: true|false
+#         AvailabilityZone: 
+#         BackupRetentionPeriod: 
+#         CharacterSetName: 
+#         DBInstanceIdentifier: 
+#         DBName: 
+#         DBParameterGroupName: 
+#         DBSecurityGroups: 
+#           - db-sg-group
+#         DBSnapshotIdentifier: 
+#         DBSubnetGroupName: 
+#         Engine: postgres 
+#         EngineVersion: 
+#         Iops: 
+#         KmsKeyId: 
+#         LicenseModel: 
+#         MasterUsername: 
+#         MasterUserPassword: 
+#         MultiAZ: true|false
+#         OptionGroupName: 
+#         Port: 
+#         PreferredBackupWindow: 
+#         PreferredMaintenanceWindow: 
+#         PubliclyAccessible: true|false
+#         SourceDBInstanceIdentifier: 
+#         StorageEncrypted: true|false
+#         StorageType: 
+#         VPCSecurityGroups:
+#           - vpc-sg-id
+#         Tags:
+#           - Key: keyname
+#             Value: value
+# Outputs:
