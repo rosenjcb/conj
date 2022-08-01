@@ -153,11 +153,11 @@ export const Link = styled.a`
   color: ${props => props.theme.colors.black};
 `;
 
-export const Checkbox = ({label, onClick, checked}) => {
+export const Checkbox = ({label, onClick, checked, disabled}) => {
 
   return(
     <CheckBoxContainer>
-      <StyledCheckbox checked={checked} onClick={onClick}/>
+      <StyledCheckbox disabled={disabled} checked={checked} onClick={onClick}/>
       {label ? <Text bold size="medium">{label}</Text> : null }
     </CheckBoxContainer>
   )

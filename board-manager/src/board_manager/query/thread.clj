@@ -65,10 +65,16 @@
   (def redis-conn (:redis-conn user/sys))
   (def db-conn (:db-conn user/sys))
   (def threads (fetch-threads! db-conn redis-conn "random" {:enrich? true :sort? true}))
-  (def res (q.account/find-accounts-by-ids! db-conn #{1 2 3 4 5 6}))
+  (def res (q.account/find-accounts-by-ids! db-conn []))
+  (q.account/find-accounts-by-ids! db-conn [2 3])
+  (print res)
+  (when ((comp empty?) #{}) (print 5))
+  ((complement empty?) #{})
+  (print res)
   (set '(1 2 3 4 5 5 5))
   (clojure.pprint/pprint threads)
   (response/response threads)
+  (q.account/find-account-by-ids! db-conn #{})
   (enrich-threads db-conn true res))
 
 (defn- validate-subject

@@ -44,7 +44,9 @@
   (sql/execute-one! (db-conn) (sql.helper/format (q-account-by-id id))))
 
 (defn find-accounts-by-ids! [db-conn ids]
-  (sql/execute! (db-conn) (sql.helper/format (q-accounts-by-ids ids))))
+  (if (and (set? ids) (> (count ids) 0))
+    (sql/execute! (db-conn) (sql.helper/format (q-accounts-by-ids ids)))
+    []))
 
 (defn find-account-by-email! [db-conn email]
   (sql/execute-one! (db-conn) (sql.helper/format (q-account-by-email email))))

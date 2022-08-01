@@ -4,6 +4,7 @@
             [board-manager.query.account :as q.account]
             [board-manager.services.auth :as s.auth]
             [clojure.tools.logging :as log]
+            [clojure.walk :as walk]
             [reitit.coercion.malli :as malli]
             [ring.util.response :as response])
   (:import [org.postgresql.util PSQLException]))
@@ -21,9 +22,10 @@
 
 (defn create-account! [req]
   (let [auth-service (get-in req [:components :auth-service])
-        account-req (get-in req [:parameters :body])]
+        account-req (:multipart-params req)]
+        ;; account-req (get-in req [:parameters :body])]
     (try 
-      (let [account (s.auth/add-account! auth-service account-req)]  
+      (let [account (s.auth/add-account! auth-service (walk/keywordize-keys account-req))]  
         (->> (:refresh-token account)
              (set-cookies (response/status 200))))
       (catch PSQLException e
@@ -59,7 +61,7 @@
   [["/accounts"
     {:post {:summary "Creates a new account"
             :coercion malli/coercion
-            :parameters {:body api.account/new-account}
+            :parameters {:multipart-params api.account/new-account}
             :handler create-account!}}]
    ["/ping"
     {:get {:summary "A testing endpoint that returns a simple message"
@@ -73,7 +75,7 @@
            :handler update-account!
            :middleware [[middleware/wrap-auth]]
            :coercion malli/coercion
-           :parameters {:body api.account/update-me}}}]
+           :parameters {:multipart-params api.account/update-me}}}]
    ["/authenticate"
     {:post {:name ::authenticate-account
             :summary "Authenticates an existing account"

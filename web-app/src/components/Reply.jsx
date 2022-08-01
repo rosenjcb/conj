@@ -117,18 +117,19 @@ export const Reply = (props) => {
         { me === null ? <ReactModal style={customStyle} isOpen={loginOpen} onRequestClose={closeLogin}><Login/></ReactModal> : null}
         <Formik
         initialValues={post}
+         
         onSubmit={submitPost}>
           {(props) => (
             <StyledForm className={className} onClick={handleClick}>
-              { isNewThread ? <SubjectInput name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/> : null }
-              <CommentBody name="comment" as="textarea" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
+              { isNewThread ? <SubjectInput disabled={me === null} name="subject" as="input" placeholder="Title goes here" value={post.subject ?? ""} onChange={(e) => {handleChange(props.handleChange, e, 'subject')}}/> : null }
+              <CommentBody disabled={me === null} name="comment" as="textarea" placeholder="Whatchu' thinking about?" value={post.comment} onChange={(e) => handleChange(props.handleChange, e, 'comment')}/>
               {post.image ? <PreviewImage src={URL.createObjectURL(post.image)}/> : null}
               <ActionsContainer>
                 <OptionsContainer>
-                  <UploadImage/>
-                  { threadNo === null ?  <Checkbox checked={check} onClick={toggleCheck} label="Anonymous?"/> : null }
+                  <UploadImage disabled={me === null}/>
+                  { threadNo === null ?  <Checkbox disabled={me === null} checked={check} onClick={toggleCheck} label="Anonymous?"/> : null }
                 </OptionsContainer>
-                <RoundButton type="submit">Conj</RoundButton>
+                <RoundButton disabled={me === null} type="submit">Conj</RoundButton>
               </ActionsContainer>
             </StyledForm>
           )}
@@ -189,7 +190,7 @@ const PreviewImage = ({src}) => {
   )
 }
 
-const UploadImage = () => {
+const UploadImage = ({disabled}) => {
 
   const dispatch = useDispatch();
 
@@ -200,7 +201,7 @@ const UploadImage = () => {
   return (
     <label htmlFor="file-input">
       <UploadImageIcon/>
-      <UploadImageInput id="file-input" onChange={handlePick}/>
+      <UploadImageInput disabled={disabled} id="file-input" onChange={handlePick}/>
     </label>
   )
 }

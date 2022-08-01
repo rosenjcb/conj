@@ -77,7 +77,7 @@ export const Post = (props) => {
   }
   const { post, handleRef, highlight, preview, replyCount, opNo } = props;
 
-  const { name, subject, id, comment, image, time } = post;
+  const { username, subject, id, comment, image, time } = post;
 
   const isOriginalPost = opNo === id;
 
@@ -103,25 +103,25 @@ export const Post = (props) => {
       { isOriginalPost
         ? 
           <OriginalPost key={post.id} preview={preview} highlight={false} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
-                                      openFullScreen={openFullScreen} closeFullScreen={closeFullScreen} id={id} name={name} handleClick={handleClick}
+                                      openFullScreen={openFullScreen} closeFullScreen={closeFullScreen} id={id} username={username} handleClick={handleClick}
                                       opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image} replyCount={replyCount}/> 
         : 
           <ReplyPost key={post.id} highlight={highlight} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
-                                      openFullScreen={openFullScreen} closeTFullScreen={closeFullScreen} id={id} name={name} handleClick={handleClick}
+                                      openFullScreen={openFullScreen} closeTFullScreen={closeFullScreen} id={id} username={username} handleClick={handleClick}
                                       opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image}/> }
     </div>
   )
 }
 
 const OriginalPost = (props) => {
-  const { postHref, handleRef, fullScreen, openFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
+  const { postHref, handleRef, fullScreen, openFullScreen, id, username, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
 
   return(
     <PostRoot key={id} ref={handleRef}>
       <UserInfo>
         <AnonymousAvatar/>
         <TextContainer>
-          <Text bold size="medium">{name}</Text>
+          <Text bold size="medium">{username}</Text>
           <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
         </TextContainer>
       </UserInfo>
@@ -140,7 +140,7 @@ const OriginalPost = (props) => {
 }
 
 const ReplyPost = (props) => {
-  const { postHref, highlight, fullScreen, openFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
+  const { postHref, highlight, fullScreen, openFullScreen, id, username, handleClick, opNo, subject, comment, formattedTime, image } = props;
 
   return(
     <PostRoot highlight={highlight}>
@@ -155,7 +155,7 @@ const ReplyPost = (props) => {
           <ReplyUserInfo>
             <AnonymousAvatar/>
             <TextContainer>
-              <Text>{name}</Text>
+              <Text>{username}</Text>
               <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
             </TextContainer>
           </ReplyUserInfo>
