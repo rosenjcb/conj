@@ -48,7 +48,7 @@
 (defn update-account! [req]
   (let [db (get-in req [:components :db-conn])
         account-id (get-in req [:account :id])
-        update (get-in req [:parameters :body])] 
+        update (walk/keywordize-keys (:multipart-params req))] 
     (try
       (some-> (q.account/update-account! db update account-id)
               (dissoc :pass)

@@ -28,38 +28,64 @@
     threads))
 
 (defn- enrich-post [[post account]]
-  (let [account-id (m.account/id account)
-        username (m.account/username account)]
-    (api.post/model->response post account-id username)))
+  (let [username (m.account/username account)]
+    (api.post/model->response post username)))
 
 (defn- post&account [accounts post]
   (let [account (first (filter #(= (m.post/account_id post) (m.account/id %)) accounts))]
     [post account]))
 
-(defn- enrich-threads [db-conn enrich? threads]
-  (if enrich?
+(defn- maybe-trim-post [anonymous? post]
+  (if anonymous? 
+    (-> (dissoc post api.post/account-id)
+        (assoc api.post/username "Anonymous"))
+    post))
+
+(defn- stitch-threads
+  ([posts] (stitch-threads posts []))
+  ([posts state]
+  (let [post (first posts)
+        anonymous? (or (m.post/is_anonymous post) (m.thread/anonymous? (last state)))
+        ;; anonymous? (if (seq state) (m.thread/anonymous? (last state)) (m.post/is_anonymous post)) ;;something wrong here with determining anon
+        trimmed-post (maybe-trim-post anonymous? post)
+        rest (into [] (rest posts))
+        thread (or (last state) [])
+        index (max 0 (- (count state) 1))] 
+    (if (empty? posts)
+      state
+      (if (m.post/op? trimmed-post)
+        (->> (conj state [trimmed-post])
+             (stitch-threads rest))
+        (->> (conj thread trimmed-post)
+             (assoc state index)
+             (stitch-threads rest)))))))
+
+(defn ^:private ^:test enrich-threads [db-conn enrich? threads]
+  (if (and enrich? (seq threads))
     (let [posts (flatten threads)
-          account-ids (set (map m.post/account_id posts))
+          account-ids (set (mapv m.post/account_id posts))
           accounts (q.account/find-accounts-by-ids! db-conn account-ids)
-          posts&accounts (map (partial post&account accounts) posts)
-          enriched-posts (map enrich-post posts&accounts)
-          final-threads (partition-by m.post/op? enriched-posts)]
+          posts&accounts (mapv (partial post&account accounts) posts)
+          enriched-posts (mapv enrich-post posts&accounts)
+          final-threads (stitch-threads enriched-posts)]
+      ;; (->> (mapv flatten (stitch-threads enriched-posts))
+      ;;      (mapv vec)
+      ;;      (into [])))
       final-threads)
-    threads))
+    (into [] threads)))
 
 (defn fetch-threads! 
   ([db-conn redis-conn board] 
    (fetch-threads! db-conn redis-conn board {}))
   ([db-conn redis-conn board {:keys [sort? preview-length enrich?]}]
    (let [threads (db.redis/get redis-conn board)]
-     (if threads
-      (some->> threads
-                (map (if preview-length (partial m.thread/preview preview-length) identity))
+     (when (not (some? threads)) (db.redis/set redis-conn board []))
+     (if (seq threads)
+       (some->> threads
+                (mapv (if preview-length (partial m.thread/preview preview-length) identity))
                 (sort-threads sort?)
                 (enrich-threads db-conn enrich?))
-       (do
-        (db.redis/set redis-conn board [])
-        [])))))
+        []))))
 
 (comment
   (def redis-conn (:redis-conn user/sys))
@@ -145,8 +171,8 @@
   (db.s3/delete-object s3-client s3-folder filename))
 
 (defn find-thread-by-id!
-  [redis-conn board id]
-  (let [threads (db.redis/get redis-conn board)]
+  [db-conn redis-conn board id]
+  (let [threads (fetch-threads! db-conn redis-conn board {:enrich? true :sort? true})]
     (first (filter #(= id (m.post/id (first %))) threads))))
 
 (defn- delete-thread [redis-conn board thread-id]
@@ -154,8 +180,8 @@
         new-threads (filter #((complement =) thread-id (m.post/id (first %))) threads)]
       (db.redis/set redis-conn board new-threads)))
 
-(defn delete-thread-by-id! [redis-conn s3-client board thread-id]
-  (let [thread (find-thread-by-id! redis-conn board thread-id)]
+(defn delete-thread-by-id! [db-conn redis-conn s3-client board thread-id]
+  (let [thread (find-thread-by-id! db-conn redis-conn board thread-id)]
     (if thread
       (do 
         (delete-thread redis-conn board thread-id)
@@ -167,8 +193,8 @@
             (delete-image s3-client (:filename image)))))
       (throw (Exception. (format "Thread No. %s not found." thread-id))))))
 
-(defn ^:test ^:private add-thread-to-board! [redis-conn s3-client board thread]
-  (let [sorted-threads (fetch-threads! redis-conn board {:sort? true})
+(defn ^:test ^:private add-thread-to-board! [db-conn redis-conn s3-client board thread]
+  (let [sorted-threads (fetch-threads! db-conn redis-conn board {:sort? true})
         thread-count (count sorted-threads)
         expired-threads (when (> thread-count max-thread-count) (subvec sorted-threads max-thread-count thread-count))
         new-threads (set/difference (conj sorted-threads thread) expired-threads)]
@@ -176,7 +202,7 @@
             :let [post-id (m.post/id original-post)]]
       (when post-id 
         (log/infof "Deleting expired thread %s" post-id)
-        (delete-thread-by-id! redis-conn s3-client board post-id)))
+        (delete-thread-by-id! db-conn redis-conn s3-client board post-id)))
     (db.redis/set redis-conn board new-threads)))
 
 (defn create-thread! 
@@ -184,26 +210,24 @@
   (let [account-id (:id account)
         db-account (q.account/find-account-by-id! db-conn account-id)
         account-id (m.account/id db-account)
-        ;; username (m.account/username db-account)
         post-count (q.board/get-count! db-conn board)
         thread (m.thread/->thread req account-id post-count)
-        ;; anonymous? (m.thread/anonymous? thread)
-        ;; name (if anonymous? "Anonymous" username)
+        anonymous? (m.thread/anonymous? thread)
         op (first thread)
-        ;; _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         image (m.post/image op)
         uploaded-image (upload-image s3-client image)
-        enriched-thread (vector (assoc op :image uploaded-image :time (t/zoned-date-time) :account_id account-id))] 
-    (add-thread-to-board! redis-conn s3-client board enriched-thread)
+        updated-op (assoc op :image uploaded-image :time (t/zoned-date-time) :is_anonymous anonymous?)
+        final-thread (vector updated-op)]
+    (add-thread-to-board! db-conn redis-conn s3-client board final-thread)
     (q.board/increment-counter! db-conn board)
     (q.account/update-last-thread! db-conn account-id)
-    enriched-thread))
+    final-thread))
 
 (defn ^:private ^:test update-thread! [redis-conn board thread-id updated-thread]
   (let [old-threads (fetch-threads! nil redis-conn board)
         final-thread (if (> (count updated-thread) max-post-count) (assoc-in updated-thread [0 :locked] true) updated-thread)
-        new-threads (map #(if (= (m.post/id (first %)) thread-id) final-thread %) old-threads)]
+        new-threads (mapv #(if (= (m.post/id (first %)) thread-id) final-thread %) old-threads)]
     (db.redis/set redis-conn board new-threads)
     final-thread))
 
@@ -220,21 +244,20 @@
   "Grabs a thread by its id, adds a post to it, and saves it to the database"  
   [db-conn s3-client redis-conn account board thread-id post-body]
   (let [account-id (:id account)
-        old-thread (find-thread-by-id! redis-conn board thread-id)
+        old-thread (find-thread-by-id! db-conn redis-conn board thread-id)
         ;; anonymous? (m.thread/anonymous? old-thread)
         _ (validate-thread-lock board old-thread)
         db-account (q.account/find-account-by-id! db-conn account-id)
         ;; username (m.account/username db-account)
         account-id (m.account/id db-account)
-        ;; name (if anonymous? "Anonymous" username)
-        _ (validate-reply-time db-account)
+        ;; _ (validate-reply-time db-account)
         post-count (q.board/get-count! db-conn board)
         post (m.post/->post post-body account-id post-count)
         _ (validate-add-post post)
         image (m.post/image post)
         _ (when (nil? old-thread) (throw (Exception. "Thread does not exist")))
         uploaded-image (when image (upload-image s3-client image))
-        enriched-post (assoc post :image uploaded-image :time (t/zoned-date-time) :name name)
+        enriched-post (assoc post :image uploaded-image :time (t/zoned-date-time))
         updated-thread (m.thread/add-post enriched-post old-thread)] 
     (update-thread! redis-conn board thread-id updated-thread)
     (q.board/increment-counter! db-conn board)
@@ -242,7 +265,7 @@
     updated-thread))
 
 ;; can probably be replaced with generic "del all redis keys and images" without validating the relationships 
-(defn delete-all-threads! [redis-conn s3-client board]
+(defn delete-all-threads! [db-conn redis-conn s3-client board]
   (let [threads (fetch-threads! nil redis-conn board)]
     (dorun 
-     (map #(delete-thread-by-id! redis-conn s3-client board (m.post/id (first %))) threads))))
+     (map #(delete-thread-by-id! db-conn redis-conn s3-client board (m.post/id (first %))) threads))))

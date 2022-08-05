@@ -35,7 +35,7 @@
   [:avatar
    [:fn
     {:error/message "Avatar picture must be a valid image file"}
-    any?]])
+    map?]])
 
 (def new-account
   [:map

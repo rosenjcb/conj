@@ -7,7 +7,8 @@
    [:image {:optional true} map?]
    [:comment string?]
    [:time inst?]
-   [:is_anonymous {:optional true} boolean?]])
+   [:is_anonymous {:optional true} boolean?]
+   [:account_id {:optional true} int?]])
 
 (defn ->post
   "Takes a given API request and generates a new thread"

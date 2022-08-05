@@ -33,10 +33,11 @@
              response/bad-request)))))
 
 (defn get-thread! [req]
-  (let [redis-conn (get-in req [:components :redis-conn])
+  (let [db-conn (get-in req [:components :db-conn])
+        redis-conn (get-in req [:components :redis-conn])
         id (get-in req [:parameters :path :id])
         board (get-in req [:parameters :path :board])
-        thread (query.thread/find-thread-by-id! redis-conn board id)]
+        thread (query.thread/find-thread-by-id! db-conn redis-conn board id)]
     (if thread
       (response/response thread)
       (response/not-found (format "No thread found with the id %s" id)))))
@@ -58,12 +59,13 @@
         (response/bad-request (.getMessage e))))))
 
 (defn kill-thread! [req]
-  (let [redis-conn (get-in req [:components :redis-conn])
+  (let [db-conn (get-in req [:components :db-conn])
+        redis-conn (get-in req [:components :redis-conn])
         s3-client (get-in req [:components :s3-client])
         thread-id (get-in req [:parameters :path :id])
         board (get-in req [:parameters :path :board])]
     (try
-      (query.thread/delete-thread-by-id! redis-conn s3-client board thread-id)
+      (query.thread/delete-thread-by-id! db-conn redis-conn s3-client board thread-id)
       (response/response (format "Thread No. %s has been deleted" thread-id))
       (catch Exception e
         (log/infof "%s" (.getMessage e))

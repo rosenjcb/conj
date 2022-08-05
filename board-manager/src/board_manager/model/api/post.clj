@@ -1,5 +1,11 @@
 (ns board-manager.model.api.post)
 
-(defn model->response [post account-id username]
+(def username :username)
+
+(def account-id :account_id)
+
+(defn model->response [post name]
   (when post
-    (assoc post :account-id account-id :username username)))
+    (if name 
+      (assoc post username name)
+      post)))
