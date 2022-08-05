@@ -13,6 +13,8 @@ import { SquareButton } from './index';
 import { detectMobile } from '../util/window';
 import ReactModal from 'react-modal';
 import { Header } from './index';
+import { GoGear } from 'react-icons/go';
+import {useComponentVisible} from '../hooks/useComponentVisible';
 
 const customStyle = {
   overlay: {
@@ -85,12 +87,27 @@ export const WithNavBar = ({component}) => {
     history.push("/");
   }
 
+  const [popUp, setPopUp] = useState(false);
+
+  const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
+
+  const toggleVisible = () => {
+    setIsComponentVisible(!isComponentVisible)
+  }
+
+
   return (
     <BoardRoot>
       <HomeNavBar>
         <HamburgerMenu onClick={openDrawer}/>
         <Header bold onClick={redirectHome}>conj.app</Header>
-        <SquareButton onClick={handleLogout}>Logout</SquareButton>
+        <IconContainer>
+          <SettingsIcon onClick={toggleVisible}/>
+          <SettingsContent visible={isComponentVisible} ref={ref}>
+              <Link onClick={handleLogout}><SettingText align="center">Logout</SettingText></Link>
+              <Link><SettingText align="center">Account</SettingText></Link>
+            </SettingsContent>
+        </IconContainer>
       </HomeNavBar>
       <Page>
         { !isMobile ? <BoardDrawer boards={boards}/> : <ReactModal style={customStyle} isOpen={drawerOpen} onRequestClose={closeDrawer}><BoardDrawer boards={boards}/></ReactModal>}
@@ -340,4 +357,54 @@ const ToolTip = styled.span`
     border-style: solid;
     border-color: ${props => props.theme.colors.grey} transparent transparent transparent;
   };
+`;
+
+
+const SettingsContent = styled.div`
+  display: ${props => props.visible ? "block" : "none"};
+  position: absolute;
+  width: 160px;
+  min-height: 90px;
+  background-color: ${props => props.theme.colors.white};
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  transform: translate(55%, 28%) translate(-100%, 0px);
+  border-radius: 8px;
+  padding: 12px 16px;
+  align-items: center;
+`;
+
+const SettingsIcon = styled(GoGear)`
+  cursor: pointer;
+  width: 40px;
+  align-self: center;
+  height: 40px;
+  display: inline-block;
+  position: relative;
+  
+`;
+
+
+const IconContainer = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 9000px;
+  display: flex;
+  justify-content: center;
+  background-color: ${props => chroma(props.theme.colors.grey).brighten(0.6).hex()};
+`;
+
+const Link = styled.div`
+  display: flex;
+  align-self: center;
+  cursor: pointer;
+  width: 100%;
+`;
+
+const SettingText = styled(Text)`
+  padding: 12px 16px;
+  border-radius: 8px;
+    
+    &:hover {
+      background-color: ${props => chroma(props.theme.colors.grey).brighten(0.6).hex()};
+    }
 `;

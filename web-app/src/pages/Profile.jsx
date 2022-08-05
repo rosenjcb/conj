@@ -7,9 +7,6 @@ import { parseError } from '../util/error';
 import toast from 'react-hot-toast';
 import { me as callMe } from '../api/account';
 
-
-
-
 export const ProfilePage = () => {
 
     const [me, setMe] = useState({});
