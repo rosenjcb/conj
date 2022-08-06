@@ -31,11 +31,18 @@
     {:error/message "Username must be between 1 and 16 characters"}
     username?]])
 
+(def avatar
+  [:avatar
+   [:fn
+    {:error/message "Avatar picture must be a valid image file"}
+    map?]])
+
 (def new-account
   [:map
    email
    pass
-   username])
+   username
+   (api.common/optional avatar)])
 
 (def auth-account 
   [:map
@@ -46,4 +53,5 @@
   [:map
    {:closed true}
    (api.common/optional username)
-   (api.common/optional email)])
+   (api.common/optional email)
+   (api.common/optional avatar)])

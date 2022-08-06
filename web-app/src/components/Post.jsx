@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import styled from 'styled-components';
-import { Text, PrimaryText, Avatar, HR, AnonymousAvatar } from './index';
+import { Text, Avatar } from './index';
 import { processPostText } from '../util/post';
 import { useDispatch } from 'react-redux';
 import { insertPostLink } from '../slices/postSlice';
 import { Link } from 'react-router-dom';
 import chroma from 'chroma-js';
-import { BiMessageDetail, BsFillPersonFill } from 'react-icons/bi'; 
+import { BiMessageDetail } from 'react-icons/bi'; 
 import { Reply } from './Reply';
 import Modal from 'react-modal';
+import { useEffect } from 'react';
 
 Modal.defaultStyles.overlay.backgroundColor = 'rgba(0, 0, 0, 0.7)';
 
@@ -77,7 +78,7 @@ export const Post = (props) => {
   }
   const { post, handleRef, highlight, preview, replyCount, opNo } = props;
 
-  const { name, subject, id, comment, image, time } = post;
+  const { username, subject, id, comment, image, time, avatar } = post;
 
   const isOriginalPost = opNo === id;
 
@@ -103,25 +104,24 @@ export const Post = (props) => {
       { isOriginalPost
         ? 
           <OriginalPost key={post.id} preview={preview} highlight={false} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
-                                      openFullScreen={openFullScreen} closeFullScreen={closeFullScreen} id={id} name={name} handleClick={handleClick}
-                                      opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image} replyCount={replyCount}/> 
+                                      openFullScreen={openFullScreen} closeFullScreen={closeFullScreen} id={id} username={username} handleClick={handleClick}
+                                      opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image} replyCount={replyCount} avatar={avatar}/> 
         : 
           <ReplyPost key={post.id} highlight={highlight} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
-                                      openFullScreen={openFullScreen} closeTFullScreen={closeFullScreen} id={id} name={name} handleClick={handleClick}
-                                      opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image}/> }
+                                      openFullScreen={openFullScreen} closeTFullScreen={closeFullScreen} id={id} username={username} handleClick={handleClick}
+                                      opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image} avatar={avatar}/> }
     </div>
   )
 }
 
-const OriginalPost = (props) => {
-  const { postHref, handleRef, fullScreen, openFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview } = props;
+const OriginalPost = ({postHref, handleRef, fullScreen, openFullScreen, id, username, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview, avatar}) => {
 
   return(
     <PostRoot key={id} ref={handleRef}>
       <UserInfo>
-        <AnonymousAvatar/>
+        <Avatar avatar={avatar}/>
         <TextContainer>
-          <Text bold size="medium">{name}</Text>
+          <Text bold size="medium">{username ?? "Anonymous"}</Text>
           <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
         </TextContainer>
       </UserInfo>
@@ -139,10 +139,9 @@ const OriginalPost = (props) => {
   )
 }
 
-const ReplyPost = (props) => {
-  const { postHref, highlight, fullScreen, openFullScreen, id, name, handleClick, opNo, subject, comment, formattedTime, image } = props;
+const ReplyPost = ({postHref, highlight, fullScreen, openFullScreen, id, username, handleClick, opNo, subject, comment, formattedTime, image, avatar}) => {
 
-  return(
+  return (
     <PostRoot highlight={highlight}>
       <FalseBorder/>
       <PostBody>
@@ -153,9 +152,9 @@ const ReplyPost = (props) => {
         </ContentRoot>
         <BottomRow>
           <ReplyUserInfo>
-            <AnonymousAvatar/>
+            <Avatar avatar={avatar}/>
             <TextContainer>
-              <Text>{name}</Text>
+              <Text>{username ?? "Anonymous"}</Text>
               <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
             </TextContainer>
           </ReplyUserInfo>

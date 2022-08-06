@@ -99,7 +99,6 @@
         s3-client (aws/client {:api :s3 :region :us-west-2})
         db-spec {:dbtype "postgresql" :host db-host :port db-port :dbname db-name :username db-user :password db-pass}
         redis-conn {:pool {} :spec {:uri (str "redis://" redis-host ":" redis-port)}}]
-    (log/infof "Here's your db-spec %s" db-spec)
     (component/system-map
      :auth-conf {:privkey "auth_privkey.pem" :passphrase passphrase}
      :db-conn (connection/component HikariDataSource db-spec)

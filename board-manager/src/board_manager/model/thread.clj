@@ -8,8 +8,9 @@
 
 #_{:clj-kondo/ignore [:redefined-var]}
 (defn sort [threads] 
-  (when threads
-    (sort-by (comp - :id last) threads)))
+  (if (seq threads)
+    (->> (sort-by (comp - :id last) threads))
+    threads))
 
 (defn preview [length t]
   (let [no-op (drop 1 t)]
@@ -17,9 +18,9 @@
 
 (defn ->thread
   "Takes a given API request and generates a new thread"
-  [req name id]
+  [req account-id thread-id]
   (let [{:strs [subject comment image is_anonymous]} req]
-    [{:id id :name name :subject subject :comment comment :image image :is_anonymous (boolean (Boolean/valueOf is_anonymous))}]))
+    [{:id thread-id :account_id account-id :subject subject :comment comment :image image :is_anonymous (boolean (Boolean/valueOf is_anonymous))}]))
 
 (defn anonymous?
   [thread]

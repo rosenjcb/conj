@@ -1,4 +1,5 @@
-(ns board-manager.model.account)
+(ns board-manager.model.account 
+  (:require [board-manager.util.uri :as util.uri]))
 
 (def schema 
   [:map
@@ -8,7 +9,8 @@
    [:last_post inst?]
    [:last_thread inst?]
    [:role [:enum "user" "admin"]]
-   [:username string?]])
+   [:username string?]
+   [:avatar util.uri/uri?]])
 
 (def id :id)
 
@@ -27,3 +29,5 @@
 (def ^:const admin-role "admin")
 
 (def username :username)
+
+(def avatar :avatar)
