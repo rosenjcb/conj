@@ -136,7 +136,6 @@
         (is (= (list thread-with-unknown-ids) (#'q.thread/enrich-threads nil true thread-with-unknown-ids)))
         (is (= multiple-enriched-threads (#'q.thread/enrich-threads nil true multiple-known-threads)))
         (is (= multiple-unknown-threads (#'q.thread/enrich-threads nil true multiple-unknown-threads)))))))
-  ;; (testing "Threads enrich correctly"))
 
 (deftest thread-locks
   (testing "Threads over the post limit are locked, those aren't are left unchanged."
@@ -145,15 +144,3 @@
       (let [expected-thread (assoc-in max-thread [0 :locked] true)]
         (is (= expected-thread (#'q.thread/update-thread! nil nil nil max-thread)))
         (is (= basic-thread (#'q.thread/update-thread! nil nil nil basic-thread)))))))
-
-(comment
-  (clojure.test/run-tests)
-  (clojure.test/test-vars [#'sort-threads])
-  (clojure.test/test-vars [#'board-manager.query.thread-test/enrich-threads])
-  (({:id 100, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false, :username "test.mctest"} {:id 101, :account_id 2, :subject "", :image nil, :comment "", :username "jane1992"} {:id 102, :account_id 3, :subject "", :image nil, :comment "", :username "bobbyhill94"}) 
-   ({:id 100, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false, :username "test.mctest"} {:id 101, :account_id 2, :subject "", :image nil, :comment "", :username "jane1992"} {:id 102, :account_id 3, :subject "", :image nil, :comment "", :username "bobbyhill94"}) ({:id 100, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false, :username "test.mctest"} {:id 101, :account_id 2, :subject "", :image nil, :comment "", :username "jane1992"} {:id 102, :account_id 3, :subject "", :image nil, :comment "", :username "bobbyhill94"})) (({:id 100, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false} {:id 101, :account_id 2, :subject "", :image nil, :comment ""} {:id 102, :account_id 3, :subject "", :image nil, :comment ""}) ({:id 100, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false} {:id 101, :account_id 2, :subject "", :image nil, :comment ""} {:id 102, :account_id 3, :subject "", :image nil, :comment ""}) ({:id 100, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false} {:id 101, :account_id 2, :subject "", :image nil, :comment ""} {:id 102, :account_id 3, :subject "", :image nil, :comment ""}))
-  (def x '(1 2 3))
-  (list x x x)
-  (def b-thread (repeat 4 basic-post))
-  (def part (partial change-account-id [10 11 12]))
-  (map-indexed (partial change-account-id [10 11 12]) b-thread))
