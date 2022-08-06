@@ -103,34 +103,34 @@
 
 (deftest enrich-threads
   (testing "enrich? flag is respected"
-    (is (= '() (#'q.thread/enrich-threads nil false '())))
-    (is (= nil (#'q.thread/enrich-threads nil false nil))))
+    (is (= [] (#'q.thread/enrich-threads nil false [])))
+    (is (= [] (#'q.thread/enrich-threads nil false nil))))
   (testing "Empty threads enrich nothing"
-    (is (= '() (#'q.thread/enrich-threads nil true '())))
-    (is (= nil (#'q.thread/enrich-threads nil true nil))))
+    (is (= [] (#'q.thread/enrich-threads nil true [])))
+    (is (= [] (#'q.thread/enrich-threads nil true nil))))
   (testing "Thread(s) enrich with nothing when accounts aren't discovered, will enrich with account and avatar when they are found"
     (with-redefs [q.account/find-accounts-by-ids! (constantly (list test-account jane-account bob-account))]
-      (let [thread-with-unknown-ids '({:id 100 :account_id 100 :subject "" :image nil :comment "" :is_anonymous false}
-                                     {:id 101 :account_id 101 :subject "" :image nil :comment ""}
-                                     {:id 102 :account_id 102 :subject "" :image nil :comment ""})
-            thread-with-known-ids '({:id 100 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false}
+      (let [thread-with-unknown-ids [{:id 100 :account_id 100 :subject "" :image nil :comment "" :is_anonymous false :username nil :avatar nil}
+                                     {:id 101 :account_id 101 :subject "" :image nil :comment "" :username nil :avatar nil}
+                                     {:id 102 :account_id 102 :subject "" :image nil :comment "" :username nil :avatar nil}]
+            thread-with-known-ids [{:id 100 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false}
                                    {:id 101 :account_id 2 :subject "" :image nil :comment ""}
-                                   {:id 102 :account_id 3 :subject "" :image nil :comment ""})
-            enriched-thread '({:id 100 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false :username "test.mctest"}
-                              {:id 101 :account_id 2 :subject "" :image nil :comment "" :username "jane1992"}
-                              {:id 102 :account_id 3 :subject "" :image nil :comment "" :username "bobbyhill94"})
-            multiple-enriched-threads '(({:id 100 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false :username "test.mctest"}
-                                          {:id 101 :account_id 2 :subject "" :image nil :comment "" :username "jane1992"}
-                                          {:id 102 :account_id 3 :subject "" :image nil :comment "" :username "bobbyhill94"})
-                                        ({:id 103 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false :username "test.mctest"}
-                                          {:id 104 :account_id 2 :subject "" :image nil :comment "" :username "jane1992"}
-                                          {:id 105 :account_id 3 :subject "" :image nil :comment "" :username "bobbyhill94"}))
-            multiple-known-threads '(({:id 100, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false} 
-                                      {:id 101, :account_id 2, :subject "", :image nil, :comment ""} 
-                                      {:id 102, :account_id 3, :subject "", :image nil, :comment ""}) 
-                                     ({:id 103, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false} 
-                                      {:id 104, :account_id 2, :subject "", :image nil, :comment ""} 
-                                      {:id 105, :account_id 3, :subject "", :image nil, :comment ""}))
+                                   {:id 102 :account_id 3 :subject "" :image nil :comment ""}]
+            enriched-thread [{:id 100 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false :username "test.mctest" :avatar nil}
+                             {:id 101 :account_id 2 :subject "" :image nil :comment "" :username "jane1992" :avatar nil}
+                             {:id 102 :account_id 3 :subject "" :image nil :comment "" :username "bobbyhill94" :avatar nil}]
+            multiple-enriched-threads [[{:id 100 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false :username "test.mctest" :avatar nil}
+                                        {:id 101 :account_id 2 :subject "" :image nil :comment "" :username "jane1992" :avatar nil}
+                                        {:id 102 :account_id 3 :subject "" :image nil :comment "" :username "bobbyhill94":avatar nil}]
+                                       [{:id 103 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false :username "test.mctest" :avatar nil}
+                                        {:id 104 :account_id 2 :subject "" :image nil :comment "" :username "jane1992" :avatar nil}
+                                        {:id 105 :account_id 3 :subject "" :image nil :comment "" :username "bobbyhill94" :avatar nil}]]
+            multiple-known-threads [[{:id 100, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false} 
+                                     {:id 101, :account_id 2, :subject "", :image nil, :comment ""} 
+                                     {:id 102, :account_id 3, :subject "", :image nil, :comment ""}] 
+                                    [{:id 103, :account_id 1, :subject "", :image nil, :comment "", :is_anonymous false} 
+                                     {:id 104, :account_id 2, :subject "", :image nil, :comment ""} 
+                                     {:id 105, :account_id 3, :subject "", :image nil, :comment ""}]]
             multiple-unknown-threads (list thread-with-unknown-ids thread-with-unknown-ids)]
         (is (= (list enriched-thread) (#'q.thread/enrich-threads nil true thread-with-known-ids)))
         (is (= (list thread-with-unknown-ids) (#'q.thread/enrich-threads nil true thread-with-unknown-ids)))

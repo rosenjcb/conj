@@ -53,4 +53,5 @@
   [:map
    {:closed true}
    (api.common/optional username)
-   (api.common/optional email)])
+   (api.common/optional email)
+   (api.common/optional avatar)])

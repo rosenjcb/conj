@@ -129,7 +129,7 @@ export const RoundImage = styled.img`
   border-radius: 8px;
 `;
 
-export const Avatar = styled.img`
+const ExistingAvatar = styled.img`
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -138,6 +138,14 @@ export const Avatar = styled.img`
     cursor: pointer;
   }
 `;
+
+export const Avatar = ({avatar}) => {
+  if(avatar) {
+    return <ExistingAvatar src={avatar}/>
+  } else {
+    return <AnonymousAvatar/>
+  }
+}
 
 export const AnonymousAvatar = styled(BsFillPersonFill)`
   width: 64px;

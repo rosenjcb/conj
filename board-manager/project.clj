@@ -27,7 +27,8 @@
                  [clojure.java-time "0.3.3"]
                  [com.cognitect.aws/api "0.8.561"]
                  [com.cognitect.aws/endpoints "1.1.12.230"]
-                 [com.cognitect.aws/s3 "822.2.1145.0"]]
+                 [com.cognitect.aws/s3 "822.2.1145.0"]
+                 [lambdaisland/uri "1.13.95"]]
   :exclusions [; Exclude transitive dependencies on concrete implementations
                ; and adapters of the above java logging abstractions:
                [ch.qos.logback/logback-classic]

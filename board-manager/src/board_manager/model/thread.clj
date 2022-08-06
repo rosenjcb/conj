@@ -8,8 +8,9 @@
 
 #_{:clj-kondo/ignore [:redefined-var]}
 (defn sort [threads] 
-  (when (seq threads)
-    (->> (sort-by (comp - :id last) threads))))
+  (if (seq threads)
+    (->> (sort-by (comp - :id last) threads))
+    threads))
 
 (defn preview [length t]
   (let [no-op (drop 1 t)]

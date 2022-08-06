@@ -28,8 +28,9 @@
     threads))
 
 (defn- enrich-post [[post account]]
-  (let [username (m.account/username account)]
-    (api.post/model->response post username)))
+  (let [username (m.account/username account)
+        avatar (m.account/avatar account)]
+    (api.post/model->response post username avatar)))
 
 (defn- post&account [accounts post]
   (let [account (first (filter #(= (m.post/account_id post) (m.account/id %)) accounts))]
@@ -38,19 +39,19 @@
 (defn- maybe-trim-post [anonymous? post]
   (if anonymous? 
     (-> (dissoc post api.post/account-id)
-        (assoc api.post/username "Anonymous"))
+        (dissoc api.post/username)
+        (dissoc api.post/avatar))
     post))
 
-(defn- stitch-threads
+(defn ^:private ^:test stitch-threads
   ([posts] (stitch-threads posts []))
   ([posts state]
   (let [post (first posts)
-        anonymous? (or (m.post/is_anonymous post) (m.thread/anonymous? (last state)))
-        ;; anonymous? (if (seq state) (m.thread/anonymous? (last state)) (m.post/is_anonymous post)) ;;something wrong here with determining anon
+        anonymous? (if-some [val (m.post/is_anonymous post)] val (m.thread/anonymous? (last state)))
         trimmed-post (maybe-trim-post anonymous? post)
         rest (into [] (rest posts))
         thread (or (last state) [])
-        index (max 0 (- (count state) 1))] 
+        index (max 0 (dec (count state)))]
     (if (empty? posts)
       state
       (if (m.post/op? trimmed-post)
@@ -68,9 +69,6 @@
           posts&accounts (mapv (partial post&account accounts) posts)
           enriched-posts (mapv enrich-post posts&accounts)
           final-threads (stitch-threads enriched-posts)]
-      ;; (->> (mapv flatten (stitch-threads enriched-posts))
-      ;;      (mapv vec)
-      ;;      (into [])))
       final-threads)
     (into [] threads)))
 
@@ -86,22 +84,6 @@
                 (sort-threads sort?)
                 (enrich-threads db-conn enrich?))
         []))))
-
-(comment
-  (def redis-conn (:redis-conn user/sys))
-  (def db-conn (:db-conn user/sys))
-  (def threads (fetch-threads! db-conn redis-conn "random" {:enrich? true :sort? true}))
-  (def res (q.account/find-accounts-by-ids! db-conn []))
-  (q.account/find-accounts-by-ids! db-conn [2 3])
-  (print res)
-  (when ((comp empty?) #{}) (print 5))
-  ((complement empty?) #{})
-  (print res)
-  (set '(1 2 3 4 5 5 5))
-  (clojure.pprint/pprint threads)
-  (response/response threads)
-  (q.account/find-account-by-ids! db-conn #{})
-  (enrich-threads db-conn true res))
 
 (defn- validate-subject
   [subject]
@@ -214,6 +196,7 @@
         thread (m.thread/->thread req account-id post-count)
         anonymous? (m.thread/anonymous? thread)
         op (first thread)
+        _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         image (m.post/image op)
         uploaded-image (upload-image s3-client image)
@@ -245,12 +228,10 @@
   [db-conn s3-client redis-conn account board thread-id post-body]
   (let [account-id (:id account)
         old-thread (find-thread-by-id! db-conn redis-conn board thread-id)
-        ;; anonymous? (m.thread/anonymous? old-thread)
         _ (validate-thread-lock board old-thread)
         db-account (q.account/find-account-by-id! db-conn account-id)
-        ;; username (m.account/username db-account)
         account-id (m.account/id db-account)
-        ;; _ (validate-reply-time db-account)
+        _ (validate-reply-time db-account)
         post-count (q.board/get-count! db-conn board)
         post (m.post/->post post-body account-id post-count)
         _ (validate-add-post post)

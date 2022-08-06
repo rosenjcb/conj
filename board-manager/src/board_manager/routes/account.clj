@@ -1,8 +1,11 @@
 (ns board-manager.routes.account
   (:require [board-manager.middleware :as middleware]
+            [board-manager.model.account :as m.account]
             [board-manager.model.api.account :as api.account]
             [board-manager.query.account :as q.account]
+            [board-manager.query.db.s3 :as db.s3]
             [board-manager.services.auth :as s.auth]
+            [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [clojure.walk :as walk]
             [reitit.coercion.malli :as malli]
@@ -20,12 +23,20 @@
 (defn- set-cookies [response {:keys [access-token refresh-token]}]
   (assoc response :cookies {"refresh_token" refresh-token "access_token" access-token}))
 
+(defn- upload-avatar
+  [s3-client {:keys [filename tempfile]}]
+  (db.s3/upload-object s3-client "conj-images" (str "avatars/" filename) (io/input-stream tempfile)))
+
 (defn create-account! [req]
   (let [auth-service (get-in req [:components :auth-service])
+        s3-client (get-in req [:components :s3-client])
         account-req (:multipart-params req)]
-        ;; account-req (get-in req [:parameters :body])]
     (try 
-      (let [account (s.auth/add-account! auth-service (walk/keywordize-keys account-req))]  
+      (let [avatar (get account-req "image")
+            {:keys [location]} (when avatar (upload-avatar s3-client avatar))
+            account (->> (assoc account-req m.account/avatar location)
+                         walk/keywordize-keys
+                         (s.auth/add-account! auth-service))]
         (->> (:refresh-token account)
              (set-cookies (response/status 200))))
       (catch PSQLException e
@@ -47,11 +58,15 @@
 
 (defn update-account! [req]
   (let [db (get-in req [:components :db-conn])
+        s3-client (get-in req [:components :s3-client])
         account-id (get-in req [:account :id])
-        update (walk/keywordize-keys (:multipart-params req))] 
+        update (walk/keywordize-keys (:multipart-params req))
+        avatar (m.account/avatar update)
+        {:keys [location]} (when avatar (upload-avatar s3-client avatar))
+        final (assoc update m.account/avatar location)]
     (try
-      (some-> (q.account/update-account! db update account-id)
-              (dissoc :pass)
+      (some-> (q.account/update-account! db final account-id)
+              (dissoc m.account/pass)
               response/response)
       (catch Exception e
         (log/errorf e "Error found for account id %s" account-id)
