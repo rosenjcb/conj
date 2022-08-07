@@ -85,7 +85,7 @@
     (response/response (query.board/list-boards! db-conn))))
 
 (defn flush-all! [req]
-  (let [redis-conn (get-in req [:components :db-conn])]
+  (let [redis-conn (get-in req [:components :redis-conn])]
     (db.redis/flush-all redis-conn)
     (response/response "Boards have been purged and redis cache is clear!")))
 
