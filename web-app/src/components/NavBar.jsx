@@ -15,6 +15,8 @@ import ReactModal from 'react-modal';
 import { Header } from './index';
 import { GoGear } from 'react-icons/go';
 import {useComponentVisible} from '../hooks/useComponentVisible';
+import { AccountSettings } from './AccountSettings';
+import { Login } from './Login';
 
 const customStyle = {
   overlay: {
@@ -95,17 +97,53 @@ export const WithNavBar = ({component}) => {
     setIsComponentVisible(!isComponentVisible)
   }
 
+  const [accountIsOpen, setAccountIsOpen] = useState(false)
+
+  const closeAccount = () => setAccountIsOpen(false);
+
+  const openAccount = () => setAccountIsOpen(true);
+
+
+
+  const [loginOpen, setLoginOpen] = useState(false)
+
+  const closeLogin = () => setLoginOpen(false);
+
+  const openLogin = () => setLoginOpen(true);
+
+
+  const customStyle = {
+    overlay: {
+      zIndex: 2,
+      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    },
+    content: {
+      top: '50%',
+      left: '50%',
+      right: 'auto',
+      bottom: 'auto',
+      marginRight: '-50%',
+      transform: 'translate(-50%, -50%)',
+      padding: '0',
+      border: 'none',
+      borderRadius: '0px',
+      background: 'none'
+    },
+  };
 
   return (
     <BoardRoot>
+      <ReactModal style={customStyle} isOpen={accountIsOpen} onRequestClose={closeAccount}><AccountSettings/></ReactModal>
+      <ReactModal style={customStyle} isOpen={loginOpen} onRequestClose={closeLogin}><Login/></ReactModal>
       <HomeNavBar>
         <HamburgerMenu onClick={openDrawer}/>
         <Header bold onClick={redirectHome}>conj.app</Header>
         <IconContainer>
           <SettingsIcon onClick={toggleVisible}/>
           <SettingsContent visible={isComponentVisible} ref={ref}>
-              <Link onClick={handleLogout}><SettingText align="center">Logout</SettingText></Link>
-              <Link><SettingText align="center">Account</SettingText></Link>
+              {me === null ? <Link onClick={openLogin}><SettingText align="center">Login</SettingText></Link> : null}
+              {me !== null ? <Link onClick={handleLogout}><SettingText align="center">Logout</SettingText></Link> : null}
+              {me !== null ? <Link onClick={openAccount}><SettingText align="center">Account</SettingText></Link> : null}
             </SettingsContent>
         </IconContainer>
       </HomeNavBar>
@@ -364,7 +402,6 @@ const SettingsContent = styled.div`
   display: ${props => props.visible ? "block" : "none"};
   position: absolute;
   width: 160px;
-  min-height: 90px;
   background-color: ${props => props.theme.colors.white};
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   transform: translate(55%, 28%) translate(-100%, 0px);

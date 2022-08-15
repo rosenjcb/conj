@@ -163,6 +163,53 @@ export const Checkbox = ({label, onClick, checked}) => {
   )
 }
 
+export const InputField = (props) => {
+  const { label, field, form, secret } = props;
+
+  const type = props.type ?? 'text';
+
+  const autocomplete = props.autocomplete ?? 'false';
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    form.setFieldValue(field.name, e.target.value);
+  }
+
+  return (
+    <InputFieldRoot>
+      <Label>{label}</Label>
+      <TextField type={type} name={type} autocomplete={autocomplete} secret={secret} placeholder={props.placeholder} onChange={handleChange}/>
+    </InputFieldRoot>
+  )
+}
+
+const InputFieldRoot = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 70%;
+  margin:0 auto;
+  margin-top: 12px; 
+  margin-bottom: 12px;
+`;
+
+const Label = styled.label`
+  display: flex;
+  justify-content: flex-start;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: ${props => props.theme.colors.black};
+`;
+
+const TextField = styled.input`
+  -webkit-text-security: ${props => props.secret ? "circle" : "none"};
+  border-radius: 8px;
+  border-color: ${props => props.theme.colors.grey};
+  min-height: 2rem;
+`;
+
+
 const CheckBoxContainer = styled.div`
   display: flex;
   justify-content: flex-start;
