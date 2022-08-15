@@ -15,5 +15,9 @@ export const signup = (accountDetails) => {
 };
 
 export const updateMe = (me) => {
-  return axios.put('/api/me', me);
+  var formData = new FormData();
+  for (let [key, val] of Object.entries(me)) {
+    if(val !== null) formData.append(key, val);
+  }
+  return axios.put('/api/me', formData);
 }
