@@ -13,7 +13,6 @@ import { useEffect } from 'react';
 
 Modal.defaultStyles.overlay.backgroundColor = 'rgba(0, 0, 0, 0.7)';
 
-
 const WithText = ({direction, component, text}) => {
   return (
     <WithTextRoot direction={direction}>

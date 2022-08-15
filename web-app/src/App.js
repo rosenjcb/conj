@@ -9,6 +9,7 @@ import { AboutPage } from './pages/About';
 import { BoardPage } from './pages/Board';
 import { Toaster } from 'react-hot-toast';
 import chroma from 'chroma-js';
+import { ProfilePage } from './pages/Profile';
 
 export const theme = {
   colors: {
@@ -47,6 +48,9 @@ function App() {
             </Route>
             <Route exact path ="/about">
               <AboutPage/>
+            </Route>
+            <Route exact path="/profile">
+              <WithNavBar component={<ProfilePage/>}/>
             </Route>
           </Switch>
         </Router>
