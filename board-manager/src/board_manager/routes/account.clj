@@ -60,10 +60,11 @@
   (let [db (get-in req [:components :db-conn])
         s3-client (get-in req [:components :s3-client])
         account-id (get-in req [:account :id])
+        account (q.account/find-account-by-id! db account-id)
         update (walk/keywordize-keys (:multipart-params req))
         avatar (m.account/avatar update)
         {:keys [location]} (when avatar (upload-avatar s3-client avatar))
-        final (assoc update m.account/avatar location)]
+        final (assoc update m.account/avatar (or location (m.account/avatar account)))]
     (try
       (some-> (q.account/update-account! db final account-id)
               (dissoc m.account/pass)

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { Formik, Field } from 'formik';
-import { Header, RoundButton, Back, InputField } from './index';
+import { Header, RoundButton, Back, InputField, AnonymousAvatar, InputFile } from './index';
 import { signup, updateMe, me as callMe } from '../api/account';
 import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
@@ -42,13 +42,17 @@ export function AccountSettings() {
         <Header bold size="large">Account</Header>
         { me ? <Formik
           initialValues={{
-            username: ''
+            username: null,
+            avatar: null
           }}
           onSubmit={handleSignup}
         >
           {(props) => (
             <StyledForm onSubmit={props.handleSubmit}>
-              <Field label="USERNAME" type="username" name="username" placeholder={me.username} component={InputField}/>
+              <ContentDetails> 
+                <Field label="AVATAR" type="AVATAR" name="avatar" placeholder={me.avatar} component={InputFile}/>
+                <Field label="USERNAME" type="username" name="username" placeholder={me.username} component={InputField}/>
+              </ContentDetails>
               <SubmitOptions>
                 <RoundButton type="submit">Update</RoundButton> 
               </SubmitOptions>
@@ -58,15 +62,25 @@ export function AccountSettings() {
       </Root>
     )
   }
-  
 
-  const SubmitOptions = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 10px;
-  padding-bottom: 1rem;
+const AnonymousAvatarConfig = styled(AnonymousAvatar)`
   padding-top: 1rem;
+`;
+
+const ContentDetails = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+`;
+
+
+const SubmitOptions = styled.div`
+display: flex;
+flex-direction: row;
+justify-content: center;
+gap: 10px;
+padding-bottom: 1rem;
+padding-top: 1rem;
 `;
 
 
