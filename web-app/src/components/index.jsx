@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import chroma from 'chroma-js';
 import { BsFillPersonFill } from 'react-icons/bs';
 import { BiArrowBack } from 'react-icons/bi';
+import { useState } from 'react';
 
 export const HR = styled.hr`
   width: ${props => props.width ?? "100%"};
@@ -188,6 +189,25 @@ export const InputField = (props) => {
       <Label>{label}</Label>
       <TextField type={type} name={type} autocomplete={autocomplete} secret={secret} placeholder={props.placeholder} onChange={handleChange}/>
     </InputFieldRoot>
+  )
+}
+
+export const InputFile = ({field, form, placeholder}) => {
+  const [avatar, setAvatar] = useState(placeholder);
+
+  const handleClick= (e) => {
+    e.preventDefault();
+    form.setFieldValue(field.name, e.target.files[0]);
+    setAvatar(URL.createObjectURL(e.target.files[0]));
+    console.log(e.target.files[0])
+  }
+
+  return (
+    <label>
+      <Avatar avatar={avatar}/>
+      <input onChange={handleClick} type="file" style={{"display": "none"}}/>
+    </label>
+
   )
 }
 
