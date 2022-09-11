@@ -15,9 +15,10 @@
          formatted-filename (if (pos? retry-count) (str name "-" retry-count "." extension) filename)]
     (if (peek-object client bucket-name formatted-filename)
       (upload-object client bucket-name filename inputstream (inc retry-count))
-      (do
-        (logging/infof "Uploading to bucket: %s name: %s" bucket-name formatted-filename)
-        (aws/invoke client {:op :PutObject :request {:Bucket bucket-name :Key formatted-filename :Body inputstream :ContentType (when (#{"png" "jpg" "jpeg" "gif"} extension) (str "image/" extension))}})
+      (let [_ (logging/infof "Uploading to bucket: %s name: %s" bucket-name formatted-filename)
+            res (aws/invoke client {:op :PutObject :request {:Bucket bucket-name :Key formatted-filename :Body inputstream :ContentType (when (#{"png" "jpg" "jpeg" "gif"} extension) (str "image/" extension))}})
+            error-message (:cognitect.anomalies/message res)]
+        (when (some? error-message) (throw (Exception. error-message)))
         {:filename formatted-filename :location (format "https://%s.s3.amazonaws.com/%s" bucket-name formatted-filename)})))))
 
 (defn get-object [client bucket-name filename]
@@ -31,3 +32,8 @@
       ;; (logging/infof "Deleting from bucket: %s file: %s" bucket-name filename)  
       (aws/invoke client {:op :DeleteObject :request {:Bucket bucket-name :Key filename}})
       true)))
+
+
+;; (comment
+;;   (def s3-client (:s3-client user/sys))
+;;   (aws/invoke s3-client {:op :ListObjects :request {:Bucket "conj-images"}}))
