@@ -17,9 +17,8 @@
       (upload-object client bucket-name filename inputstream (inc retry-count))
       (let [_ (logging/infof "Uploading to bucket: %s name: %s" bucket-name formatted-filename)
             res (aws/invoke client {:op :PutObject :request {:Bucket bucket-name :Key formatted-filename :Body inputstream :ContentType (when (#{"png" "jpg" "jpeg" "gif"} extension) (str "image/" extension))}})
-            error-message (:cognitect.anomalies/message res)]
-        (logging/infof "Res: %s" res)
-        (when (some? error-message) (throw (Exception. error-message)))
+            error (:cognitect.anomalies/category res)]
+        (when (some? error) (throw (Exception. "Couldn't upload the object for one reason or another.")))
         {:filename formatted-filename :location (format "https://%s.s3.amazonaws.com/%s" bucket-name formatted-filename)})))))
 
 (defn get-object [client bucket-name filename]
