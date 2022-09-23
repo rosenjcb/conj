@@ -57,8 +57,7 @@ export function ThreadPage() {
 }
 
 const Root = styled.div`
-  padding: 1.5rem;
-  width: calc(100% - 3rem);
+  width: 100%;
   margin: 0 auto;
   overflow-y: scroll;
 

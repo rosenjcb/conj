@@ -64,17 +64,29 @@ const handlePostDate = (time) => {
 
 export const Post = (props) => {
     
-  const [fullScreen, setFullScreen] = useState(false);
+  const [enlargePostImage, setEnlargePostImage] = useState(false);
 
   const dispatch = useDispatch();
 
-  const openFullScreen = () => {
-    setFullScreen(true);
+  const openPostImage = () => {
+    setEnlargePostImage(true);
   }
 
-  const closeFullScreen = () => {
-    setFullScreen(false);
+  const closePostImage = () => {
+    setEnlargePostImage(false);
   }
+
+  const[enlargeAvatar, setEnlargeAvatar] = useState(false);
+
+  const openAvatar = () => {
+    setEnlargeAvatar(true);
+  }
+
+  const closeAvatar = () => {
+    setEnlargeAvatar(false);
+  }
+
+
   const { post, handleRef, highlight, preview, replyCount, opNo } = props;
 
   const { username, subject, id, comment, image, time, avatar } = post;
@@ -96,29 +108,35 @@ export const Post = (props) => {
     <div>
       <Modal
         style={customStyles}
-        isOpen={fullScreen}
-        onRequestClose={closeFullScreen}>
-          { image ? <CenteredImage fullScreen={true} src={image.location}/> : null}
+        isOpen={enlargePostImage}
+        onRequestClose={closePostImage}>
+          { image ? <ModalImage src={image.location}/> : null}
+      </Modal>
+      <Modal
+        style={customStyles}
+        isOpen={enlargeAvatar}
+        onRequestClose={closeAvatar}>
+          <ModalImage src={avatar}/> 
       </Modal>
       { isOriginalPost
         ? 
-          <OriginalPost key={post.id} preview={preview} highlight={false} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
-                                      openFullScreen={openFullScreen} closeFullScreen={closeFullScreen} id={id} username={username} handleClick={handleClick}
+          <OriginalPost key={post.id} preview={preview} highlight={false} postHref={postHref} handleRef={handleRef} openAvatar={openAvatar}
+                                      openPostImage={openPostImage} closePostImage={closePostImage} id={id} username={username} handleClick={handleClick}
                                       opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image} replyCount={replyCount} avatar={avatar}/> 
         : 
-          <ReplyPost key={post.id} highlight={highlight} postHref={postHref} handleRef={handleRef} fullScreen={fullScreen} 
-                                      openFullScreen={openFullScreen} closeTFullScreen={closeFullScreen} id={id} username={username} handleClick={handleClick}
+          <ReplyPost key={post.id} highlight={highlight} postHref={postHref} handleRef={handleRef} openAvatar={openAvatar}
+                                      openPostImage={openPostImage} closePostImage={closePostImage} id={id} username={username} handleClick={handleClick}
                                       opNo={opNo} subject={subject} comment={comment} formattedTime={formattedTime} image={image} avatar={avatar}/> }
     </div>
   )
 }
 
-const OriginalPost = ({postHref, handleRef, fullScreen, openFullScreen, id, username, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview, avatar}) => {
+const OriginalPost = ({postHref, handleRef, fullScreen, openPostImage, id, username, handleClick, opNo, subject, comment, formattedTime, image, replyCount, preview, avatar, openAvatar}) => {
 
   return(
     <PostRoot key={id} ref={handleRef}>
       <UserInfo>
-        <Avatar avatar={avatar}/>
+        <Avatar onClick={openAvatar} avatar={avatar}/>
         <TextContainer>
           <Text bold size="medium">{username ?? "Anonymous"}</Text>
           <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
@@ -126,7 +144,7 @@ const OriginalPost = ({postHref, handleRef, fullScreen, openFullScreen, id, user
       </UserInfo>
       <OriginalContentRoot>
         <Text align="left" width="100%" size="x-large" color="primary">{subject}</Text>
-        <CenteredImage fullScreen={fullScreen} onClick={() => openFullScreen()} src={image.location}/>
+        <CenteredImage fullScreen={fullScreen} onClick={() => openPostImage()} src={image.location}/>
         {processPostText(opNo, comment)}
       </OriginalContentRoot>
       <ActionsContainer>
@@ -138,27 +156,29 @@ const OriginalPost = ({postHref, handleRef, fullScreen, openFullScreen, id, user
   )
 }
 
-const ReplyPost = ({postHref, highlight, fullScreen, openFullScreen, id, username, handleClick, opNo, subject, comment, formattedTime, image, avatar}) => {
+const ReplyPost = ({postHref, highlight, fullScreen, openPostImage, id, username, handleClick, opNo, subject, comment, formattedTime, image, avatar, openAvatar}) => {
 
   return (
     <PostRoot highlight={highlight}>
       <FalseBorder/>
       <PostBody>
-        <ContentRoot>
-          { image && image.location ? <Image fullScreen={fullScreen} onClick={() => openFullScreen()} src={image.location}/> : null }
-          { subject ? <Text size="large" color="primary">{subject}</Text> : null }
-          {processPostText(opNo, comment)}
-        </ContentRoot>
         <BottomRow>
           <ReplyUserInfo>
-            <Avatar avatar={avatar}/>
-            <TextContainer>
-              <Text>{username ?? "Anonymous"}</Text>
-              <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
-            </TextContainer>
+            <Avatar onClick={openAvatar} avatar={avatar}/>
+            <InfoContent>
+              <TextContainer>
+                <Text>{username ?? "Anonymous"}</Text>
+                <PostLink to={postHref} onClick={handleClick}>#{id}</PostLink>
+              </TextContainer>
+              <Text align="right">{formattedTime}</Text>  
+            </InfoContent>
           </ReplyUserInfo>
-          <Text align="right">{formattedTime}</Text>
         </BottomRow>
+        <ContentRoot>
+        { subject ? <Text size="large" color="primary">{subject}</Text> : null }
+        {processPostText(opNo, comment)}
+        { image && image.location ? <Image fullScreen={fullScreen} onClick={() => openPostImage()} src={image.location}/> : null }
+        </ContentRoot>
       </PostBody>
     </PostRoot>
   )
@@ -169,7 +189,7 @@ const PostBody = styled.div`
   justify-content: column;
   flex-direction: flex-start;
   flex-flow: wrap;
-  gap: 2rem;
+  gap: 1rem;
   width: calc(100% - 1px - 1rem);
 `;
 
@@ -203,20 +223,20 @@ const TextContainer = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-`
+  width: 100%;
+  gap:0.5rem;
+`;
+
 const UserInfo = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
   gap: 20px;
-  margin-bottom: 10px;
   width: 100%;
 `;
 
 const ReplyUserInfo = styled(UserInfo)`
-  justify-content: space-between;
-  width: fit-content;
 `;
 
 const Image = styled.img`
@@ -236,11 +256,28 @@ const CenteredImage = styled(Image)`
   margin: 0 auto;
 `;
 
+const ModalImage = styled(CenteredImage)`
+  max-width: 50vw;
+  max-height: 50vh;
+
+  @media all and (min-width: 1024px) and (max-width: 1280px) { 
+    max-width: 50vw;
+  }
+
+  @media all and (min-width: 768px) and (max-width: 1024px) { }
+
+  @media all and (min-width: 480px) and (max-width: 768px) { }
+
+  @media all and (max-width: 480px) { 
+    width: 100vw;
+    max-width: 100vw; 
+  }
+`
+
 const IconText = styled.p`
-  // color: ${props => chroma(props.theme.colors.grey).darken().hex()};
-  text-align: center;
   font-size: 1.25rem;
-  padding: 0;
+  padding-bottom 8px;
+  align-self: center;
   margin: 0;
 `;
 
@@ -251,7 +288,7 @@ const ContentRoot = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 2rem;
+  gap: 1rem;
 `;
 
 const OriginalContentRoot = styled(ContentRoot)`
@@ -281,7 +318,6 @@ const PostLink = styled(Link)`
   text-decoration: none;
   font-weight: 500; 
   font-size: 1rem;
-  line-height: 1.5rem;
   color: ${props => props.theme.colors.black};
   font-family: 'Open Sans', sans-serif;
   padding: 0;
@@ -308,5 +344,14 @@ const ThreadLink = styled(Link)`
 
 const FalseBorder = styled.div`
   width: 1px;
-  background-color: ${props => chroma(props.theme.colors.grey).darken().hex()};
+  background-color: ${props => chroma(props.theme.colors.grey).brighten(0.5).hex()};
 `;
+
+const InfoContent = styled.div`
+  height: 80%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-direction: row;
+  width: 100%;
+`

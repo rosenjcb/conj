@@ -179,7 +179,7 @@ const BoardDrawer = (props) => {
       </TitleContainer>
       <BoardList>
         <BoardRow><BoardIcon/><BarChartIcon/></BoardRow>
-        {boards != null ? boards.map(b => <HighlightBoardRow selected={b === board}><BoardItem onClick={() => handleClick(b)}>/{b}/</BoardItem><Text size={"large"} align="right" color={"black"} bold>10+</Text></HighlightBoardRow>) : <Text bold size={"large"}>No Boards Found</Text>}
+        {boards != null ? boards.map(b => <HighlightBoardRow onClick={() => handleClick(b)} selected={b === board}><BoardItem>/{b}/</BoardItem><Text size={"medium"} align="right" color={"black"} bold>10+</Text></HighlightBoardRow>) : <Text bold size={"medium"}>No Boards Found</Text>}
       </BoardList>
       <SearchForm onSubmit={handleSubmit}>
         <Input type="text"/>
@@ -246,7 +246,6 @@ const BoardList = styled.ul`
   margin: 0;
   padding-left: 10px;
   padding-right: 10px;
-  padding-bottom: 3em;
 `;
 
 const BoardRow = styled.div`
@@ -266,9 +265,10 @@ const HighlightBoardRow = styled(BoardRow)`
     background-color: ${props => chroma(props.theme.colors.primary).brighten(2.5).hex()};
     cursor: pointer;
   }
+  min-width: 250px;
 `;
 
-const BoardItem = styled(Header).attrs(props => ({bold: true}))`
+const BoardItem = styled(Text).attrs(props => ({bold: true}))`
   color: ${props => props.theme.colors.black};
   border-radius: 12px; 
   padding: 8px;
@@ -280,7 +280,7 @@ const BoardDrawerRoot = styled.div`
   justify-content: flex-start;
   flex-direction: column;
   gap: 2rem;
-  min-width: 300px;
+  width: 25%;
   height: fit-content;
   border-radius: 8px;
   margin-right: 1rem;
@@ -314,7 +314,8 @@ const HomeNavBar = styled.div`
   background-color: ${props => props.theme.colors.white};
   align-items: center;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  height: 5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 
   @media all and (min-width: 1024px) {
     width: 60%;
