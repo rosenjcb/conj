@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 export const processPostText = (opNo, text) => {
-  if(text === null || text === undefined) return text;
+  if(text === null || text === undefined || text === "") return text;
 
   const textTrimmed = text.trim();
 
@@ -47,4 +47,4 @@ const GreenText = styled.span`
 
 const PostLink = styled.a`
   color: ${props => props.theme.colors.white};
-`
+`;

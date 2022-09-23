@@ -41,7 +41,7 @@ const sizeCompute = (tag, size) => {
     case "p":
       break;
     case "h1":
-      multiplier = 2;
+      multiplier = 1.5;
       break;
   };
   switch(size) {
@@ -77,6 +77,7 @@ export const Text = styled.p`
   width: 100%;
   padding: 0;
   margin: 0;
+  overflow-wrap: ${props => props.noOverflow ? 'initial' : 'break-word'};
 `;
 
 export const Header = styled.h1`
@@ -140,11 +141,11 @@ const ExistingAvatar = styled.img`
   }
 `;
 
-export const Avatar = ({avatar}) => {
+export const Avatar = ({avatar, onClick}) => {
   if(avatar) {
-    return <ExistingAvatar src={avatar}/>
+    return <ExistingAvatar onClick={onClick} src={avatar}/>
   } else {
-    return <AnonymousAvatar/>
+    return <AnonymousAvatar onClick={onClick}/>
   }
 }
 
@@ -167,7 +168,7 @@ export const Checkbox = ({label, onClick, checked, disabled}) => {
   return(
     <CheckBoxContainer>
       <StyledCheckbox disabled={disabled} checked={checked} onClick={onClick}/>
-      {label ? <Text bold size="medium">{label}</Text> : null }
+      {label ? <Text bold noOverflow size="medium">{label}</Text> : null }
     </CheckBoxContainer>
   )
 }

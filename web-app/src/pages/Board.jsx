@@ -64,7 +64,7 @@ const ThreadPreviewRoot = styled.div`
   flex-direction: column;
   height: calc(100vh - 96px);
   width: 100%;
-  gap: 5rem;
+  gap: 0.5rem;
   margin: 0 auto;
 `;
 
