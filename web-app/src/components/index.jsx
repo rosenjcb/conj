@@ -77,7 +77,7 @@ export const Text = styled.p`
   width: 100%;
   padding: 0;
   margin: 0;
-  word-break: break-word;
+  overflow-wrap: ${props => props.noOverflow ? 'initial' : 'break-word'};
 `;
 
 export const Header = styled.h1`
@@ -168,7 +168,7 @@ export const Checkbox = ({label, onClick, checked, disabled}) => {
   return(
     <CheckBoxContainer>
       <StyledCheckbox disabled={disabled} checked={checked} onClick={onClick}/>
-      {label ? <Text bold size="medium">{label}</Text> : null }
+      {label ? <Text bold noOverflow size="medium">{label}</Text> : null }
     </CheckBoxContainer>
   )
 }
