@@ -17,6 +17,7 @@ import { GoGear } from 'react-icons/go';
 import {useComponentVisible} from '../hooks/useComponentVisible';
 import { AccountSettings } from './AccountSettings';
 import { Login } from './Login';
+import { useMeQuery, meApi } from '../api/account';
 
 const customStyle = {
   overlay: {
@@ -38,18 +39,26 @@ const customStyle = {
 
 export const WithNavBar = ({component}) => {
 
-  const [me, setMe] = useState(null);
+  //const [me, setMe] = useState(null);
   const [boards, setBoards] = useState([]);
 
+  
+
+  // const { data, error, isLoading } = useMe();
+
+  const me = null;
+
   useEffect(() => {
-    async function getAuth() {
-      try { 
-        const res = await callMe();
-        setMe(res);
-      } catch(e) {
-        setMe(null);
-      }
-    }
+    console.log(meApi);
+    console.log(useMeQuery)
+    // async function getAuth() {
+    //   try { 
+    //     const res = await callMe();
+    //     setMe(res);
+    //   } catch(e) {
+    //     setMe(null);
+    //   }
+    // }
     async function getBoards() {
       try {
         const res = await fetchBoards();
@@ -58,7 +67,7 @@ export const WithNavBar = ({component}) => {
         setBoards(null);
       }
     }
-    getAuth();
+    // getAuth();
     getBoards();
   },[]);
 

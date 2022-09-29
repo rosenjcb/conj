@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/dist/query';
 
 export const me = () => axios.get('/api/me');
 
@@ -21,3 +22,16 @@ export const updateMe = (me) => {
   }
   return axios.put('/api/me', formData);
 }
+
+export const meApi = createApi({
+  reducerPath: 'meApi',
+  baseQuery: fetchBaseQuery({baseUrl:'/api/'}),
+  endpoints: (builder) => ({
+    me: builder.query({
+      query: () => 'me'
+    })
+  })
+})
+
+export const { useMeQuery } = meApi;
+
