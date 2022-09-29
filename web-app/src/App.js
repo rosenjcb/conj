@@ -32,7 +32,7 @@ function App() {
     <ThemeProvider theme={theme}>    
       <AppRoot>
         <Helmet>
-          <title>/b/ - Random</title>
+          <title>Conj - A Social Media Reboot</title>
         </Helmet>
         <Router forceRefresh>
           <Switch>
