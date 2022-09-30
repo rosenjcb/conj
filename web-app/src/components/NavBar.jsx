@@ -39,26 +39,13 @@ const customStyle = {
 
 export const WithNavBar = ({component}) => {
 
-  //const [me, setMe] = useState(null);
   const [boards, setBoards] = useState([]);
-
   
 
-  // const { data, error, isLoading } = useMe();
-
-  const me = null;
+  const { data, error, isLoading } = useMeQuery();
+  const me = data;
 
   useEffect(() => {
-    console.log(meApi);
-    console.log(useMeQuery)
-    // async function getAuth() {
-    //   try { 
-    //     const res = await callMe();
-    //     setMe(res);
-    //   } catch(e) {
-    //     setMe(null);
-    //   }
-    // }
     async function getBoards() {
       try {
         const res = await fetchBoards();
@@ -242,7 +229,7 @@ const Input = styled.input`
 const Content = styled.div`
   display: flex;
   justify-content: flex-start;
-  flex-direction column;
+  flex-direction: column;
   background-color: ${props => props.theme.colors.grey};
 `;
 
