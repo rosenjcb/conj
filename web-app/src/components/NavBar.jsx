@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { me as callMe, logout } from '../api/account'
+import { me as callMe, logout, useLogoutMutation } from '../api/account'
 import { fetchBoards } from '../api/board';
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
@@ -18,6 +18,7 @@ import {useComponentVisible} from '../hooks/useComponentVisible';
 import { AccountSettings } from './AccountSettings';
 import { Login } from './Login';
 import { useMeQuery, meApi } from '../api/account';
+import toast, { Toaster } from 'react-hot-toast';
 
 const customStyle = {
   overlay: {
@@ -40,12 +41,18 @@ const customStyle = {
 export const WithNavBar = ({component}) => {
 
   const [boards, setBoards] = useState([]);
-  
+  const [logout, logoutResult] = useLogoutMutation();
+
+  const handleLogout = () => {
+    logout();
+    window.location.reload();
+  }
 
   const { data, error, isLoading } = useMeQuery();
   const me = data;
 
   useEffect(() => {
+    console.log(me);
     async function getBoards() {
       try {
         const res = await fetchBoards();
@@ -61,11 +68,6 @@ export const WithNavBar = ({component}) => {
   const history = useHistory();
 
   const isMobile = detectMobile();
-
-  const handleLogout = async() => {
-    await logout();
-    window.location.reload();
-  }
 
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -85,8 +87,6 @@ export const WithNavBar = ({component}) => {
     history.push("/");
   }
 
-  const [popUp, setPopUp] = useState(false);
-
   const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
 
   const toggleVisible = () => {
@@ -99,14 +99,11 @@ export const WithNavBar = ({component}) => {
 
   const openAccount = () => setAccountIsOpen(true);
 
-
-
   const [loginOpen, setLoginOpen] = useState(false)
 
   const closeLogin = () => setLoginOpen(false);
 
   const openLogin = () => setLoginOpen(true);
-
 
   const customStyle = {
     overlay: {
@@ -127,6 +124,16 @@ export const WithNavBar = ({component}) => {
     },
   };
 
+  // if(error) {
+  //   toast.error(error.data);
+  // }
+
+  if(isLoading) {
+    return (
+      <div/>
+    )
+  }
+
   return (
     <BoardRoot>
       <ReactModal style={customStyle} isOpen={accountIsOpen} onRequestClose={closeAccount}><AccountSettings/></ReactModal>
@@ -137,9 +144,9 @@ export const WithNavBar = ({component}) => {
         <IconContainer>
           <SettingsIcon onClick={toggleVisible}/>
           <SettingsContent visible={isComponentVisible} ref={ref}>
-              {me === null ? <Link onClick={openLogin}><SettingText align="center">Login</SettingText></Link> : null}
-              {me !== null ? <Link onClick={handleLogout}><SettingText align="center">Logout</SettingText></Link> : null}
-              {me !== null ? <Link onClick={openAccount}><SettingText align="center">Account</SettingText></Link> : null}
+              {me === undefined ? <Link onClick={openLogin}><SettingText align="center">Login</SettingText></Link> : null}
+              {me !== undefined ? <Link onClick={handleLogout}><SettingText align="center">Logout</SettingText></Link> : null}
+              {me !== undefined ? <Link onClick={openAccount}><SettingText align="center">Account</SettingText></Link> : null}
             </SettingsContent>
         </IconContainer>
       </HomeNavBar>

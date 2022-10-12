@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
 import { useThread } from '../hooks/useThread';
 import { Login } from './Login';
-import { me as callMe } from '../api/account'
+import { me as callMe, useMeQuery } from '../api/account'
 import ReactModal from 'react-modal';
 
 
@@ -73,19 +73,7 @@ export const Reply = (props) => {
     };
   }
 
-  const [me, setMe] = useState({});
-
-  useEffect(() => {
-    async function setAuth() {
-        try { 
-          const res = await callMe();
-          setMe(res);
-        } catch(e) {
-          setMe(null);
-        }
-      }
-    setAuth();
-  },[]);
+  const { data: me, error, isLoading } = useMeQuery();
 
   const [check, setChecked] = useState(post.is_anonymous);
 
@@ -107,7 +95,7 @@ export const Reply = (props) => {
     dispatch(updateEntry({key: 'is_anonymous', value: !check}));
   }
 
-  if(me === {}) {
+  if(isLoading) {
     return(
       <div/>
     )

@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Formik, Field} from 'formik';
-import { login, signup } from '../api/account';
+import { login, signup, useLoginMutation } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { parseError } from '../util/error';
 import chroma from 'chroma-js';
 import { Link, Header, RoundButton, Back, InputField } from './index';
 import toast from 'react-hot-toast';
-
-
-
 
 function SignUp({onClick}) {
 
@@ -63,16 +60,32 @@ export function Login() {
     setSignUp(true);
   }
 
+  const[login, loginresult] = useLoginMutation();
+
   const handleLogin = async(values, actions) => {
-    try {
-      actions.setSubmitting(false);
-      await login(values);
-      history.push('/')
-      history.go();
-    } catch(e) {
-      toast.error(parseError(e));
-    }
+    await login(values);
   }
+
+  useEffect(() => {
+    if(loginresult.isSuccess) {
+      history.push('/');
+      history.go();
+    } else {
+      console.log(loginresult);
+      console.log('still not done yet')
+    } 
+  },[loginresult]);
+
+  // const handleLogin = async(values, actions) => {
+  //   try {
+  //     actions.setSubmitting(false);
+  //     await login(values);
+  //     history.push('/')
+  //     history.go();
+  //   } catch(e) {
+  //     toast.error(parseError(e));
+  //   }
+  // }
 
   if(signUp) {
     return <SignUp onClick={() => setSignUp(false)}/>

@@ -28,10 +28,27 @@ export const meApi = createApi({
   baseQuery: fetchBaseQuery({baseUrl:'/api/'}),
   endpoints: (builder) => ({
     me: builder.query({
-      query: () => 'me'
+      query: () => ({
+        method: 'GET',
+        url: 'me'
+      })
+    }),
+    logout: builder.mutation({
+      query: () => ({
+        method: 'GET',
+        url: 'logout'
+      })
+    }),
+    login: builder.mutation({
+      query: (body) => ({
+        method: 'POST',
+        body: body,
+        url: 'authenticate'
+      })
     })
+
   })
 })
 
-export const { useMeQuery } = meApi;
+export const { useMeQuery, useLogoutMutation, useLoginMutation } = meApi;
 
