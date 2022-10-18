@@ -1,25 +1,30 @@
 import { Form, Formik, Field } from 'formik';
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
-import { updateMe } from '../api/account';
+import { updateMe, useMeQuery } from '../api/account';
 import { RoundButton, Text } from '../components';
 import { parseError } from '../util/error';
 import toast from 'react-hot-toast';
-import { me as callMe } from '../api/account';
 
 export const ProfilePage = () => {
 
-    const [me, setMe] = useState({});
+    //const [me, setMe] = useState({});
 
-    useEffect(async() => {
-        try{
-            const response = await callMe();
-            setMe(response.data);
-        } catch(e) {
-            setMe(null);
-            toast.error(parseError(e));
-        }
-    },[])
+    const { data: me , isLoading, error } = useMeQuery();
+
+    // useEffect(async() => {
+    //     try{
+    //         const response = await callMe();
+    //         setMe(response.data);
+    //     } catch(e) {
+    //         setMe(null);
+    //         toast.error(parseError(e));
+    //     }
+    // },[])
+
+    if(error) {
+        toast.error(parseError(error));
+    }
 
     const handleUpdate = async(values, actions) => {
         try{
@@ -30,7 +35,7 @@ export const ProfilePage = () => {
         }
     }
 
-    if(me === null) {
+    if(isLoading) {
         return (
             <div>loading</div>
         )

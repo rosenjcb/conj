@@ -48,8 +48,9 @@ export const WithNavBar = ({component}) => {
     window.location.reload();
   }
 
-  const { data, error, isLoading } = useMeQuery();
-  const me = data;
+  const { data: me, error, isLoading } = useMeQuery();
+  //const me = null;
+  //const isLoading = false;
 
   useEffect(() => {
     console.log(me);
@@ -144,9 +145,9 @@ export const WithNavBar = ({component}) => {
         <IconContainer>
           <SettingsIcon onClick={toggleVisible}/>
           <SettingsContent visible={isComponentVisible} ref={ref}>
-              {me === undefined ? <Link onClick={openLogin}><SettingText align="center">Login</SettingText></Link> : null}
-              {me !== undefined ? <Link onClick={handleLogout}><SettingText align="center">Logout</SettingText></Link> : null}
-              {me !== undefined ? <Link onClick={openAccount}><SettingText align="center">Account</SettingText></Link> : null}
+              {me === null ? <Link onClick={openLogin}><SettingText align="center">Login</SettingText></Link> : null}
+              {me !== null ? <Link onClick={handleLogout}><SettingText align="center">Logout</SettingText></Link> : null}
+              {me !== null? <Link onClick={openAccount}><SettingText align="center">Account</SettingText></Link> : null}
             </SettingsContent>
         </IconContainer>
       </HomeNavBar>

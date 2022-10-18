@@ -75,6 +75,8 @@ export const Reply = (props) => {
 
   const { data: me, error, isLoading } = useMeQuery();
 
+  //const me = null;
+  //const isLoading = false;
   const [check, setChecked] = useState(post.is_anonymous);
 
   const handleClick = () => {

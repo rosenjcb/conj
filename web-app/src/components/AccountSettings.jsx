@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { Formik, Field } from 'formik';
 import { Header, RoundButton, Back, InputField, AnonymousAvatar, InputFile } from './index';
-import { signup, updateMe, me as callMe } from '../api/account';
+import { signup, updateMe, me as callMe, useMeQuery } from '../api/account';
 import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
 import chroma from 'chroma-js';
@@ -12,20 +12,26 @@ export function AccountSettings() {
 
     const history = useHistory();
   
-    const [me, setMe] = useState(null)
+    //const [me, setMe] = useState(null)
 
-    useEffect(() => {
-        async function getAuth() {
-            try { 
-                const res = await callMe();
-                setMe(res.data);
-            } catch(e) {
-                setMe(null);
-                toast.error(parseError(e));
-            }
-        }
-        getAuth();
-    },[])
+    const { data: me, isLoading, error } = useMeQuery();
+
+    // useEffect(() => {
+    //     async function getAuth() {
+    //         try { 
+    //             const res = await callMe();
+    //             setMe(res.data);
+    //         } catch(e) {
+    //             setMe(null);
+    //             toast.error(parseError(e));
+    //         }
+    //     }
+    //     getAuth();
+    // },[])
+
+    if(error) {
+      toast.error(parseError(error));
+    }
 
     const handleSignup = async(values) => {
       try {
