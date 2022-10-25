@@ -1,26 +1,16 @@
 import { Form, Formik, Field } from 'formik';
 import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
-import { updateMe, useMeQuery } from '../api/account';
+import { useUpdateMeMutation, useMeQuery } from '../api/account';
 import { RoundButton, Text } from '../components';
 import { parseError } from '../util/error';
 import toast from 'react-hot-toast';
 
 export const ProfilePage = () => {
 
-    //const [me, setMe] = useState({});
-
     const { data: me , isLoading, error } = useMeQuery();
 
-    // useEffect(async() => {
-    //     try{
-    //         const response = await callMe();
-    //         setMe(response.data);
-    //     } catch(e) {
-    //         setMe(null);
-    //         toast.error(parseError(e));
-    //     }
-    // },[])
+    const [updateMe] = useUpdateMeMutation();
 
     if(error) {
         toast.error(parseError(error));
@@ -29,7 +19,11 @@ export const ProfilePage = () => {
     const handleUpdate = async(values, actions) => {
         try{
             actions.setSubmitting(false);
-            await updateMe(values);
+            var formData = new FormData();
+            for(var key in values) {
+              formData.append(key, values[key]);
+            }
+            await updateMe(formData).unwrap();
         } catch(e) {
           toast.error(parseError(e));
         }

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { Formik, Field } from 'formik';
-import { Header, RoundButton, Back, InputField, AnonymousAvatar, InputFile } from './index';
-import { signup, updateMe, me as callMe, useMeQuery } from '../api/account';
+import { Header, RoundButton, InputField, AnonymousAvatar, InputFile } from './index';
+import { useMeQuery, useUpdateMeMutation } from '../api/account';
 import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
 import chroma from 'chroma-js';
@@ -11,37 +11,29 @@ import chroma from 'chroma-js';
 export function AccountSettings() {
 
     const history = useHistory();
-  
-    //const [me, setMe] = useState(null)
 
-    const { data: me, isLoading, error } = useMeQuery();
+    const [updateMe] = useUpdateMeMutation();
 
-    // useEffect(() => {
-    //     async function getAuth() {
-    //         try { 
-    //             const res = await callMe();
-    //             setMe(res.data);
-    //         } catch(e) {
-    //             setMe(null);
-    //             toast.error(parseError(e));
-    //         }
-    //     }
-    //     getAuth();
-    // },[])
+    const { data: me, error } = useMeQuery();
 
     if(error) {
       toast.error(parseError(error));
     }
 
-    const handleSignup = async(values) => {
-      try {
-        await updateMe(values);
-        history.push('/');
-        history.go();
+    const handleUpdate = async(values, actions) => {
+      try{
+          actions.setSubmitting(false);
+          var formData = new FormData();
+          for(var key in values) {
+            formData.append(key, values[key]);
+          }
+          await updateMe(formData).unwrap();
+          history.push('/');
+          history.go();
       } catch(e) {
         toast.error(parseError(e));
       }
-    }
+  }
   
     return (
       <Root>
@@ -51,7 +43,7 @@ export function AccountSettings() {
             username: null,
             avatar: null
           }}
-          onSubmit={handleSignup}
+          onSubmit={handleUpdate}
         >
           {(props) => (
             <StyledForm onSubmit={props.handleSubmit}>

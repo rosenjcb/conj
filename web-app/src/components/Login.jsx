@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Formik, Field} from 'formik';
-import { login, signup, useLoginMutation } from '../api/account';
+import { useLoginMutation, useSignupMutation } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { parseError } from '../util/error';
 import chroma from 'chroma-js';
@@ -12,9 +12,15 @@ function SignUp({onClick}) {
 
   const history = useHistory();
 
+  const [signUp] = useSignupMutation();
+
   const handleSignup = async(values) => {
+    var formData = new FormData();
+    for(var key in values) {
+      formData.append(key, values[key]);
+    }
     try {
-      await signup(values);
+      await signUp(formData).unwrap();
       history.push('/');
       history.go();
     } catch(e) {
@@ -75,17 +81,6 @@ export function Login() {
       console.log('still not done yet')
     } 
   },[loginresult]);
-
-  // const handleLogin = async(values, actions) => {
-  //   try {
-  //     actions.setSubmitting(false);
-  //     await login(values);
-  //     history.push('/')
-  //     history.go();
-  //   } catch(e) {
-  //     toast.error(parseError(e));
-  //   }
-  // }
 
   if(signUp) {
     return <SignUp onClick={() => setSignUp(false)}/>

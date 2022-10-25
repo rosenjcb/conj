@@ -1,26 +1,4 @@
-import axios from 'axios';
-import { retry, createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import toast from 'react-hot-toast';
-
-// export const login = (accountDetails) => {
-//   return axios.post('/api/authenticate', accountDetails);
-// };
-
-export const logout = () => {
-  return axios.get('/api/logout');
-};
-
-export const signup = (accountDetails) => {
-  return axios.post('/api/accounts', accountDetails);
-};
-
-export const updateMe = (me) => {
-  var formData = new FormData();
-  for (let [key, val] of Object.entries(me)) {
-    if(val !== null) formData.append(key, val);
-  }
-  return axios.put('/api/me', formData);
-}
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const fetchBaseQueryDefault = (queryOptions) => {
   const baseQuery = fetchBaseQuery(queryOptions);
@@ -29,7 +7,6 @@ const fetchBaseQueryDefault = (queryOptions) => {
     const result = await baseQuery(args, api, extraOptions);
     const isMeQuery = args.url === "me" && args.method === "GET";
     if(result.error && isMeQuery) {
-      //toast.error('Whoops :)');
       delete result.error;
       return {...result, data: null};
     } else {
@@ -64,9 +41,22 @@ export const meApi = createApi({
         url: 'authenticate'
       }),
       invalidatesTags: ['Me']
+    }),
+    signup: builder.mutation({
+      query: (body) => ({
+        method: 'POST',
+        body: body,
+        url: 'accounts'
+      })
+    }),
+    updateMe: builder.mutation({
+      query: (body) => ({
+        method: 'PUT',
+        body: body,
+        url: 'me'
+      })
     })
   })
 })
 
-export const { useMeQuery, useLogoutMutation, useLoginMutation } = meApi;
-
+export const { useMeQuery, useLogoutMutation, useLoginMutation, useSignupMutation, useUpdateMeMutation } = meApi;
