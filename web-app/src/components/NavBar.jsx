@@ -152,7 +152,7 @@ export const WithNavBar = ({component}) => {
         </IconContainer>
       </HomeNavBar>
       <Page>
-        { !isMobile ? <BoardDrawer boards={boards}/> : <ReactModal style={customStyle} isOpen={drawerOpen} onRequestClose={closeDrawer}><BoardDrawer boards={boards}/></ReactModal>}
+        { !isMobile ? <BoardDrawer boards={boards}/> : <ReactModal style={customStyle} isOpen={drawerOpen} onRequestClose={closeDrawer}><BoardDrawer fill={true} boards={boards}/></ReactModal>}
         {component}
       </Page>
     </BoardRoot>
@@ -161,7 +161,7 @@ export const WithNavBar = ({component}) => {
 
 const BoardDrawer = (props) => {
 
-  const { boards } = props; 
+  const { boards, fill } = props; 
 
   const history = useHistory();
 
@@ -177,7 +177,7 @@ const BoardDrawer = (props) => {
   }
 
   return(
-    <BoardDrawerRoot>
+    <BoardDrawerRoot fill={fill}>
       <TitleContainer>
         <Header bold>Most Popular Boards</Header>
       </TitleContainer>
@@ -234,13 +234,6 @@ const Input = styled.input`
   padding: 0;
 `;
 
-const Content = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
-  background-color: ${props => props.theme.colors.grey};
-`;
-
 const BoardList = styled.ul`
   display: flex;
   justify-content: flex-start;
@@ -258,8 +251,8 @@ const BoardRow = styled.div`
   width: 100%;
   align-items: center;
   flex-direction: row;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
   border-radius: 9000px;
 `;
 
@@ -283,11 +276,30 @@ const BoardDrawerRoot = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
+  background-color: ${props => props.fill ? props.theme.colors.white : 'inherit'};
   gap: 2rem;
-  width: 25%;
+  width: auto;
   height: fit-content;
   border-radius: 8px;
-  margin-right: 1rem;
+
+  @media all and (min-width: 1024px) and (max-width: 1280px) { 
+    width: auto; 
+  }
+  
+  @media all and (min-width: 768px) and (max-width: 1024px) { 
+    width: auto;
+  }
+  
+  @media all and (min-width: 480px) and (max-width: 768px) { 
+    width: auto;
+  }
+  
+  @media all and (max-width: 480px) { 
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border-radius: 0px;
+  }
 `;
 
 const BoardRoot = styled.div`
@@ -306,7 +318,7 @@ const TitleContainer = styled.div`
   justify-content: center;
   flex-direction: column;
   text-align: center;
-`
+`;
 
 const HomeNavBar = styled.div`
   display: flex;

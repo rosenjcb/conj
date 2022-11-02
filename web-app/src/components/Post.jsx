@@ -95,7 +95,7 @@ export const Post = (props) => {
 
   const handleClick = (e) => {
       e.preventDefault();
-      dispatch(insertPostLink(opNo));
+      dispatch(insertPostLink(id));
   }
 
   const prefix = preview ? '/thread/' : ''
