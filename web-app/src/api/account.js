@@ -1,17 +1,15 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 
 const fetchBaseQueryDefault = (queryOptions) => {
   const baseQuery = fetchBaseQuery(queryOptions);
   return async(args, api, extraOptions) => {
-    console.log(args);
     const result = await baseQuery(args, api, extraOptions);
     const isMeQuery = args.url === "me" && args.method === "GET";
     if(result.error && isMeQuery) {
       delete result.error;
       return {...result, data: null};
-    } else {
-      return result;
-    }
+    } 
+    return result;
   }
 }
 

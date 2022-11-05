@@ -1,3 +1,17 @@
-import axios from 'axios';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-export const fetchBoards = () => axios.get('/api/boards');
+export const boardsApi = createApi({
+  reducerPath: 'boardsApi',
+  baseQuery: fetchBaseQuery({baseUrl: '/api/boards'}),
+  tagTypes: ['Boards'],
+  endpoints: (builder) => ({
+    fetchBoards: builder.query({
+      query: () => ({
+          method: 'GET',
+          url: ''
+      })
+    }) 
+  })
+})
+
+export const { useFetchBoardsQuery } = boardsApi;

@@ -1,15 +1,14 @@
-import React, { useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { me as callMe, logout, useLogoutMutation } from '../api/account'
-import { fetchBoards } from '../api/board';
+import { useLogoutMutation } from '../api/account'
+import { useFetchBoardsQuery } from '../api/board';
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
 import {RiDiscussFill} from 'react-icons/ri';
 import { BsFillBarChartFill } from 'react-icons/bs';
 import { Text } from './index';
 import { useThread } from '../hooks/useThread';
-import { SquareButton } from './index';
 import { detectMobile } from '../util/window';
 import ReactModal from 'react-modal';
 import { Header } from './index';
@@ -17,8 +16,8 @@ import { GoGear } from 'react-icons/go';
 import {useComponentVisible} from '../hooks/useComponentVisible';
 import { AccountSettings } from './AccountSettings';
 import { Login } from './Login';
-import { useMeQuery, meApi } from '../api/account';
-import toast, { Toaster } from 'react-hot-toast';
+import { useMeQuery } from '../api/account';
+import toast from 'react-hot-toast';
 
 const customStyle = {
   overlay: {
@@ -40,41 +39,25 @@ const customStyle = {
 
 export const WithNavBar = ({component}) => {
 
-  const [boards, setBoards] = useState([]);
-  const [logout, logoutResult] = useLogoutMutation();
+  const [logout, _] = useLogoutMutation();
 
-  const handleLogout = () => {
-    logout();
-    window.location.reload();
+  const handleLogout = async() => {
+    try {
+      await logout().unwrap();
+    } catch (e) {
+      toast.error(e.data);
+    }
   }
 
   const { data: me, error, isLoading } = useMeQuery();
-  //const me = null;
-  //const isLoading = false;
 
-  useEffect(() => {
-    console.log(me);
-    async function getBoards() {
-      try {
-        const res = await fetchBoards();
-        setBoards(res.data);
-      } catch (e) {
-        setBoards(null);
-      }
-    }
-    // getAuth();
-    getBoards();
-  },[]);
+  const { data: boards, error: boardsError, isLoading: boardsIsLoading } = useFetchBoardsQuery();
 
   const history = useHistory();
 
   const isMobile = detectMobile();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // const toggleDrawer = () => {
-  //   setDrawerOpen(!drawerOpen);
-  // }
 
   const openDrawer = () => {
     setDrawerOpen(true);
@@ -124,10 +107,6 @@ export const WithNavBar = ({component}) => {
       background: 'none'
     },
   };
-
-  // if(error) {
-  //   toast.error(error.data);
-  // }
 
   if(isLoading) {
     return (

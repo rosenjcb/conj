@@ -3,16 +3,15 @@ import styled from 'styled-components';
 import { Formik, Field} from 'formik';
 import { useLoginMutation, useSignupMutation } from '../api/account';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { parseError } from '../util/error';
 import chroma from 'chroma-js';
-import { Link, Header, RoundButton, Back, InputField } from './index';
+import { Header, RoundButton, Back, InputField } from './index';
 import toast from 'react-hot-toast';
 
 function SignUp({onClick}) {
 
   const history = useHistory();
 
-  const [signUp] = useSignupMutation();
+  const [signUp, _] = useSignupMutation();
 
   const handleSignup = async(values) => {
     var formData = new FormData();
@@ -23,8 +22,9 @@ function SignUp({onClick}) {
       await signUp(formData).unwrap();
       history.push('/');
       history.go();
-    } catch(e) {
-      toast.error(parseError(e));
+    } catch (e) {
+      if(e.data) toast.error(e.data);
+      console.log(e);
     }
   }
 
@@ -66,21 +66,20 @@ export function Login() {
     setSignUp(true);
   }
 
-  const[login, loginresult] = useLoginMutation();
+  const[login, loginResult] = useLoginMutation();
 
   const handleLogin = async(values, actions) => {
     await login(values);
   }
 
   useEffect(() => {
-    if(loginresult.isSuccess) {
+    if(loginResult.isSuccess) {
       history.push('/');
       history.go();
-    } else {
-      console.log(loginresult);
-      console.log('still not done yet')
+    } else if(loginResult.error) {
+      toast.error(loginResult.error.data);
     } 
-  },[loginresult]);
+  },[loginResult]);
 
   if(signUp) {
     return <SignUp onClick={() => setSignUp(false)}/>

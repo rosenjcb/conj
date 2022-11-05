@@ -6,15 +6,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost } from '../slices/postSlice';
 import { updateThread } from '../slices/threadSlice';
-import { upsertThread } from '../api/thread';
-import chroma from 'chroma-js';
+import { useCreateThreadMutation, useUpdateThreadMutation } from '../api/thread';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';
 import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
 import { useThread } from '../hooks/useThread';
 import { Login } from './Login';
-import { me as callMe, useMeQuery } from '../api/account'
+import { useMeQuery } from '../api/account'
 import ReactModal from 'react-modal';
 
 
@@ -43,6 +42,11 @@ export const Reply = (props) => {
 
   const post = useSelector(state => state.post);
   const thread = useSelector(state => state.thread);
+
+  const {board, threadNo } = useThread();
+
+  const [updateThread, updateThreadResult] = useUpdateThreadMutation(board, threadNo, post);
+  const [createThread, createThreadResult] = useCreateThreadMutation(board, post);
   
   const dispatch = useDispatch();
 
@@ -51,22 +55,25 @@ export const Reply = (props) => {
     dispatch(updateEntry({key: key, value: e.target.value}));
   }
 
-  const {board, threadNo } = useThread();
-
   const history = useHistory();
 
   const submitPost = async(values, actions) => {
     try {
-      const res = await upsertThread(board, threadNo, post);
-      const updatedThread = res.data;
+      if(threadNo !== null) {
+        updateThread();
+      } else {
+        createThread();
+      }
+
+      const res = updateThreadResult ?? createThreadResult;
+      
       dispatch(resetPost());
       if(threadNo === null) {
-        const op = updatedThread[0];
-        const newPost = updatedThread[updatedThread.length - 1];
-        // dispatch(swapThread(updatedThread));
+        const op = res[0];
+        const newPost = res[res.length - 1];
         history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
       } else {
-        dispatch(updateThread(updatedThread));
+        dispatch(updateThread(res));
       }
     } catch(e) {
       toast.error(parseError(e));

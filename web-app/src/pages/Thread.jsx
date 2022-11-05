@@ -4,11 +4,9 @@ import { Thread } from '../components/Thread';
 import { useParams } from 'react-router'
 import { swapThread } from '../slices/threadSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import chroma from 'chroma-js';
 import toast from 'react-hot-toast';
-import { parseError } from '../util/error';
 import { useThread } from '../hooks/useThread';
-import { fetchThread } from '../api/thread';
+import { useFetchThreadQuery } from '../api/thread';
 
 export function ThreadPage() {
 
@@ -16,7 +14,7 @@ export function ThreadPage() {
 
   const dispatch = useDispatch();
 
-  const { id } = useParams();
+  // const { id } = useParams();
 
   const {board, threadNo, replyNo} = useThread();
 
@@ -24,23 +22,22 @@ export function ThreadPage() {
 
   const replyIndex = replyNo && current ? current.findIndex((p) => p.id === replyNo) : -1;
 
+  const {data, isSuccess, error } = useFetchThreadQuery(board, threadNo);
+
   useEffect(() => {
     if(replyIndex && threadRef.current[replyIndex]) {
       threadRef.current[replyIndex].scrollIntoView();
     }
   },[replyIndex])
 
-  useEffect(async() => {
-    try {
-      const res = await fetchThread(board, threadNo);
-      if(res.data === "") {
-        window.location="/";
-      }
-      dispatch(swapThread(res.data));
-    } catch(e) {
-      toast.error(parseError(e));
-    }
-  },[id, dispatch]);
+  useEffect(() => {
+    console.log('hello world')
+    if(isSuccess) {
+      dispatch(swapThread(data));
+    } else if (error) {
+      toast.error(error.data);
+    };
+  },[data, dispatch]);
 
   useEffect(() => {
     const lastPostRef = threadRef.current[current.length - 1];
