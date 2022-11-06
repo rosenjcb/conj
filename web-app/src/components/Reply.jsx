@@ -15,6 +15,7 @@ import { useThread } from '../hooks/useThread';
 import { Login } from './Login';
 import { useMeQuery } from '../api/account'
 import ReactModal from 'react-modal';
+import _ from 'lodash';
 
 
 const customStyle = {
@@ -41,13 +42,13 @@ export const Reply = (props) => {
   const { className, isNewThread } = props;
 
   const post = useSelector(state => state.post);
-  const thread = useSelector(state => state.thread);
+  // const thread = useSelector(state => state.thread);
 
-  const {board, threadNo } = useThread();
+  const { board, threadNo } = useThread();
 
-  const [updateThread, updateThreadResult] = useUpdateThreadMutation(board, threadNo, post);
-  const [createThread, createThreadResult] = useCreateThreadMutation(board, post);
-  
+  const [updateThreadHook, updateThreadResult] = useUpdateThreadMutation();
+  const [createThread, createThreadResult] = useCreateThreadMutation();
+
   const dispatch = useDispatch();
 
   const handleChange = (formikHandler, e, key) => {
@@ -59,24 +60,25 @@ export const Reply = (props) => {
 
   const submitPost = async(values, actions) => {
     try {
-      if(threadNo !== null) {
-        updateThread();
-      } else {
-        createThread();
+      const req = _.pick(post, 'name', 'image', 'subject', 'comment', 'is_anonymous')
+      var formData = new FormData();
+      for (let [key, val] of Object.entries(req)) {
+        if(val !== null) formData.append(key, val);
       }
-
-      const res = updateThreadResult ?? createThreadResult;
-      
-      dispatch(resetPost());
-      if(threadNo === null) {
+      if(threadNo !== null) {
+        const res = await updateThreadHook({board, threadNo, post: formData}).unwrap();
+        dispatch(updateThread(res))
+        console.log(res);
+      } else {
+        const res = await createThread({board, post: formData}).unwrap();
         const op = res[0];
         const newPost = res[res.length - 1];
         history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
-      } else {
-        dispatch(updateThread(res));
       }
+      dispatch(resetPost());
     } catch(e) {
-      toast.error(parseError(e));
+      console.log('uh woops');
+      toast.error(e.data);
     };
   }
 

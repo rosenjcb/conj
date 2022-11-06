@@ -28,7 +28,7 @@ export const threadApi = createApi({
   tagTypes: ['Thread'],
   endpoints: (builder) => ({
     createThread: builder.mutation({
-      query: (board, post) => ({
+      query: ({board, post}) => ({
         method: 'POST',
         url: `/${board}`,
         body: post
@@ -36,24 +36,26 @@ export const threadApi = createApi({
       invalidatesTags: ['Threads']
     }),
     updateThread: builder.mutation({
-      query: (board, threadNo, post) => ({
+      query: ({board, threadNo, post}) => ({
         method: 'PUT',
         url: `/${board}/threads/${threadNo}`,
         body: post
       }),
+      invalidatesTags: ['Thread']
     }),
     fetchThread: builder.query({
-      query: (board, threadNo) => ({
+      query: ({board, threadNo}) => ({
         method: 'GET',
         url: `/${board}/threads/${threadNo}`
       }),
-      providesTags: ['Threads']
+      providesTags: ['Thread']
     }),
     fetchThreads: builder.query({
       query: (board) => ({
         method: 'GET',
         url: `/${board}`
       }),
+      providesTags: ['Threads']
     })
   })
 });

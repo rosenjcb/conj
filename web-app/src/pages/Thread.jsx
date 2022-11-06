@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Thread } from '../components/Thread';
-import { useParams } from 'react-router'
 import { swapThread } from '../slices/threadSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
@@ -14,15 +13,14 @@ export function ThreadPage() {
 
   const dispatch = useDispatch();
 
-  // const { id } = useParams();
-
   const {board, threadNo, replyNo} = useThread();
 
   const threadRef = useRef([]);
 
   const replyIndex = replyNo && current ? current.findIndex((p) => p.id === replyNo) : -1;
 
-  const {data, isSuccess, error } = useFetchThreadQuery(board, threadNo);
+  const threads = useFetchThreadQuery({board, threadNo});
+  const { data, isSuccess, error } = threads;
 
   useEffect(() => {
     if(replyIndex && threadRef.current[replyIndex]) {
@@ -31,7 +29,6 @@ export function ThreadPage() {
   },[replyIndex])
 
   useEffect(() => {
-    console.log('hello world')
     if(isSuccess) {
       dispatch(swapThread(data));
     } else if (error) {
