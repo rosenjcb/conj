@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit'
-import threadReducer from './slices/threadSlice';
 import postReducer from './slices/postSlice';
 import { meApi } from './api/account';
 import { boardsApi } from './api/board';
@@ -11,10 +10,9 @@ export const store = configureStore({
     [meApi.reducerPath]: meApi.reducer,
     [boardsApi.reducerPath]: boardsApi.reducer,
     [threadApi.reducerPath]: threadApi.reducer,
-    thread: threadReducer,
     post: postReducer
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false}).concat(meApi.middleware)
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false}).concat(meApi.middleware).concat(boardsApi.middleware).concat(threadApi.middleware)
 });
 
 setupListeners(store.dispatch);

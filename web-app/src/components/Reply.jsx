@@ -5,8 +5,7 @@ import { Checkbox, RoundButton, RoundImage, Text } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost } from '../slices/postSlice';
-import { updateThread } from '../slices/threadSlice';
-import { useCreateThreadMutation, useUpdateThreadMutation } from '../api/thread';
+import { useCreateThreadMutation, useUpdateThreadMutation, threadApi } from '../api/thread';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';
 import toast from 'react-hot-toast';
@@ -42,12 +41,11 @@ export const Reply = (props) => {
   const { className, isNewThread } = props;
 
   const post = useSelector(state => state.post);
-  // const thread = useSelector(state => state.thread);
 
   const { board, threadNo } = useThread();
 
-  const [updateThreadHook, updateThreadResult] = useUpdateThreadMutation();
-  const [createThread, createThreadResult] = useCreateThreadMutation();
+  const [updateThread] = useUpdateThreadMutation();
+  const [createThread] = useCreateThreadMutation();
 
   const dispatch = useDispatch();
 
@@ -66,9 +64,8 @@ export const Reply = (props) => {
         if(val !== null) formData.append(key, val);
       }
       if(threadNo !== null) {
-        const res = await updateThreadHook({board, threadNo, post: formData}).unwrap();
-        dispatch(updateThread(res))
-        console.log(res);
+        const res = await updateThread({board, threadNo, post: formData}).unwrap();
+        console.log(`Hey just posted to the thread! ${res}`);
       } else {
         const res = await createThread({board, post: formData}).unwrap();
         const op = res[0];

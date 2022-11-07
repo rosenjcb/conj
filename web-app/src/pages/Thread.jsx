@@ -1,51 +1,60 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Thread } from '../components/Thread';
-import { swapThread } from '../slices/threadSlice';
-import { useSelector, useDispatch } from 'react-redux';
+// import { useSelector, useDispatch } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useThread } from '../hooks/useThread';
 import { useFetchThreadQuery } from '../api/thread';
 
 export function ThreadPage() {
 
-  const {current, localReplyCount} = useSelector(state => state.thread);
+  // const {current, localReplyCount} = useSelector(state => state.thread);
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const {board, threadNo, replyNo} = useThread();
 
   const threadRef = useRef([]);
 
-  const replyIndex = replyNo && current ? current.findIndex((p) => p.id === replyNo) : -1;
+  const result = useFetchThreadQuery({board, threadNo});
+  const { data: current, isSuccess, error, isLoading } = result;
 
-  const threads = useFetchThreadQuery({board, threadNo});
-  const { data, isSuccess, error } = threads;
+  //This stuff is broken and needs to be fixed.
+  const replyIndex = replyNo && current ? current.findIndex((p) => p.id === replyNo) : null; 
+  const lastPostRef = threadRef.current[current?.length ?? 0 - 1];
 
+  //when post link is clicked
   useEffect(() => {
     if(replyIndex && threadRef.current[replyIndex]) {
       threadRef.current[replyIndex].scrollIntoView();
     }
   },[replyIndex])
 
+  //when thread is appended/changes (e.g. when a user creates a new post)
   useEffect(() => {
-    if(isSuccess) {
-      dispatch(swapThread(data));
-    } else if (error) {
-      toast.error(error.data);
-    };
-  },[data, dispatch]);
-
-  useEffect(() => {
-    const lastPostRef = threadRef.current[current.length - 1];
-    if(lastPostRef !== undefined && localReplyCount > 0) {
+    console.log(`thread has been updated ${JSON.stringify(result, null, 2)}`)
+    console.log(`This is your threadRef: ${JSON.stringify(threadRef, null, 2)}`);
+    if(lastPostRef !== undefined) {
+      console.log(`This is your lastPostRef: ${JSON.stringify(lastPostRef, null, 2)}`);
       lastPostRef.scrollIntoView({"behavior": "smooth"});
     }
-  },[localReplyCount, current]);
+  },[lastPostRef]);
+
+  useEffect(() => {
+    console.log(`This is your res ${JSON.stringify(result, null, 2)}`)
+  },[result])
+
+  if(!(current && current.length > 0)) {
+    return(
+      <div>
+        Loading???
+      </div>
+    )
+  }
 
   return(
     <Root>
-      { current.length > 0 ? <Thread replyIndex={replyIndex} threadRef={threadRef} preview={false} thread={current}/> : null }
+      <Thread replyIndex={replyIndex} threadRef={threadRef} preview={false} thread={current}/>
     </Root>
   )
 }

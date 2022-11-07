@@ -52,7 +52,8 @@ export const meApi = createApi({
         method: 'PUT',
         body: body,
         url: 'me'
-      })
+      }),
+      invalidatesTags: ['Me']
     })
   })
 })
