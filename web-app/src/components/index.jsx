@@ -43,6 +43,8 @@ const sizeCompute = (tag, size) => {
     case "h1":
       multiplier = 1.5;
       break;
+    default:
+      break;
   };
   switch(size) {
     case "small": 
@@ -60,6 +62,8 @@ const sizeCompute = (tag, size) => {
     case "xx-large": 
       res = `${2 * multiplier}rem`;
       break;
+    default:
+      res = "1rem"
   };
   return res;
 }

@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const fetchBaseQueryDefault = (queryOptions) => {
   const baseQuery = fetchBaseQuery(queryOptions);

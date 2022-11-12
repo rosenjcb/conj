@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Formik, Field} from 'formik';
 import { useLoginMutation, useSignupMutation } from '../api/account';
@@ -6,12 +6,13 @@ import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import chroma from 'chroma-js';
 import { Header, RoundButton, Back, InputField } from './index';
 import toast from 'react-hot-toast';
+import PropTypes from 'prop-types';
 
 function SignUp({onClick}) {
 
   const history = useHistory();
 
-  const [signUp, _] = useSignupMutation();
+  const [signUp] = useSignupMutation();
 
   const handleSignup = async(values) => {
     var formData = new FormData();
@@ -23,8 +24,7 @@ function SignUp({onClick}) {
       history.push('/');
       history.go();
     } catch (e) {
-      if(e.data) toast.error(e.data);
-      console.log(e);
+      toast.error(e.data);
     }
   }
 
@@ -56,9 +56,12 @@ function SignUp({onClick}) {
   )
 }
 
-export function Login() {
+SignUp.propTypes = {
+  onClick: PropTypes.func,
 
-  const history = useHistory();
+}
+
+export function Login({completeAction}) {
 
   const [signUp, setSignUp] = useState(false);
 
@@ -66,20 +69,18 @@ export function Login() {
     setSignUp(true);
   }
 
-  const[login, loginResult] = useLoginMutation();
+  const [login] = useLoginMutation();
 
   const handleLogin = async(values, actions) => {
-    await login(values);
+    try {
+      await login(values).unwrap();
+      toast.success('Welcome back!');
+    } catch (e) {
+      toast.error(e.data);
+    } finally {
+      completeAction();
+    }
   }
-
-  useEffect(() => {
-    if(loginResult.isSuccess) {
-      history.push('/');
-      history.go();
-    } else if(loginResult.error) {
-      toast.error(loginResult.error.data);
-    } 
-  },[loginResult]);
 
   if(signUp) {
     return <SignUp onClick={() => setSignUp(false)}/>
@@ -104,13 +105,16 @@ export function Login() {
               <RoundButton type="submit">Login</RoundButton> 
               <RoundButton type="button" onClick={() => handleSignup(props.values)}>Signup</RoundButton> 
             </SubmitOptions>
-            {/* <Link href="/about">Why do I need an account?</Link> */}
           </StyledForm>
       )}
       </Formik>
     </Root>
   )
 }
+
+Login.propTypes = {
+  completeAction: PropTypes.func
+};
 
 const SubmitOptions = styled.div`
   display: flex;

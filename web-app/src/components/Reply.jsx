@@ -1,15 +1,14 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState } from 'react'
 import styled from 'styled-components'
 import { Formik, Form, Field } from 'formik';
-import { Checkbox, RoundButton, RoundImage, Text } from './index';
+import { Checkbox, RoundButton, RoundImage } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost } from '../slices/postSlice';
-import { useCreateThreadMutation, useUpdateThreadMutation, threadApi } from '../api/thread';
+import { useCreateThreadMutation, useUpdateThreadMutation } from '../api/thread';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';
 import toast from 'react-hot-toast';
-import { parseError } from '../util/error';
 import { useThread } from '../hooks/useThread';
 import { Login } from './Login';
 import { useMeQuery } from '../api/account'
@@ -75,11 +74,11 @@ export const Reply = (props) => {
       dispatch(resetPost());
     } catch(e) {
       console.log('uh woops');
-      toast.error(e.data);
+      if(e.data) toast.error(e.data);
     };
   }
 
-  const { data: me, error, isLoading } = useMeQuery();
+  const { data: me, isLoading } = useMeQuery();
 
   //const me = null;
   //const isLoading = false;

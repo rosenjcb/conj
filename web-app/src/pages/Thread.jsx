@@ -1,8 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Thread } from '../components/Thread';
-// import { useSelector, useDispatch } from 'react-redux';
-import toast from 'react-hot-toast';
 import { useThread } from '../hooks/useThread';
 import { useFetchThreadQuery } from '../api/thread';
 
@@ -17,7 +15,7 @@ export function ThreadPage() {
   const threadRef = useRef([]);
 
   const result = useFetchThreadQuery({board, threadNo});
-  const { data: current, isSuccess, error, isLoading } = result;
+  const { data: current } = result;
 
   //This stuff is broken and needs to be fixed.
   const replyIndex = replyNo && current ? current.findIndex((p) => p.id === replyNo) : null; 
@@ -32,17 +30,13 @@ export function ThreadPage() {
 
   //when thread is appended/changes (e.g. when a user creates a new post)
   useEffect(() => {
-    console.log(`thread has been updated ${JSON.stringify(result, null, 2)}`)
-    console.log(`This is your threadRef: ${JSON.stringify(threadRef, null, 2)}`);
+    // console.log(`thread has been updated ${JSON.stringify(result, null, 2)}`)
+    // console.log(`This is your threadRef: ${JSON.stringify(threadRef, null, 2)}`);
     if(lastPostRef !== undefined) {
-      console.log(`This is your lastPostRef: ${JSON.stringify(lastPostRef, null, 2)}`);
+      // console.log(`This is your lastPostRef: ${JSON.stringify(lastPostRef, null, 2)}`);
       lastPostRef.scrollIntoView({"behavior": "smooth"});
     }
   },[lastPostRef]);
-
-  useEffect(() => {
-    console.log(`This is your res ${JSON.stringify(result, null, 2)}`)
-  },[result])
 
   if(!(current && current.length > 0)) {
     return(

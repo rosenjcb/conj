@@ -1,5 +1,4 @@
 import { Form, Formik, Field } from 'formik';
-import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import { useUpdateMeMutation, useMeQuery } from '../api/account';
 import { RoundButton, Text } from '../components';

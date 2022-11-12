@@ -9,7 +9,6 @@ import chroma from 'chroma-js';
 import { BiMessageDetail } from 'react-icons/bi'; 
 import { Reply } from './Reply';
 import Modal from 'react-modal';
-import { useEffect } from 'react';
 
 Modal.defaultStyles.overlay.backgroundColor = 'rgba(0, 0, 0, 0.7)';
 

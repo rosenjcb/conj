@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { Formik, Field } from 'formik';
-import { Header, RoundButton, InputField, AnonymousAvatar, InputFile } from './index';
+import { Header, RoundButton, InputField, InputFile } from './index';
 import { useMeQuery, useUpdateMeMutation } from '../api/account';
 import toast from 'react-hot-toast';
 import { parseError } from '../util/error';
@@ -60,10 +60,6 @@ export function AccountSettings() {
       </Root>
     )
   }
-
-const AnonymousAvatarConfig = styled(AnonymousAvatar)`
-  padding-top: 1rem;
-`;
 
 const ContentDetails = styled.div`
     display: flex;
