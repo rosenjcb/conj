@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import { me as callMe, logout } from '../api/account'
-import { fetchBoards } from '../api/board';
+import { useLogoutMutation } from '../api/account'
+import { useFetchBoardsQuery } from '../api/board';
 import chroma from 'chroma-js';
 import { FiMenu } from 'react-icons/fi';
 import {RiDiscussFill} from 'react-icons/ri';
 import { BsFillBarChartFill } from 'react-icons/bs';
 import { Text } from './index';
 import { useThread } from '../hooks/useThread';
-import { SquareButton } from './index';
 import { detectMobile } from '../util/window';
 import ReactModal from 'react-modal';
 import { Header } from './index';
@@ -17,65 +16,40 @@ import { GoGear } from 'react-icons/go';
 import {useComponentVisible} from '../hooks/useComponentVisible';
 import { AccountSettings } from './AccountSettings';
 import { Login } from './Login';
+import { useMeQuery } from '../api/account';
+import toast from 'react-hot-toast';
 
-const customStyle = {
-  overlay: {
-    inset: 0,
-    zIndex: 2,
-  },
-  content: {
-    inset: 0,
-    right: 0,
-    padding: 0,
-    margin: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'white',
-    borderRadius: '0px',
-    border: 'none'
-  },
-};
+// const customStyle = {
+//   overlay: {
+//     inset: 0,
+//     zIndex: 2,
+//   },
+//   content: {
+//     inset: 0,
+//     right: 0,
+//     padding: 0,
+//     margin: 0,
+//     width: '100%',
+//     height: '100%',
+//     backgroundColor: 'white',
+//     borderRadius: '0px',
+//     border: 'none'
+//   },
+// };
 
 export const WithNavBar = ({component}) => {
 
-  const [me, setMe] = useState(null);
-  const [boards, setBoards] = useState([]);
+  const [logout] = useLogoutMutation();
 
-  useEffect(() => {
-    async function getAuth() {
-      try { 
-        const res = await callMe();
-        setMe(res);
-      } catch(e) {
-        setMe(null);
-      }
-    }
-    async function getBoards() {
-      try {
-        const res = await fetchBoards();
-        setBoards(res.data);
-      } catch (e) {
-        setBoards(null);
-      }
-    }
-    getAuth();
-    getBoards();
-  },[]);
+  const { data: me, isLoading } = useMeQuery();
+
+  const { data: boards } = useFetchBoardsQuery();
 
   const history = useHistory();
 
   const isMobile = detectMobile();
 
-  const handleLogout = async() => {
-    await logout();
-    window.location.reload();
-  }
-
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // const toggleDrawer = () => {
-  //   setDrawerOpen(!drawerOpen);
-  // }
 
   const openDrawer = () => {
     setDrawerOpen(true);
@@ -95,6 +69,15 @@ export const WithNavBar = ({component}) => {
     setIsComponentVisible(!isComponentVisible)
   }
 
+  const handleLogout = async() => {
+    try {
+      await logout().unwrap();
+    } catch (e) {
+      toast.error(e.data);
+    } finally {
+      setIsComponentVisible(false);
+    }
+  }
   const [accountIsOpen, setAccountIsOpen] = useState(false)
 
   const closeAccount = () => setAccountIsOpen(false);
@@ -106,7 +89,6 @@ export const WithNavBar = ({component}) => {
   const closeLogin = () => setLoginOpen(false);
 
   const openLogin = () => setLoginOpen(true);
-
 
   const customStyle = {
     overlay: {
@@ -127,10 +109,16 @@ export const WithNavBar = ({component}) => {
     },
   };
 
+  if(isLoading) {
+    return (
+      <div/>
+    )
+  }
+
   return (
     <BoardRoot>
       <ReactModal style={customStyle} isOpen={accountIsOpen} onRequestClose={closeAccount}><AccountSettings/></ReactModal>
-      <ReactModal style={customStyle} isOpen={loginOpen} onRequestClose={closeLogin}><Login/></ReactModal>
+      <ReactModal style={customStyle} isOpen={loginOpen} onRequestClose={closeLogin}><Login completeAction={closeLogin}/></ReactModal>
       <HomeNavBar>
         <HamburgerMenu onClick={openDrawer}/>
         <Header bold onClick={redirectHome}>conj.app</Header>
@@ -139,7 +127,7 @@ export const WithNavBar = ({component}) => {
           <SettingsContent visible={isComponentVisible} ref={ref}>
               {me === null ? <Link onClick={openLogin}><SettingText align="center">Login</SettingText></Link> : null}
               {me !== null ? <Link onClick={handleLogout}><SettingText align="center">Logout</SettingText></Link> : null}
-              {me !== null ? <Link onClick={openAccount}><SettingText align="center">Account</SettingText></Link> : null}
+              {me !== null? <Link onClick={openAccount}><SettingText align="center">Account</SettingText></Link> : null}
             </SettingsContent>
         </IconContainer>
       </HomeNavBar>
@@ -270,21 +258,9 @@ const BoardDrawerRoot = styled.div`
   flex-direction: column;
   background-color: ${props => props.fill ? props.theme.colors.white : 'inherit'};
   gap: 2rem;
-  width: auto;
   height: fit-content;
   border-radius: 8px;
-
-  @media all and (min-width: 1024px) and (max-width: 1280px) { 
-    width: auto; 
-  }
-  
-  @media all and (min-width: 768px) and (max-width: 1024px) { 
-    width: auto;
-  }
-  
-  @media all and (min-width: 480px) and (max-width: 768px) { 
-    width: auto;
-  }
+  width: 300px;
   
   @media all and (max-width: 480px) { 
     width: 100%;
@@ -379,32 +355,32 @@ const BarChartIcon = styled(BsFillBarChartFill)`
   height: 48px;
 `;
 
-const ToolTip = styled.span`
-  visibility: ${props => props.visibility ? "visible" : "hidden"};
-  width: 100%;
-  background-color: ${props => props.theme.colors.grey};
-  color: white;
-  font-weight: 650;
-  text-align: center;
-  border-radius: 6px;
-  padding: 10px;
-  position: relative;
-  z-index: 1;
-  bottom: 60px;
-  left: 15%;
-  margin-left: -100px;
+// const ToolTip = styled.span`
+//   visibility: ${props => props.visibility ? "visible" : "hidden"};
+//   width: 100%;
+//   background-color: ${props => props.theme.colors.grey};
+//   color: white;
+//   font-weight: 650;
+//   text-align: center;
+//   border-radius: 6px;
+//   padding: 10px;
+//   position: relative;
+//   z-index: 1;
+//   bottom: 60px;
+//   left: 15%;
+//   margin-left: -100px;
 
-  &:after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: ${props => props.theme.colors.grey} transparent transparent transparent;
-  };
-`;
+//   &:after {
+//     content: "";
+//     position: absolute;
+//     top: 100%;
+//     left: 50%;
+//     margin-left: -5px;
+//     border-width: 5px;
+//     border-style: solid;
+//     border-color: ${props => props.theme.colors.grey} transparent transparent transparent;
+//   };
+// `;
 
 
 const SettingsContent = styled.div`

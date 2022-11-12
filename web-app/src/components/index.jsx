@@ -8,7 +8,7 @@ export const HR = styled.hr`
   width: ${props => props.width ?? "100%"};
   border: none;
   height: 2px;
-  background-color ${props => props.theme.colors.grey};
+  background-color: ${props => props.theme.colors.grey};
   border-radius: 8px;
 `;
 
@@ -43,6 +43,8 @@ const sizeCompute = (tag, size) => {
     case "h1":
       multiplier = 1.5;
       break;
+    default:
+      break;
   };
   switch(size) {
     case "small": 
@@ -60,6 +62,8 @@ const sizeCompute = (tag, size) => {
     case "xx-large": 
       res = `${2 * multiplier}rem`;
       break;
+    default:
+      res = "1rem"
   };
   return res;
 }
@@ -82,7 +86,7 @@ export const Text = styled.p`
 
 export const Header = styled.h1`
   font-weight: ${props => props.bold ? 700 : 500};
-  text-align ${props => props.align ?? 'center'};
+  text-align: ${props => props.align ?? 'center'};
   font-family: "Inter",arial,sans-serif;
   color: ${props => computeColor(props.theme.colors, props.color)};
   padding: 0;

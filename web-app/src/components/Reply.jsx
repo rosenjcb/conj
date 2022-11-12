@@ -1,21 +1,19 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState } from 'react'
 import styled from 'styled-components'
 import { Formik, Form, Field } from 'formik';
-import { Checkbox, RoundButton, RoundImage, Text } from './index';
+import { Checkbox, RoundButton, RoundImage } from './index';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { updateEntry, resetPost } from '../slices/postSlice';
-import { updateThread } from '../slices/threadSlice';
-import { upsertThread } from '../api/thread';
-import chroma from 'chroma-js';
+import { useCreateThreadMutation, useUpdateThreadMutation } from '../api/thread';
 import { BiImageAdd } from 'react-icons/bi';
 import { AiFillDelete } from 'react-icons/ai';
 import toast from 'react-hot-toast';
-import { parseError } from '../util/error';
 import { useThread } from '../hooks/useThread';
 import { Login } from './Login';
-import { me as callMe } from '../api/account'
+import { useMeQuery } from '../api/account'
 import ReactModal from 'react-modal';
+import _ from 'lodash';
 
 
 const customStyle = {
@@ -42,8 +40,12 @@ export const Reply = (props) => {
   const { className, isNewThread } = props;
 
   const post = useSelector(state => state.post);
-  const thread = useSelector(state => state.thread);
-  
+
+  const { board, threadNo } = useThread();
+
+  const [updateThread] = useUpdateThreadMutation();
+  const [createThread] = useCreateThreadMutation();
+
   const dispatch = useDispatch();
 
   const handleChange = (formikHandler, e, key) => {
@@ -51,42 +53,35 @@ export const Reply = (props) => {
     dispatch(updateEntry({key: key, value: e.target.value}));
   }
 
-  const {board, threadNo } = useThread();
-
   const history = useHistory();
 
   const submitPost = async(values, actions) => {
     try {
-      const res = await upsertThread(board, threadNo, post);
-      const updatedThread = res.data;
-      dispatch(resetPost());
-      if(threadNo === null) {
-        const op = updatedThread[0];
-        const newPost = updatedThread[updatedThread.length - 1];
-        // dispatch(swapThread(updatedThread));
-        history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
-      } else {
-        dispatch(updateThread(updatedThread));
+      const req = _.pick(post, 'name', 'image', 'subject', 'comment', 'is_anonymous')
+      var formData = new FormData();
+      for (let [key, val] of Object.entries(req)) {
+        if(val !== null) formData.append(key, val);
       }
+      if(threadNo !== null) {
+        const res = await updateThread({board, threadNo, post: formData}).unwrap();
+        console.log(`Hey just posted to the thread! ${res}`);
+      } else {
+        const res = await createThread({board, post: formData}).unwrap();
+        const op = res[0];
+        const newPost = res[res.length - 1];
+        history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
+      }
+      dispatch(resetPost());
     } catch(e) {
-      toast.error(parseError(e));
+      console.log('uh woops');
+      if(e.data) toast.error(e.data);
     };
   }
 
-  const [me, setMe] = useState({});
+  const { data: me, isLoading } = useMeQuery();
 
-  useEffect(() => {
-    async function setAuth() {
-        try { 
-          const res = await callMe();
-          setMe(res);
-        } catch(e) {
-          setMe(null);
-        }
-      }
-    setAuth();
-  },[]);
-
+  //const me = null;
+  //const isLoading = false;
   const [check, setChecked] = useState(post.is_anonymous);
 
   const handleClick = () => {
@@ -107,7 +102,7 @@ export const Reply = (props) => {
     dispatch(updateEntry({key: 'is_anonymous', value: !check}));
   }
 
-  if(me === {}) {
+  if(isLoading) {
     return(
       <div/>
     )

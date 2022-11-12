@@ -1,17 +1,17 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Helmet from 'react-helmet';
-import { Text, Header, Link } from '../components';
+import { Text, Header } from '../components';
 import { Login } from '../components/Login';
 import { Thread } from '../components/Thread';
 import { detectMobile } from '../util/window';
 
 const exampleThread = [{"id": 1, name: "cl0jure", comment: "Here's my first post, everyone!", subject: "Hello World", image: {"location": "dinosaur.jpg"}}]
 
-const introText = 
-`
-  Social media is experience a slump blah blah blah.
-`;
+// const introText = 
+// `
+//   Social media is experience a slump blah blah blah.
+// `;
 
 const threadText = 
 `

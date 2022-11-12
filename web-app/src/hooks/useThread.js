@@ -5,8 +5,6 @@ export const useThread = () => {
 
     const pathSlugs = location.pathname.split("/"); 
 
-    // const finalSlug = pathSlugs[slugCount - 1].match(/(\d+)/);
-
     if(pathSlugs.length < 2) {
         return {
             board: null,

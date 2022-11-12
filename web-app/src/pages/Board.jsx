@@ -1,33 +1,30 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { AnonymousAvatar, Text } from '../components';
+import { Text } from '../components';
 import { Reply } from '../components/Reply';
 import { Thread } from '../components/Thread';
-import {  Avatar } from '../components';
 import * as _ from 'lodash';
-import { fetchThreads } from '../api/thread';
+import { useFetchThreadsQuery } from '../api/thread';
 import toast from 'react-hot-toast'
 import { useThread } from '../hooks/useThread';
-import { parseError } from '../util/error';
 
 export const BoardPage = () => {
 
-  const [threads, setThreads] = useState([]);
-
   const { board } = useThread();
 
+  const {data: threads, error, isLoading } = useFetchThreadsQuery(board);
+
   useEffect(() => {
-    async function fetchAndSetThreads() {
-      try {
-        const res = await fetchThreads(board);
-        setThreads(res.data);
-      } catch(e) {
-        setThreads(null);
-        toast.error(parseError(e));
-      }
+    if(error) {
+      toast.error(error.data);
     }
-    fetchAndSetThreads();
-  },[board]);
+  },[error]);
+
+  if(isLoading) {
+    return (
+      <div/>
+    )
+  }
 
   return(
     <BoardRoot>
