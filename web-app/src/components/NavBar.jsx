@@ -251,10 +251,6 @@ const Page = styled.div`
   }
 `;
 
-
-const y 
-= 'hello'
-
 const SearchForm = styled.form`
   display: flex;
   flex-direction: row;
