@@ -23,8 +23,6 @@ export const useThread = () => {
 
   const replyNo = hash ? Number(hash) : null;
 
-  const y = "y";
-
   return {
     board: board,
     threadNo: threadNo,
