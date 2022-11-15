@@ -180,10 +180,6 @@ const BoardDrawer = (props) => {
 
   const { board } = useThread();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
-
   const handleClick = (board) => {
     console.log(board);
     history.push(`/boards/${board}`);
@@ -217,9 +213,6 @@ const BoardDrawer = (props) => {
           </Text>
         )}
       </BoardList>
-      <SearchForm onSubmit={handleSubmit}>
-        <Input type="text" />
-      </SearchForm>
     </BoardDrawerRoot>
   );
 };
@@ -251,21 +244,6 @@ const Page = styled.div`
   }
 `;
 
-const SearchForm = styled.form`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 10px;
-`;
-
-const Input = styled.input`
-  border-radius: 80px;
-  font-size: 2rem;
-  width: 60%;
-  margin-bottom: 10px;
-  padding: 0;
-`;
-
 const BoardList = styled.ul`
   display: flex;
   justify-content: flex-start;
@@ -285,7 +263,7 @@ const BoardRow = styled.div`
   flex-direction: row;
   margin-left: 1rem;
   margin-right: 1rem;
-  border-radius: 9000px;
+  border-radius: 4px;
 `;
 
 const HighlightBoardRow = styled(BoardRow)`
