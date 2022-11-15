@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
-import { useLogoutMutation } from '../api/account'
-import { useFetchBoardsQuery } from '../api/board';
-import chroma from 'chroma-js';
-import { FiMenu } from 'react-icons/fi';
-import {RiDiscussFill} from 'react-icons/ri';
-import { BsFillBarChartFill } from 'react-icons/bs';
-import { Text } from './index';
-import { useThread } from '../hooks/useThread';
-import { detectMobile } from '../util/window';
-import ReactModal from 'react-modal';
-import { Header } from './index';
-import { GoGear } from 'react-icons/go';
-import {useComponentVisible} from '../hooks/useComponentVisible';
-import { AccountSettings } from './AccountSettings';
-import { Login } from './Login';
-import { useMeQuery } from '../api/account';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import styled from "styled-components";
+import { useHistory } from "react-router-dom";
+import { useLogoutMutation } from "../api/account";
+import { useFetchBoardsQuery } from "../api/board";
+import chroma from "chroma-js";
+import { FiMenu } from "react-icons/fi";
+import { RiDiscussFill } from "react-icons/ri";
+import { BsFillBarChartFill } from "react-icons/bs";
+import { Text } from "./index";
+import { useThread } from "../hooks/useThread";
+import { detectMobile } from "../util/window";
+import ReactModal from "react-modal";
+import { Header } from "./index";
+import { GoGear } from "react-icons/go";
+import { useComponentVisible } from "../hooks/useComponentVisible";
+import { AccountSettings } from "./AccountSettings";
+import { Login } from "./Login";
+import { useMeQuery } from "../api/account";
+import toast from "react-hot-toast";
 
 // const customStyle = {
 //   overlay: {
@@ -37,8 +37,7 @@ import toast from 'react-hot-toast';
 //   },
 // };
 
-export const WithNavBar = ({component}) => {
-
+export const WithNavBar = ({ component }) => {
   const [logout] = useLogoutMutation();
 
   const { data: me, isLoading } = useMeQuery();
@@ -53,23 +52,24 @@ export const WithNavBar = ({component}) => {
 
   const openDrawer = () => {
     setDrawerOpen(true);
-  }
+  };
 
   const closeDrawer = () => {
     setDrawerOpen(false);
-  }
+  };
 
   const redirectHome = () => {
     history.push("/");
-  }
+  };
 
-  const { ref, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
+  const { ref, isComponentVisible, setIsComponentVisible } =
+    useComponentVisible(false);
 
   const toggleVisible = () => {
-    setIsComponentVisible(!isComponentVisible)
-  }
+    setIsComponentVisible(!isComponentVisible);
+  };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     try {
       await logout().unwrap();
     } catch (e) {
@@ -77,14 +77,14 @@ export const WithNavBar = ({component}) => {
     } finally {
       setIsComponentVisible(false);
     }
-  }
-  const [accountIsOpen, setAccountIsOpen] = useState(false)
+  };
+  const [accountIsOpen, setAccountIsOpen] = useState(false);
 
   const closeAccount = () => setAccountIsOpen(false);
 
   const openAccount = () => setAccountIsOpen(true);
 
-  const [loginOpen, setLoginOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false);
 
   const closeLogin = () => setLoginOpen(false);
 
@@ -93,84 +93,136 @@ export const WithNavBar = ({component}) => {
   const customStyle = {
     overlay: {
       zIndex: 2,
-      backgroundColor: 'rgba(0, 0, 0, 0.3)',
+      backgroundColor: "rgba(0, 0, 0, 0.3)",
     },
     content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-      padding: '0',
-      border: 'none',
-      borderRadius: '0px',
-      background: 'none'
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+      padding: "0",
+      border: "none",
+      borderRadius: "0px",
+      background: "none",
     },
   };
 
-  if(isLoading) {
-    return (
-      <div/>
-    )
+  if (isLoading) {
+    return <div />;
   }
 
   return (
     <BoardRoot>
-      <ReactModal style={customStyle} isOpen={accountIsOpen} onRequestClose={closeAccount}><AccountSettings/></ReactModal>
-      <ReactModal style={customStyle} isOpen={loginOpen} onRequestClose={closeLogin}><Login completeAction={closeLogin}/></ReactModal>
+      <ReactModal
+        style={customStyle}
+        isOpen={accountIsOpen}
+        onRequestClose={closeAccount}
+      >
+        <AccountSettings />
+      </ReactModal>
+      <ReactModal
+        style={customStyle}
+        isOpen={loginOpen}
+        onRequestClose={closeLogin}
+      >
+        <Login completeAction={closeLogin} />
+      </ReactModal>
       <HomeNavBar>
-        <HamburgerMenu onClick={openDrawer}/>
-        <Header bold onClick={redirectHome}>conj.app</Header>
+        <HamburgerMenu onClick={openDrawer} />
+        <Header bold onClick={redirectHome}>
+          conj.app
+        </Header>
         <IconContainer>
-          <SettingsIcon onClick={toggleVisible}/>
+          <SettingsIcon onClick={toggleVisible} />
           <SettingsContent visible={isComponentVisible} ref={ref}>
-              {me === null ? <Link onClick={openLogin}><SettingText align="center">Login</SettingText></Link> : null}
-              {me !== null ? <Link onClick={handleLogout}><SettingText align="center">Logout</SettingText></Link> : null}
-              {me !== null? <Link onClick={openAccount}><SettingText align="center">Account</SettingText></Link> : null}
-            </SettingsContent>
+            {me === null ? (
+              <Link onClick={openLogin}>
+                <SettingText align="center">Login</SettingText>
+              </Link>
+            ) : null}
+            {me !== null ? (
+              <Link onClick={handleLogout}>
+                <SettingText align="center">Logout</SettingText>
+              </Link>
+            ) : null}
+            {me !== null ? (
+              <Link onClick={openAccount}>
+                <SettingText align="center">Account</SettingText>
+              </Link>
+            ) : null}
+          </SettingsContent>
         </IconContainer>
       </HomeNavBar>
       <Page>
-        { !isMobile ? <BoardDrawer boards={boards}/> : <ReactModal style={customStyle} isOpen={drawerOpen} onRequestClose={closeDrawer}><BoardDrawer fill={true} boards={boards}/></ReactModal>}
+        {!isMobile ? (
+          <BoardDrawer boards={boards} />
+        ) : (
+          <ReactModal
+            style={customStyle}
+            isOpen={drawerOpen}
+            onRequestClose={closeDrawer}
+          >
+            <BoardDrawer fill={true} boards={boards} />
+          </ReactModal>
+        )}
         {component}
       </Page>
     </BoardRoot>
-  )
-}
+  );
+};
 
 const BoardDrawer = (props) => {
-
-  const { boards, fill } = props; 
+  const { boards, fill } = props;
 
   const history = useHistory();
 
-  const { board } = useThread(); 
+  const { board } = useThread();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  }
+  };
 
   const handleClick = (board) => {
     console.log(board);
-    history.push(`/boards/${board}`)
-  }
+    history.push(`/boards/${board}`);
+  };
 
-  return(
+  return (
     <BoardDrawerRoot fill={fill}>
       <TitleContainer>
         <Header bold>Most Popular Boards</Header>
       </TitleContainer>
       <BoardList>
-        <BoardRow><BoardIcon/><BarChartIcon/></BoardRow>
-        {boards != null ? boards.map(b => <HighlightBoardRow onClick={() => handleClick(b)} selected={b === board}><BoardItem>/{b}/</BoardItem><Text size={"medium"} align="right" color={"black"} bold>10+</Text></HighlightBoardRow>) : <Text bold size={"medium"}>No Boards Found</Text>}
+        <BoardRow>
+          <BoardIcon />
+          <BarChartIcon />
+        </BoardRow>
+        {boards != null ? (
+          boards.map((b) => (
+            <HighlightBoardRow
+              onClick={() => handleClick(b)}
+              selected={b === board}
+            >
+              <BoardItem>/{b}/</BoardItem>
+              <Text size={"medium"} align="right" color={"black"} bold>
+                10+
+              </Text>
+            </HighlightBoardRow>
+          ))
+        ) : (
+          <Text bold size={"medium"}>
+            No Boards Found
+          </Text>
+        )}
       </BoardList>
       <SearchForm onSubmit={handleSubmit}>
-        <Input type="text"/>
+        <Input type="text" />
       </SearchForm>
     </BoardDrawerRoot>
-  )
-}
+  );
+};
 
 const Page = styled.div`
   display: flex;
@@ -185,16 +237,16 @@ const Page = styled.div`
   @media all and (min-width: 1024px) {
     width: 40%;
   }
-  
+
   @media all and (min-width: 768px) and (max-width: 1024px) {
     width: 100%;
   }
-  
+
   @media all and (min-width: 480px) and (max-width: 768px) {
     width: 100%;
-   }
-  
-  @media all and (max-width: 480px) { 
+  }
+
+  @media all and (max-width: 480px) {
     width: 100%;
   }
 `;
@@ -237,17 +289,21 @@ const BoardRow = styled.div`
 `;
 
 const HighlightBoardRow = styled(BoardRow)`
-  background-color: ${props => props.selected ? chroma(props.theme.colors.primary).brighten(2.5).hex() : "inherit"};
+  background-color: ${(props) =>
+    props.selected
+      ? chroma(props.theme.colors.primary).brighten(2.5).hex()
+      : "inherit"};
   &:hover {
-    background-color: ${props => chroma(props.theme.colors.primary).brighten(2.5).hex()};
+    background-color: ${(props) =>
+      chroma(props.theme.colors.primary).brighten(2.5).hex()};
     cursor: pointer;
   }
   min-width: 250px;
 `;
 
-const BoardItem = styled(Text).attrs(props => ({bold: true}))`
-  color: ${props => props.theme.colors.black};
-  border-radius: 12px; 
+const BoardItem = styled(Text).attrs((props) => ({ bold: true }))`
+  color: ${(props) => props.theme.colors.black};
+  border-radius: 12px;
   padding: 8px;
   user-select: none;
 `;
@@ -256,13 +312,14 @@ const BoardDrawerRoot = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  background-color: ${props => props.fill ? props.theme.colors.white : 'inherit'};
+  background-color: ${(props) =>
+    props.fill ? props.theme.colors.white : "inherit"};
   gap: 2rem;
   height: fit-content;
   border-radius: 8px;
   width: 300px;
-  
-  @media all and (max-width: 480px) { 
+
+  @media all and (max-width: 480px) {
     width: 100%;
     height: 100%;
     padding: 0;
@@ -295,9 +352,10 @@ const HomeNavBar = styled.div`
   justify-content: space-between;
   gap: 10px;
   flex-direction: row;
-  background-color: ${props => props.theme.colors.white};
+  background-color: ${(props) => props.theme.colors.white};
   align-items: center;
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 
@@ -306,22 +364,22 @@ const HomeNavBar = styled.div`
     padding-left: 20%;
     padding-right: 20%;
   }
-  
+
   @media all and (min-width: 768px) and (max-width: 1024px) {
     width: 100%;
   }
-  
+
   @media all and (min-width: 480px) and (max-width: 768px) {
     width: 100%;
   }
-  
-  @media all and (max-width: 480px) { 
+
+  @media all and (max-width: 480px) {
     width: 100%;
   }
 `;
 
 const HamburgerMenu = styled(FiMenu)`
-  color: ${props => props.theme.colors.black};
+  color: ${(props) => props.theme.colors.black};
   width: 48px;
   height: 48px;
   padding-right: 10px;
@@ -329,28 +387,28 @@ const HamburgerMenu = styled(FiMenu)`
   @media all and (min-width: 1024px) {
     visibility: hidden;
   }
-  
+
   @media all and (min-width: 768px) and (max-width: 1024px) {
     visibility: hidden;
   }
-  
+
   @media all and (min-width: 480px) and (max-width: 768px) {
     visibility: visible;
-   }
-  
-  @media all and (max-width: 480px) { 
+  }
+
+  @media all and (max-width: 480px) {
     visibility: visible;
   }
 `;
 
 const BoardIcon = styled(RiDiscussFill)`
-  color: ${props => props.theme.colors.primary};
+  color: ${(props) => props.theme.colors.primary};
   width: 48px;
   height: 48px;
 `;
 
 const BarChartIcon = styled(BsFillBarChartFill)`
-  color: ${props => props.theme.colors.primary};
+  color: ${(props) => props.theme.colors.primary};
   width: 48px;
   height: 48px;
 `;
@@ -382,13 +440,12 @@ const BarChartIcon = styled(BsFillBarChartFill)`
 //   };
 // `;
 
-
 const SettingsContent = styled.div`
-  display: ${props => props.visible ? "block" : "none"};
+  display: ${(props) => (props.visible ? "block" : "none")};
   position: absolute;
   width: 160px;
-  background-color: ${props => props.theme.colors.white};
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  background-color: ${(props) => props.theme.colors.white};
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   transform: translate(55%, 28%) translate(-100%, 0px);
   border-radius: 8px;
   padding: 12px 16px;
@@ -402,9 +459,7 @@ const SettingsIcon = styled(GoGear)`
   height: 40px;
   display: inline-block;
   position: relative;
-  
 `;
-
 
 const IconContainer = styled.div`
   width: 48px;
@@ -412,7 +467,8 @@ const IconContainer = styled.div`
   border-radius: 9000px;
   display: flex;
   justify-content: center;
-  background-color: ${props => chroma(props.theme.colors.grey).brighten(0.6).hex()};
+  background-color: ${(props) =>
+    chroma(props.theme.colors.grey).brighten(0.6).hex()};
 `;
 
 const Link = styled.div`
@@ -425,8 +481,9 @@ const Link = styled.div`
 const SettingText = styled(Text)`
   padding: 12px 16px;
   border-radius: 8px;
-    
-    &:hover {
-      background-color: ${props => chroma(props.theme.colors.grey).brighten(0.6).hex()};
-    }
+
+  &:hover {
+    background-color: ${(props) =>
+      chroma(props.theme.colors.grey).brighten(0.6).hex()};
+  }
 `;

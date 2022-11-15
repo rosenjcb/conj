@@ -1,61 +1,67 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const fetchBaseQueryDefault = (queryOptions) => {
   const baseQuery = fetchBaseQuery(queryOptions);
-  return async(args, api, extraOptions) => {
+  return async (args, api, extraOptions) => {
     const result = await baseQuery(args, api, extraOptions);
     const isMeQuery = args.url === "me" && args.method === "GET";
-    if(result.error && isMeQuery) {
+    if (result.error && isMeQuery) {
       delete result.error;
-      return {...result, data: null};
-    } 
+      return { ...result, data: null };
+    }
     return result;
-  }
-}
+  };
+};
 
 export const meApi = createApi({
-  reducerPath: 'meApi',
-  baseQuery: fetchBaseQueryDefault({baseUrl:'/api/'}),
-  tagTypes: ['Me'],
+  reducerPath: "meApi",
+  baseQuery: fetchBaseQueryDefault({ baseUrl: "/api/" }),
+  tagTypes: ["Me"],
   endpoints: (builder) => ({
     me: builder.query({
       query: () => ({
-        method: 'GET',
-        url: 'me'
+        method: "GET",
+        url: "me",
       }),
-      providesTags: ['Me']
+      providesTags: ["Me"],
     }),
     logout: builder.mutation({
       query: () => ({
-        method: 'GET',
-        url: 'logout'
+        method: "GET",
+        url: "logout",
       }),
-      invalidatesTags: ['Me']
+      invalidatesTags: ["Me"],
     }),
     login: builder.mutation({
       query: (body) => ({
-        method: 'POST',
+        method: "POST",
         body: body,
-        url: 'authenticate'
+        url: "authenticate",
       }),
-      invalidatesTags: ['Me']
+      invalidatesTags: ["Me"],
     }),
     signup: builder.mutation({
       query: (body) => ({
-        method: 'POST',
+        method: "POST",
         body: body,
-        url: 'accounts'
-      })
+        url: "accounts",
+      }),
     }),
     updateMe: builder.mutation({
       query: (body) => ({
-        method: 'PUT',
+        method: "PUT",
         body: body,
-        url: 'me'
+        url: "me",
       }),
-      invalidatesTags: ['Me']
-    })
-  })
-})
+      invalidatesTags: ["Me"],
+    }),
+  }),
+});
 
-export const { useMeQuery, useLogoutMutation, useLoginMutation, useSignupMutation, useUpdateMeMutation } = meApi;
+export const {
+  useMeQuery,
+  useLogoutMutation,
+  useLoginMutation,
+  useSignupMutation,
+  useUpdateMeMutation,
+} = meApi;
