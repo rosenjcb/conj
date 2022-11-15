@@ -21,6 +21,9 @@ const WithText = ({direction, component, text}) => {
   )
 }
 
+const y = 
+'blah'
+
 const customStyles = {
   content: {
     top: '50%',
