@@ -217,9 +217,6 @@ const BoardDrawer = (props) => {
           </Text>
         )}
       </BoardList>
-      <SearchForm onSubmit={handleSubmit}>
-        <Input type="text" />
-      </SearchForm>
     </BoardDrawerRoot>
   );
 };
@@ -249,21 +246,10 @@ const Page = styled.div`
   @media all and (max-width: 480px) {
     width: 100%;
   }
-`;
 
-const SearchForm = styled.form`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 10px;
-`;
-
-const Input = styled.input`
-  border-radius: 80px;
-  font-size: 2rem;
-  width: 60%;
-  margin-bottom: 10px;
-  padding: 0;
+  @media all and (max-width: 480px) {
+    width: 100%;
+  }
 `;
 
 const BoardList = styled.ul`
@@ -285,7 +271,7 @@ const BoardRow = styled.div`
   flex-direction: row;
   margin-left: 1rem;
   margin-right: 1rem;
-  border-radius: 9000px;
+  border-radius: 4px;
 `;
 
 const HighlightBoardRow = styled(BoardRow)`

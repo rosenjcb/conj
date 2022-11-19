@@ -1,15 +1,20 @@
-import React from 'react';
-import styled, { ThemeProvider } from 'styled-components';
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import Helmet from 'react-helmet';
-import { ThreadPage } from './pages/Thread';
-import { useSelector } from 'react-redux';
-import { WithNavBar } from './components/NavBar';
-import { AboutPage } from './pages/About';
-import { BoardPage } from './pages/Board';
-import { Toaster } from 'react-hot-toast';
-import chroma from 'chroma-js';
-import { ProfilePage } from './pages/Profile';
+import React from "react";
+import styled, { ThemeProvider } from "styled-components";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
+import Helmet from "react-helmet";
+import { ThreadPage } from "./pages/Thread";
+import { useSelector } from "react-redux";
+import { WithNavBar } from "./components/NavBar";
+import { AboutPage } from "./pages/About";
+import { BoardPage } from "./pages/Board";
+import { Toaster } from "react-hot-toast";
+import chroma from "chroma-js";
+import { ProfilePage } from "./pages/Profile";
 
 export const theme = {
   colors: {
@@ -22,14 +27,14 @@ export const theme = {
     black: "black",
     white: "white",
     grey: "#b9bbbe",
-  }
-}
+  },
+};
 
 function App() {
-  const thread = useSelector(state => state.thread);
+  const thread = useSelector((state) => state.thread);
 
   return (
-    <ThemeProvider theme={theme}>    
+    <ThemeProvider theme={theme}>
       <AppRoot>
         <Helmet>
           <title>Conj - A Social Media Reboot</title>
@@ -38,19 +43,21 @@ function App() {
           <Switch>
             <Route exact path="/">
               {/* <WithNavBar component={<AboutPage/>}/> */}
-              <Redirect to="/boards/random"/>
+              <Redirect to="/boards/random" />
             </Route>
             <Route exact path="/boards/:board">
-              <WithNavBar component={<BoardPage/>}/>
+              <WithNavBar component={<BoardPage />} />
             </Route>
             <Route path="/boards/:board/thread/:id">
-              <WithNavBar component={<ThreadPage preview={true} thread={thread}/>}/>
+              <WithNavBar
+                component={<ThreadPage preview={true} thread={thread} />}
+              />
             </Route>
-            <Route exact path ="/about">
-              <AboutPage/>
+            <Route exact path="/about">
+              <AboutPage />
             </Route>
             <Route exact path="/profile">
-              <WithNavBar component={<ProfilePage/>}/>
+              <WithNavBar component={<ProfilePage />} />
             </Route>
           </Switch>
         </Router>
@@ -65,7 +72,15 @@ const AppRoot = styled.div`
   flex-direction: column;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(112deg, transparent 0, transparent 20%, ${props => chroma(props.theme.colors.primary).alpha(0.1).hex()} 30%, ${props => chroma(props.theme.colors.primary).alpha(0.1).hex()} 70%, transparent 80%, transparent 100%);
+  background: linear-gradient(
+    112deg,
+    transparent 0,
+    transparent 20%,
+    ${(props) => chroma(props.theme.colors.primary).alpha(0.1).hex()} 30%,
+    ${(props) => chroma(props.theme.colors.primary).alpha(0.1).hex()} 70%,
+    transparent 80%,
+    transparent 100%
+  );
   overflow-x: hidden;
 `;
 

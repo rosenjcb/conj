@@ -1,42 +1,46 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const threadApi = createApi({
-  reducerPath: 'threadApi',
-  baseQuery: fetchBaseQuery({baseUrl: '/api/boards'}),
-  tagTypes: ['Thread', 'Threads'],
+  reducerPath: "threadApi",
+  baseQuery: fetchBaseQuery({ baseUrl: "/api/boards" }),
+  tagTypes: ["Thread", "Threads"],
   endpoints: (builder) => ({
     createThread: builder.mutation({
-      query: ({board, post}) => ({
-        method: 'POST',
+      query: ({ board, post }) => ({
+        method: "POST",
         url: `/${board}`,
-        body: post
+        body: post,
       }),
-      invalidatesTags: ['Threads']
+      invalidatesTags: ["Threads"],
     }),
     updateThread: builder.mutation({
-      query: ({board, threadNo, post}) => ({
-        method: 'PUT',
+      query: ({ board, threadNo, post }) => ({
+        method: "PUT",
         url: `/${board}/threads/${threadNo}`,
-        body: post
+        body: post,
       }),
-      invalidatesTags: ['Thread']
+      invalidatesTags: ["Thread"],
     }),
     fetchThread: builder.query({
-      query: ({board, threadNo}) => ({
-        method: 'GET',
-        url: `/${board}/threads/${threadNo}`
+      query: ({ board, threadNo }) => ({
+        method: "GET",
+        url: `/${board}/threads/${threadNo}`,
       }),
-      providesTags: ['Thread']
+      providesTags: ["Thread"],
     }),
     fetchThreads: builder.query({
       query: (board) => ({
-        method: 'GET',
-        url: `/${board}`
+        method: "GET",
+        url: `/${board}`,
       }),
-      providesTags: ['Threads']
-    })
-  })
+      providesTags: ["Threads"],
+    }),
+  }),
 });
 
-export const { useCreateThreadMutation, useUpdateThreadMutation, useFetchThreadQuery, useFetchThreadsQuery } = threadApi;
-
+export const {
+  useCreateThreadMutation,
+  useUpdateThreadMutation,
+  useFetchThreadQuery,
+  useFetchThreadsQuery,
+} = threadApi;

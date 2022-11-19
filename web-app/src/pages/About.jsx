@@ -1,20 +1,27 @@
-import React from 'react';
-import styled from 'styled-components';
-import Helmet from 'react-helmet';
-import { Text, Header } from '../components';
-import { Login } from '../components/Login';
-import { Thread } from '../components/Thread';
-import { detectMobile } from '../util/window';
+import React from "react";
+import styled from "styled-components";
+import Helmet from "react-helmet";
+import { Text, Header } from "../components";
+import { Login } from "../components/Login";
+import { Thread } from "../components/Thread";
+import { detectMobile } from "../util/window";
 
-const exampleThread = [{"id": 1, name: "cl0jure", comment: "Here's my first post, everyone!", subject: "Hello World", image: {"location": "dinosaur.jpg"}}]
+const exampleThread = [
+  {
+    id: 1,
+    name: "cl0jure",
+    comment: "Here's my first post, everyone!",
+    subject: "Hello World",
+    image: { location: "dinosaur.jpg" },
+  },
+];
 
-// const introText = 
+// const introText =
 // `
 //   Social media is experience a slump blah blah blah.
 // `;
 
-const threadText = 
-`
+const threadText = `
   Come join the discussion today on one of our many boards. Create a new thread or reply to one of the many other posts. 
 `;
 
@@ -28,31 +35,48 @@ export function AboutPage() {
         Welcome to Conj
       </Header>
       <Header bold size="large">
-        A Social Media Reboot 
+        A Social Media Reboot
       </Header>
       <DetailsContainer>
-        <Info reverse text={threadText} component={<Thread preview={true} thread={exampleThread}/>}/>
-        <Info text="epsum lorem lololo" component={<Thread preview={true} thread={exampleThread}/>}/>
+        <Info
+          reverse
+          text={threadText}
+          component={<Thread preview={true} thread={exampleThread} />}
+        />
+        <Info
+          text="epsum lorem lololo"
+          component={<Thread preview={true} thread={exampleThread} />}
+        />
       </DetailsContainer>
-      <Login/>
+      <Login />
     </Root>
-  )
+  );
 }
 
-const Info = ({text, component, reverse}) => {
-
+const Info = ({ text, component, reverse }) => {
   const isMobile = detectMobile();
 
-  const content = reverse && !isMobile
-    ? [<Item><Text bold size="large" align="left">{text}</Text></Item>,<Item>{component}</Item>]
-    : [<Item>{component}</Item>,<Item><Text bold align="right" size="large">{text}</Text></Item>]
+  const content =
+    reverse && !isMobile
+      ? [
+          <Item>
+            <Text bold size="large" align="left">
+              {text}
+            </Text>
+          </Item>,
+          <Item>{component}</Item>,
+        ]
+      : [
+          <Item>{component}</Item>,
+          <Item>
+            <Text bold align="right" size="large">
+              {text}
+            </Text>
+          </Item>,
+        ];
 
-  return (
-    <InfoRoot>
-      {content}
-    </InfoRoot>
-  )
-}
+  return <InfoRoot>{content}</InfoRoot>;
+};
 
 const InfoRoot = styled.div`
   display: flex;
@@ -66,16 +90,16 @@ const InfoRoot = styled.div`
   @media all and (min-width: 1024px) {
     flex-direction: row;
   }
-  
+
   @media all and (min-width: 768px) and (max-width: 1024px) {
     flex-direction: column;
   }
-  
+
   @media all and (min-width: 480px) and (max-width: 768px) {
     flex-direction: column;
   }
-  
-  @media all and (max-width: 480px) { 
+
+  @media all and (max-width: 480px) {
     flex-direction: column;
   }
 `;
@@ -114,4 +138,4 @@ const DetailsContainer = styled.div`
   margin: 0 auto;
   margin-top: 1rem;
   margin-bottom: 1rem;
- `;
+`;
