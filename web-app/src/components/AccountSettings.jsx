@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import { Formik, Field } from "formik";
 import { Header, RoundButton, InputField, InputFile } from "./index";
 import { useMeQuery, useUpdateMeMutation } from "../api/account";
@@ -8,9 +7,7 @@ import toast from "react-hot-toast";
 import { parseError } from "../util/error";
 import chroma from "chroma-js";
 
-export function AccountSettings() {
-  const history = useHistory();
-
+export function AccountSettings({ onFinish }) {
   const [updateMe] = useUpdateMeMutation();
 
   const { data: me, error } = useMeQuery();
@@ -24,13 +21,14 @@ export function AccountSettings() {
       actions.setSubmitting(false);
       var formData = new FormData();
       for (var key in values) {
-        formData.append(key, values[key]);
+        if (values[key] !== null && values[key] !== "") {
+          formData.append(key, values[key]);
+        }
       }
       await updateMe(formData).unwrap();
-      history.push("/");
-      history.go();
+      onFinish();
     } catch (e) {
-      toast.error(parseError(e));
+      if (e.data) toast.error(e.data);
     }
   };
 

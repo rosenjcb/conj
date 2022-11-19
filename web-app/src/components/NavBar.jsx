@@ -73,7 +73,7 @@ export const WithNavBar = ({ component }) => {
     try {
       await logout().unwrap();
     } catch (e) {
-      toast.error(e.data);
+      if (e.data) toast.error(e.data);
     } finally {
       setIsComponentVisible(false);
     }
@@ -120,7 +120,7 @@ export const WithNavBar = ({ component }) => {
         isOpen={accountIsOpen}
         onRequestClose={closeAccount}
       >
-        <AccountSettings />
+        <AccountSettings onFinish={closeAccount} />
       </ReactModal>
       <ReactModal
         style={customStyle}
@@ -180,6 +180,10 @@ const BoardDrawer = (props) => {
 
   const { board } = useThread();
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  };
+
   const handleClick = (board) => {
     console.log(board);
     history.push(`/boards/${board}`);
@@ -236,6 +240,10 @@ const Page = styled.div`
   }
 
   @media all and (min-width: 480px) and (max-width: 768px) {
+    width: 100%;
+  }
+
+  @media all and (max-width: 480px) {
     width: 100%;
   }
 
