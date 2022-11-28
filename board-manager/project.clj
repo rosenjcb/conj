@@ -28,7 +28,8 @@
                  [com.cognitect.aws/api "0.8.561"]
                  [com.cognitect.aws/endpoints "1.1.12.230"]
                  [com.cognitect.aws/s3 "822.2.1145.0"]
-                 [lambdaisland/uri "1.13.95"]]
+                 [lambdaisland/uri "1.13.95"]
+                 [clj-http "3.12.3"]]
   :exclusions [; Exclude transitive dependencies on concrete implementations
                ; and adapters of the above java logging abstractions:
                [ch.qos.logback/logback-classic]
@@ -59,7 +60,9 @@
                  :redis-host "localhost"
                  :redis-port 6379
                  :host "0.0.0.0"
-                 :port 8080}}
+                 :port 8080
+                 :google-client-id "602129467689-pe4l4im2nr62t14ae50quc1uj2dd5um1.apps.googleusercontent.com"
+                 :google-client-secret "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"}}
    :dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]
          :migratus {:store :database
@@ -75,4 +78,6 @@
                :redis-host "conj-redis-cluster.ghplor.ng.0001.usw2.cache.amazonaws.com"
                :redis-port 6379
                :host "0.0.0.0"
-               :port 8080}}})
+               :port 8080}
+               :google-client-id "602129467689-pe4l4im2nr62t14ae50quc1uj2dd5um1.apps.googleusercontent.com"
+               :google-client-secret "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"}})

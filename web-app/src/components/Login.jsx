@@ -7,6 +7,8 @@ import chroma from "chroma-js";
 import { Header, RoundButton, Back, InputField } from "./index";
 import toast from "react-hot-toast";
 import PropTypes from "prop-types";
+import { useGoogleLogin } from "@react-oauth/google";
+import { GoogleLoginButton } from "react-social-login-buttons";
 
 function SignUp({ onClick }) {
   const history = useHistory();
@@ -103,6 +105,18 @@ export function Login({ completeAction }) {
     }
   };
 
+  const handleOauth = (res) => {
+    const { code } = res;
+
+    console.log(res);
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: handleOauth,
+    onFailure: handleOauth,
+    flow: "auth-code",
+  });
+
   if (signUp) {
     return <SignUp onClick={() => setSignUp(false)} />;
   }
@@ -124,30 +138,8 @@ export function Login({ completeAction }) {
             <Header size="medium" bold>
               Welcome to Conj!
             </Header>
-            <Field
-              label="EMAIL"
-              type="email"
-              autocomplete="email"
-              name="email"
-              placeholder="user@domain.com"
-              component={InputField}
-            />
-            <Field
-              label="PASSWORD"
-              type="password"
-              autocomplete="current-password"
-              name="pass"
-              secret={true}
-              component={InputField}
-            />
             <SubmitOptions>
-              <RoundButton type="submit">Login</RoundButton>
-              <RoundButton
-                type="button"
-                onClick={() => handleSignup(props.values)}
-              >
-                Signup
-              </RoundButton>
+              <GoogleLoginButton onClick={() => googleLogin()} />
             </SubmitOptions>
           </StyledForm>
         )}

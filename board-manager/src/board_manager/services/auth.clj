@@ -1,15 +1,14 @@
 (ns board-manager.services.auth
   (:require [board-manager.model.account :as m.account]
             [board-manager.query.account :as q.account]
-            [buddy.hashers :as hashers] 
-            [buddy.sign.jwt :as jwt]
+            [board-manager.query.refresh-token :as q.refresh-token]
             [buddy.core.keys :as ks]
-            [clojure.tools.logging :as log]
+            [buddy.hashers :as hashers]
+            [buddy.sign.jwt :as jwt]
             [clojure.java.io :as io]
+            [clojure.tools.logging :as log]
             [com.stuartsierra.component :as component]
-            [java-time :as t]
-            [board-manager.query.refresh-token :as q.refresh-token]))
-
+            [java-time :as t]))
 
 (defn- encrypt [auth-service pass]
   (let [salt (:salt auth-service)]

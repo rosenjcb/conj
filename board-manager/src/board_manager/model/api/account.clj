@@ -1,5 +1,14 @@
 (ns board-manager.model.api.account
-  (:require [board-manager.model.api.common :as api.common]))
+  (:require [board-manager.model.api.common :as api.common]
+            [board-manager.util.uri :as util.uri]))
+
+(def conj-provider "conj")
+(def google-provider "google")
+(def oauth-providers #{conj-provider google-provider})
+
+(defn oauth-provider? 
+  [s]
+  (some? (oauth-providers s)))
 
 (defn email? [s]
   (let [re-email #"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"]
@@ -37,17 +46,60 @@
     {:error/message "Avatar picture must be a valid image file"}
     map?]])
 
-(def new-account
+(def provider-fn
+  [:provider
+   [:fn
+    {:error/message "No valid oauth provider found"}
+    oauth-provider?]])
+
+(def code-fn
+  [:code
+   [:fn
+    {:error/message "No valid oauth provider found"}
+    string?]])
+
+(def redirect-uri
+  [:redirectUri
+   [:fn
+    {:error/message "No valid redirect-uri found"}
+    util.uri/uri?]])
+
+(def conj-account
   [:map
    email
    pass
    username
    (api.common/optional avatar)])
 
-(def auth-account 
+(def google-account
   [:map
-   email
-   pass])
+   provider-fn
+   username
+   (api.common/optional avatar)])
+
+(def new-account
+  [:enum
+   conj-account
+   google-account])
+
+(def conj-auth
+  [:map
+    {:closed true}
+    email
+    pass
+    provider-fn])
+
+(def google-auth 
+  [:map
+   {:closed true}
+   provider-fn
+   code-fn
+   redirect-uri])
+
+(def auth-account 
+  [:or
+   conj-auth
+   google-auth])
 
 (def update-me
   [:map

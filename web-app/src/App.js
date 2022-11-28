@@ -15,6 +15,7 @@ import { BoardPage } from "./pages/Board";
 import { Toaster } from "react-hot-toast";
 import chroma from "chroma-js";
 import { ProfilePage } from "./pages/Profile";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const theme = {
   colors: {
@@ -30,39 +31,44 @@ export const theme = {
   },
 };
 
+const clientId =
+  "602129467689-pe4l4im2nr62t14ae50quc1uj2dd5um1.apps.googleusercontent.com";
+
 function App() {
   const thread = useSelector((state) => state.thread);
 
   return (
     <ThemeProvider theme={theme}>
-      <AppRoot>
-        <Helmet>
-          <title>Conj - A Social Media Reboot</title>
-        </Helmet>
-        <Router forceRefresh>
-          <Switch>
-            <Route exact path="/">
-              {/* <WithNavBar component={<AboutPage/>}/> */}
-              <Redirect to="/boards/random" />
-            </Route>
-            <Route exact path="/boards/:board">
-              <WithNavBar component={<BoardPage />} />
-            </Route>
-            <Route path="/boards/:board/thread/:id">
-              <WithNavBar
-                component={<ThreadPage preview={true} thread={thread} />}
-              />
-            </Route>
-            <Route exact path="/about">
-              <AboutPage />
-            </Route>
-            <Route exact path="/profile">
-              <WithNavBar component={<ProfilePage />} />
-            </Route>
-          </Switch>
-        </Router>
-        <Toaster />
-      </AppRoot>
+      <GoogleOAuthProvider clientId={clientId}>
+        <AppRoot>
+          <Helmet>
+            <title>Conj - A Social Media Reboot</title>
+          </Helmet>
+          <Router forceRefresh>
+            <Switch>
+              <Route exact path="/">
+                {/* <WithNavBar component={<AboutPage/>}/> */}
+                <Redirect to="/boards/random" />
+              </Route>
+              <Route exact path="/boards/:board">
+                <WithNavBar component={<BoardPage />} />
+              </Route>
+              <Route path="/boards/:board/thread/:id">
+                <WithNavBar
+                  component={<ThreadPage preview={true} thread={thread} />}
+                />
+              </Route>
+              <Route exact path="/about">
+                <AboutPage />
+              </Route>
+              <Route exact path="/profile">
+                <WithNavBar component={<ProfilePage />} />
+              </Route>
+            </Switch>
+          </Router>
+          <Toaster />
+        </AppRoot>
+      </GoogleOAuthProvider>
     </ThemeProvider>
   );
 }
