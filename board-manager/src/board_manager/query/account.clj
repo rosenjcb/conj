@@ -6,7 +6,7 @@
     [java-time :as t]))
 
 (defn- q-account-by-id [id]
-  {:select [:id :email :last_reply :last_thread :role :username :avatar]
+  {:select [:id :email :last_reply :last_thread :role :username :avatar :provider :is_onboarding]
    :from [:account]
    :where [:= m.account/id id]})
 
@@ -20,10 +20,10 @@
    :from [:account]
    :where [:= m.account/email email]})
 
-(defn- q-add-account [{:keys [email pass username avatar]}]
+(defn- q-add-account [{:keys [email pass username avatar provider is_onboarding]}]
   {:insert-into [:account]
-   :columns [:email :pass :username :role :avatar]
-   :values [[email pass username m.account/user-role avatar]]})
+   :columns [:email :pass :username :role :avatar :provider :is_onboarding]
+   :values [[email pass username m.account/user-role avatar provider is_onboarding]]})
 
 (defn- q-update-last-reply [account-id]
   {:update [:account]

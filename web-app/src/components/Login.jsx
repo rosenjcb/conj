@@ -96,7 +96,6 @@ export function Login({ completeAction }) {
 
   const handleLogin = async (values, actions) => {
     try {
-      await login(values).unwrap();
       toast.success("Welcome back!");
     } catch (e) {
       toast.error(e.data);
@@ -105,8 +104,22 @@ export function Login({ completeAction }) {
     }
   };
 
-  const handleOauth = (res) => {
+  const handleOauth = async (res) => {
     const { code } = res;
+
+    try {
+      const account = await login({
+        provider: "google",
+        code,
+        redirectUri: "https://conj.app/oauth",
+      }).unwrap();
+      console.log(account);
+      toast.success("Welcome back!");
+    } catch (e) {
+      toast.error(e.data);
+    } finally {
+      completeAction();
+    }
 
     console.log(res);
   };

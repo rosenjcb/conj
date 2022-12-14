@@ -36,9 +36,9 @@
     (try 
       (let [avatar (get account-req "image")
             {:keys [location]} (when avatar (upload-avatar s3-client avatar))
-            account (->> (assoc account-req m.account/avatar location)
+            account (->> (assoc account-req m.account/avatar location m.account/provider m.account/conj-provider)
                          walk/keywordize-keys
-                         (s.auth/add-account! auth-service))]
+                         (s.auth/add-account! auth-service :conj))]
         (->> (:refresh-token account)
              (set-cookies (response/status 200))))
       (catch PSQLException e
@@ -50,7 +50,7 @@
 (defn- do-authenticate-conj! [req]
   (let [auth-service (get-in req [:components :auth-service])
         credentials (get-in req [:parameters :body])
-        conjtoken (s.auth/create-auth-token! auth-service credentials)]
+        conjtoken (s.auth/create-auth-token! auth-service credentials m.account/conj-provider)]
     (if conjtoken 
       (-> (response/status 200)  
           (set-cookies conjtoken))
@@ -61,14 +61,17 @@
 (defn do-authenticate-google! [req]
   (try
     (let [db-conn (get-in req [:components :db-conn])
+          auth-service (get-in req [:components :auth-service])
           google-client (get-in req [:components :google-client])
           {:keys [redirectUri code]} (get-in req [:parameters :body])
           {:keys [id_token]} (google.client/authorize google-client code redirectUri)
           {:keys [email]} (:payload (util.jwt/decode id_token))
-          user-exists? (some? (q.account/find-account-by-email! db-conn email))]
-      (if user-exists?
-        (response/status 200)
-        (response/not-found email)))
+          user-exists? (some? (q.account/find-account-by-email! db-conn email))] 
+      (when-not user-exists?
+        (log/infof "Creating new google user %s" email)
+        (->> (m.account/new-account {m.account/email email m.account/provider m.account/google-provider})
+             (q.account/create-account! db-conn)))
+      (set-cookies (response/status 200) (s.auth/create-auth-token! auth-service {:email email} m.account/google-provider)))
     (catch Exception e
       (log/error e)
       (response/bad-request "Couldn't authenticate Google"))))

@@ -1,16 +1,15 @@
 (ns board-manager.model.account 
   (:require [board-manager.util.uri :as util.uri]))
 
-(def schema 
-  [:map
-   [:id number?]
-   [:email string?]
-   [:pass string?]
-   [:last_post inst?]
-   [:last_thread inst?]
-   [:role [:enum "user" "admin"]]
-   [:username string?]
-   [:avatar util.uri/uri?]])
+(def conj-provider "conj")
+(def google-provider "google")
+
+(def ^:const user-role "user")
+
+(def ^:const admin-role "admin")
+
+(defn- valid-provider? [provider]
+  (#{conj-provider google-provider} provider))
 
 (def id :id)
 
@@ -24,10 +23,35 @@
 
 (def role :role)
 
-(def ^:const user-role "user")
-
-(def ^:const admin-role "admin")
-
 (def username :username)
 
 (def avatar :avatar)
+
+(def provider :provider)
+
+(def is-onboarding :is_onboarding)
+
+(def schema 
+  [:map
+   [id number?]
+   [email string?]
+   [pass string?]
+   [last-reply inst?]
+   [last-thread inst?]
+   [role [:enum user-role admin-role]]
+   [username string?]
+   [avatar util.uri/uri?]
+   [is-onboarding boolean?]])
+
+(def default 
+  {role user-role 
+   email ""
+   pass ""
+   username ""
+   avatar ""
+   is-onboarding true})
+
+(defn new-account
+  [account]
+  (-> (merge default account)
+      (select-keys (keys default))))
