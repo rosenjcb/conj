@@ -58,11 +58,14 @@
     {:error/message "No valid oauth provider found"}
     string?]])
 
+(defn- redirect-uri? [s]
+  (or (util.uri/uri? s) (= "postmessage" s)))
+
 (def redirect-uri
   [:redirectUri
    [:fn
     {:error/message "No valid redirect-uri found"}
-    util.uri/uri?]])
+    redirect-uri?]])
 
 (def conj-account
   [:map

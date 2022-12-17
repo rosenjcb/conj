@@ -111,14 +111,14 @@ export function Login({ completeAction }) {
       const account = await login({
         provider: "google",
         code,
-        redirectUri: "https://conj.app/oauth",
+        redirectUri: "postmessage",
       }).unwrap();
       console.log(account);
       toast.success("Welcome back!");
     } catch (e) {
       toast.error(e.data);
     } finally {
-      completeAction();
+      // completeAction();
     }
 
     console.log(res);

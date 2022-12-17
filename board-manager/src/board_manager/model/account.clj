@@ -44,11 +44,12 @@
    [is-onboarding boolean?]])
 
 (def default 
-  {role user-role 
+  {role user-role
    email ""
    pass ""
    username ""
    avatar ""
+   provider conj-provider
    is-onboarding true})
 
 (defn new-account
