@@ -110,3 +110,9 @@
    (api.common/optional username)
    (api.common/optional email)
    (api.common/optional avatar)])
+
+(def onboard-me
+  [:map
+   {:closed true}
+   username
+   (api.common/optional avatar)])

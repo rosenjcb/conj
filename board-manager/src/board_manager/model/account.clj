@@ -56,3 +56,9 @@
   [account]
   (-> (merge default account)
       (select-keys (keys default))))
+
+(defn finish-onboarding
+  ([account new-username] 
+   (finish-onboarding account new-username nil))
+  ([account new-username new-avatar]
+   (assoc account username new-username avatar new-avatar is-onboarding false)))

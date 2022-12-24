@@ -66,12 +66,13 @@
           {:keys [redirectUri code]} (get-in req [:parameters :body])
           {:keys [id_token]} (google.client/authorize google-client code redirectUri)
           {:keys [email]} (:payload (util.jwt/decode id_token))
-          user-exists? (some? (q.account/find-account-by-email! db-conn email))] 
-      (when-not user-exists?
+          account (q.account/find-account-by-email! db-conn email)
+          user-exists? (some? account)
+          new-account (when-not user-exists? (m.account/new-account {m.account/email email m.account/provider m.account/google-provider}))] 
+      (when-not user-exists? 
         (log/infof "Creating new google user %s" email)
-        (->> (m.account/new-account {m.account/email email m.account/provider m.account/google-provider})
-             (q.account/create-account! db-conn)))
-      (set-cookies (response/status 200) (s.auth/create-auth-token! auth-service {:email email} m.account/google-provider)))
+        (q.account/create-account! db-conn new-account))
+      (set-cookies (response/response (or account new-account)) (s.auth/create-auth-token! auth-service {:email email} m.account/google-provider)))
     (catch Exception e
       (log/error e)
       (response/bad-request "Couldn't authenticate Google"))))
@@ -97,7 +98,26 @@
               response/response)
       (catch Exception e
         (log/errorf e "Error found for account id %s" account-id)
-        (response/bad-request "Couldn't update your account for one reason or another.")))))
+        (response/bad-request "Couldn't update your account for some reason.")))))
+
+(defn onboard-account! [req]
+  (let [db (get-in req [:components :db-conn])
+        s3-client (get-in req [:components :s3-client])
+        account-id (get-in req [:account :id])
+        account (q.account/find-account-by-id! db account-id)
+        {:keys [avatar username]} (walk/keywordize-keys (:multipart-params req))
+        is-onboarding (m.account/is-onboarding account)
+        {:keys [location]} (when avatar (upload-avatar s3-client avatar))
+        final (m.account/finish-onboarding account username (or location (m.account/avatar account)))]
+    (if is-onboarding
+      (try
+        (some-> (q.account/update-account! db final account-id)
+                (dissoc m.account/pass)
+                response/response)
+        (catch Exception e
+          (log/errorf e "Error found for account id %s" account-id)
+          (response/bad-request "Couldn't finish onboarding the account for some reason.")))
+      (response/bad-request "User has already completed onboarding."))))
 
 (def account-routes
   [["/accounts"
@@ -130,6 +150,13 @@
             :coercion malli/coercion
             :parameters {:body api.account/google-auth}
             :handler do-authenticate-google!}}]
+   ["/onboarding"
+    {:post {:name ::onboarding
+            :summary "Finishes onboarding for an existing account"
+            :coercion malli/coercion
+            :middleware [[middleware/wrap-auth]]
+            :parameters {:multipart-params api.account/onboard-me}
+            :handler onboard-account!}}]
    ["/logout"
     {:get {:name ::logout
            :summary "Logs the user out and deletes their cookies"

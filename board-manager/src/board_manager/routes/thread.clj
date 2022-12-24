@@ -118,7 +118,7 @@
    ["/boards/:board"
    {:get peek-threads! 
     :post {:summary "Create a Thread" 
-           :middleware [[middleware/wrap-auth]]
+           :middleware [[middleware/full-wrap-auth]]
            :coercion malli.coercion/coercion
            :parameters {:multipart-params thread-body}
            :handler create-thread!}
@@ -134,7 +134,7 @@
             :parameters {:path thread-path
                          :multipart-params post-body}
             :coercion malli.coercion/coercion
-            :middleware [[middleware/wrap-auth]]
+            :middleware [[middleware/full-wrap-auth]]
             :handler put-thread!}
       :delete {:summary "Deletes a thread"
                :parameters {:path thread-path}

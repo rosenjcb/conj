@@ -1,8 +1,164 @@
+import PropTypes from "prop-types";
 import styled from "styled-components";
 import chroma from "chroma-js";
 import { BsFillPersonFill } from "react-icons/bs";
 import { BiArrowBack } from "react-icons/bi";
+import { RxCross1 } from "react-icons/ri";
 import { useState } from "react";
+import ReactModal from "react-modal";
+import { detectMobile } from "../util/window";
+
+// const customStyle = {
+//   overlay: {
+//     inset: 0,
+//     zIndex: 2,
+//   },
+//   content: {
+//     inset: 0,
+//     right: 0,
+//     padding: 0,
+//     margin: 0,
+//     width: '100%',
+//     height: '100%',
+//     backgroundColor: 'white',
+//     borderRadius: '0px',
+//     border: 'none'
+//   },
+// };
+
+// const customStyle = {
+//   overlay: {
+//     zIndex: 2,
+//     backgroundColor: "rgba(0, 0, 0, 0.3)",
+//   },
+//   content: {
+//     top: "50%",
+//     left: "50%",
+//     right: "auto",
+//     bottom: "auto",
+//     marginRight: "-50%",
+//     transform: "translate(-50%, -50%)",
+//     padding: "0",
+//     border: "none",
+//     borderRadius: "0px",
+//     background: "none",
+//   },
+// };
+
+export const ModalBase = ({
+  children,
+  isOpen,
+  onRequestClose,
+  className,
+  title,
+  noExit,
+}) => {
+  const contentClassName = `${className}__content`;
+  const overlayClassName = `${className}__overlay`;
+
+  const isMobile = detectMobile();
+
+  return (
+    <ReactModal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      ariaHideApp={false}
+      portalClassName={className}
+      overlayClassName={overlayClassName}
+      className={contentClassName}
+    >
+      <ModalRoot>
+        <TitleBar>
+          {isMobile && noExit !== true ? (
+            <Back onClick={onRequestClose} />
+          ) : (
+            <span />
+          )}
+          {title ? <Header bold>{title}</Header> : null}
+          <span />
+        </TitleBar>
+        {children}
+      </ModalRoot>
+    </ReactModal>
+  );
+};
+
+ModalBase.propTypes = {
+  isOpen: PropTypes.bool,
+  onRequestClose: PropTypes.func,
+  title: PropTypes.string,
+};
+
+const ModalRoot = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+`;
+
+const TitleBar = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-items: center;
+
+  @media all and (min-width: 1024px) and (max-width: 1280px) {
+    justify-content: center;
+  }
+
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    justify-content: center;
+  }
+
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    justify-content: center;
+  }
+
+  @media all and (max-width: 480px) {
+    justify-content: space-between;
+  }
+`;
+
+export const Modal = styled(ModalBase)`
+  &__content {
+    z-index: 99999;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    padding: 0;
+    border: none;
+    border-radius: 0px;
+    background-color: ${(props) => props.theme.colors.white};
+
+    @media all and (min-width: 1024px) and (max-width: 1280px) {
+      width: 400px;
+    }
+
+    @media all and (min-width: 768px) and (max-width: 1024px) {
+      width: 400px;
+    }
+
+    @media all and (min-width: 480px) and (max-width: 768px) {
+      width: 400px;
+    }
+
+    @media all and (max-width: 480px) {
+      width: 100%;
+    }
+  }
+
+  &__overlay {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+`;
 
 export const HR = styled.hr`
   width: ${(props) => props.width ?? "100%"};
@@ -41,29 +197,29 @@ const sizeCompute = (tag, size) => {
     case "p":
       break;
     case "h1":
-      multiplier = 1.5;
+      multiplier = 1.25;
       break;
     default:
       break;
   }
   switch (size) {
     case "small":
-      res = `${0.75 * multiplier}rem`;
+      res = `${0.75 * multiplier}em`;
       break;
     case "medium":
-      res = `${1 * multiplier}rem`;
+      res = `${1 * multiplier}em`;
       break;
     case "large":
-      res = `${1.25 * multiplier}rem`;
+      res = `${1.25 * multiplier}em`;
       break;
     case "x-large":
-      res = `${1.5 * multiplier}rem`;
+      res = `${1.5 * multiplier}em`;
       break;
     case "xx-large":
-      res = `${2 * multiplier}rem`;
+      res = `${2 * multiplier}em`;
       break;
     default:
-      res = "1rem";
+      res = "rem";
   }
   return res;
 };
@@ -170,10 +326,14 @@ export const Link = styled.a`
   color: ${(props) => props.theme.colors.black};
 `;
 
-export const Checkbox = ({ label, onClick, checked, disabled }) => {
+export const Checkbox = ({ label, onChange, checked, disabled }) => {
   return (
     <CheckBoxContainer>
-      <StyledCheckbox disabled={disabled} checked={checked} onClick={onClick} />
+      <StyledCheckbox
+        disabled={disabled}
+        checked={checked}
+        onChange={onChange}
+      />
       {label ? (
         <Text bold noOverflow size="medium">
           {label}
@@ -241,9 +401,9 @@ const InputFieldRoot = styled.div`
 const Label = styled.label`
   display: flex;
   justify-content: flex-start;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 8px;
+  font-size: 1em;
+  font-weight: 650;
+  margin-bottom: 6px;
   color: ${(props) => props.theme.colors.black};
 `;
 
@@ -268,11 +428,8 @@ const StyledCheckbox = styled.input.attrs((props) => ({ type: "checkbox" }))`
 `;
 
 export const Back = styled(BiArrowBack)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 64px;
-  height: 64px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
 
   &:hover {
