@@ -54,8 +54,11 @@
 
 (defn new-account
   [account]
-  (-> (merge default account)
-      (select-keys (keys default))))
+  (let [populated-username (or (username account) (apply str (repeatedly 8 #(rand-nth "abcdefghijklmnopqrstuvwxyz"))))
+        populated-email (or (email account) (apply str populated-username "@fake.com"))]
+    (-> (merge default)
+        (assoc username populated-username email populated-email)
+        (select-keys (keys default)))))
 
 (defn finish-onboarding
   ([account new-username] 
