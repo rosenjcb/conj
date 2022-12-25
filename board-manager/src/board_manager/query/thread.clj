@@ -10,8 +10,7 @@
             [clojure.java.io :as io]
             [clojure.set :as set]
             [clojure.tools.logging :as log]
-            [java-time :as t]
-            [ring.util.response :as response]))
+            [java-time :as t]))
 
 (def ^:const min-character-count 15)
 (def ^:const max-character-count 5000)

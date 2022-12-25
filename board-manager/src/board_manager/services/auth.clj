@@ -1,7 +1,6 @@
 (ns board-manager.services.auth
   (:require [board-manager.model.account :as m.account]
             [board-manager.query.account :as q.account]
-            ;; [board-manager.query.refresh-token :as q.refresh-token]
             [buddy.core.keys :as ks]
             [buddy.hashers :as hashers]
             [buddy.sign.jwt :as jwt]
@@ -32,27 +31,13 @@
         exp (-> (t/plus now (t/days 1)) (t/sql-timestamp))]
     (jwt/sign (dissoc account :pass) (privkey auth-conf) {:alg :rs256 :exp exp})))
 
-;; (defn- make-refresh-token! [db-conn auth-conf account]
-;;   (let [iat (t/sql-timestamp (t/zoned-date-time))
-;;         expiry (->> (t/plus (t/zoned-date-time) (t/days 30))
-;;                     (t/sql-timestamp))
-;;         token (jwt/sign {:account-id (:id account)}
-;;                         (privkey auth-conf)
-;;                         {:alg :rs256 :iat iat :exp expiry})
-;;         refresh-token {:account_id (:id account) :expiry expiry :token token :valid true}]
-;;     (q.refresh-token/add-refresh-token! db-conn refresh-token)
-;;     token))
-
 (defn create-auth-token! [auth-service credentials provider]
   (let [auth-conf (:auth-conf auth-service)
         db-conn (:db-conn auth-service)
         account (q.account/find-account-by-email! db-conn (:email credentials))
-        ;; id (m.account/id account)
         auth-account (or (not= m.account/conj-provider provider) (hashers/check (:pass credentials) (:pass account)))]
     (when auth-account
-      ;; (q.refresh-token/delete-by-account-id db-conn id)  
       {:access-token (make-access-token! auth-conf account)})))
-      ;;  :refresh-token (make-refresh-token! db-conn auth-conf account)})))
 
 (defn add-account! [auth-service provider account]
   (let [db-conn (:db-conn auth-service)
