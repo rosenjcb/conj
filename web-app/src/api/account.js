@@ -55,6 +55,14 @@ export const meApi = createApi({
       }),
       invalidatesTags: ["Me"],
     }),
+    finishOnboarding: builder.mutation({
+      query: (body) => ({
+        method: "POST",
+        body: body,
+        url: "onboarding",
+      }),
+      invalidatesTags: ["Me"],
+    }),
   }),
 });
 
@@ -64,4 +72,5 @@ export const {
   useLoginMutation,
   useSignupMutation,
   useUpdateMeMutation,
+  useFinishOnboardingMutation,
 } = meApi;

@@ -17,7 +17,8 @@
             [cognitect.aws.client.api :as aws]
             [ring.util.response :as response]
             [ring.middleware.cookies :as cookies]
-            [ring.middleware.multipart-params :as multipart])
+            [ring.middleware.multipart-params :as multipart]
+            [board-manager.services.google-client :as google.client])
   (:import (com.zaxxer.hikari HikariDataSource))
   (:gen-class))
 
@@ -30,7 +31,9 @@
    :passphrase (env :passphrase)
    :port (env :port)
    :redis-host (env :redis-host)
-   :redis-port (env :redis-port)})
+   :redis-port (env :redis-port)
+   :google-client-id (env :google-client-id)
+   :google-client-secret (env :google-client-secret)})
 
 (defn app-middleware [handler state]
   (fn [request]
@@ -65,10 +68,10 @@
     (spa-fallback-handler)
     (ring/create-default-handler))))
 
-(defrecord Api [handler db-conn redis-conn auth-service s3-client]
+(defrecord Api [handler db-conn redis-conn auth-service s3-client google-client]
   component/Lifecycle
   (start [this]
-    (let [wrapped-app (app-middleware api-config {:db-conn db-conn :redis-conn redis-conn :auth-service auth-service :s3-client s3-client})] 
+    (let [wrapped-app (app-middleware api-config {:db-conn db-conn :redis-conn redis-conn :auth-service auth-service :s3-client s3-client :google-client google-client})] 
       (assoc this :handler wrapped-app)))
 
   (stop [this]
@@ -95,7 +98,8 @@
   (map->JettyServer {:port port}))
 
 (defn system [config]
-  (let [{:keys [db-host db-port db-name db-user db-pass port redis-host redis-port passphrase]} config
+  (let [{:keys [db-host db-port db-name db-user db-pass port redis-host redis-port passphrase
+                google-client-id google-client-secret]} config
         s3-client (aws/client {:api :s3 :region :us-west-2})
         db-spec {:dbtype "postgresql" :host db-host :port db-port :dbname db-name :username db-user :password db-pass}
         redis-conn {:pool {} :spec {:uri (str "redis://" redis-host ":" redis-port)}}]
@@ -104,8 +108,9 @@
      :db-conn (connection/component HikariDataSource db-spec)
      :redis-conn redis-conn
      :s3-client s3-client
-     :api (component/using (new-api api-config) [:db-conn :redis-conn :auth-service :s3-client])
      :auth-service (component/using (auth.service/new-service {:salt "1234" :auth-conf {:privkey "auth_privkey.pem" :pubkey "auth_pubkey.pem" :passphrase passphrase}}) [:db-conn])
+     :google-client (component/using (google.client/new-api-client google-client-id google-client-secret) [])
+     :api (component/using (new-api api-config) [:db-conn :redis-conn :auth-service :s3-client :google-client])
      :server (component/using
               (new-server (Integer/parseInt port))
               [:api]))))

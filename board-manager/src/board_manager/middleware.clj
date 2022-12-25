@@ -10,6 +10,17 @@
         unsigned-auth (when access-token (auth.service/unsign-token! auth-service access-token))]
     {:cookie cookie :auth unsigned-auth}))
 
+(defn wrap-onboarding [handler]
+  (fn [request]
+    (let [{:keys [auth]} (fetch-cookie&account request)
+      db-conn (get-in request [:components :db-conn])
+      account-id (m.account/id auth)
+      account (q.account/find-account-by-id! db-conn account-id)
+      is-onboarding (m.account/is-onboarding account)]
+    (if (not is-onboarding)
+      (handler request)
+      {:status 401 :headers {} :body "You need to complete onboarding before doing that."}))))
+
 (defn wrap-auth [handler]
   (fn [request]
     (try
@@ -27,6 +38,11 @@
         {:status 401
          :headers {}
          :body (.getMessage e)}))))
+
+(defn full-wrap-auth [handler]
+  (-> handler
+      wrap-auth
+      wrap-onboarding))
 
 (defn wrap-admin [handler]
   (fn [request]

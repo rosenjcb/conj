@@ -7,40 +7,23 @@ import chroma from "chroma-js";
 import { FiMenu } from "react-icons/fi";
 import { RiDiscussFill } from "react-icons/ri";
 import { BsFillBarChartFill } from "react-icons/bs";
-import { Text } from "./index";
+import { Text, Modal } from "./index";
 import { useThread } from "../hooks/useThread";
 import { detectMobile } from "../util/window";
-import ReactModal from "react-modal";
 import { Header } from "./index";
 import { GoGear } from "react-icons/go";
 import { useComponentVisible } from "../hooks/useComponentVisible";
-import { AccountSettings } from "./AccountSettings";
+import { AccountSettings, CompleteOnboarding } from "./AccountSettings";
 import { Login } from "./Login";
 import { useMeQuery } from "../api/account";
 import toast from "react-hot-toast";
-
-// const customStyle = {
-//   overlay: {
-//     inset: 0,
-//     zIndex: 2,
-//   },
-//   content: {
-//     inset: 0,
-//     right: 0,
-//     padding: 0,
-//     margin: 0,
-//     width: '100%',
-//     height: '100%',
-//     backgroundColor: 'white',
-//     borderRadius: '0px',
-//     border: 'none'
-//   },
-// };
 
 export const WithNavBar = ({ component }) => {
   const [logout] = useLogoutMutation();
 
   const { data: me, isLoading } = useMeQuery();
+
+  const { is_onboarding } = me || {};
 
   const { data: boards } = useFetchBoardsQuery();
 
@@ -90,45 +73,21 @@ export const WithNavBar = ({ component }) => {
 
   const openLogin = () => setLoginOpen(true);
 
-  const customStyle = {
-    overlay: {
-      zIndex: 2,
-      backgroundColor: "rgba(0, 0, 0, 0.3)",
-    },
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "auto",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-      padding: "0",
-      border: "none",
-      borderRadius: "0px",
-      background: "none",
-    },
-  };
-
   if (isLoading) {
     return <div />;
   }
 
   return (
     <BoardRoot>
-      <ReactModal
-        style={customStyle}
-        isOpen={accountIsOpen}
-        onRequestClose={closeAccount}
-      >
+      <Modal isOpen={is_onboarding} title="Let's Finish Account Setup" noExit>
+        <CompleteOnboarding />
+      </Modal>
+      <Modal isOpen={accountIsOpen} onRequestClose={closeAccount}>
         <AccountSettings onFinish={closeAccount} />
-      </ReactModal>
-      <ReactModal
-        style={customStyle}
-        isOpen={loginOpen}
-        onRequestClose={closeLogin}
-      >
+      </Modal>
+      <Modal isOpen={loginOpen} onRequestClose={closeLogin} title="Login">
         <Login completeAction={closeLogin} />
-      </ReactModal>
+      </Modal>
       <HomeNavBar>
         <HamburgerMenu onClick={openDrawer} />
         <Header bold onClick={redirectHome}>
@@ -159,13 +118,13 @@ export const WithNavBar = ({ component }) => {
         {!isMobile ? (
           <BoardDrawer boards={boards} />
         ) : (
-          <ReactModal
-            style={customStyle}
+          <Modal
             isOpen={drawerOpen}
             onRequestClose={closeDrawer}
+            title="Most Popular Boards"
           >
             <BoardDrawer fill={true} boards={boards} />
-          </ReactModal>
+          </Modal>
         )}
         {component}
       </Page>
@@ -180,10 +139,6 @@ const BoardDrawer = (props) => {
 
   const { board } = useThread();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
-
   const handleClick = (board) => {
     console.log(board);
     history.push(`/boards/${board}`);
@@ -191,9 +146,6 @@ const BoardDrawer = (props) => {
 
   return (
     <BoardDrawerRoot fill={fill}>
-      <TitleContainer>
-        <Header bold>Most Popular Boards</Header>
-      </TitleContainer>
       <BoardList>
         <BoardRow>
           <BoardIcon />
@@ -204,6 +156,7 @@ const BoardDrawer = (props) => {
             <HighlightBoardRow
               onClick={() => handleClick(b)}
               selected={b === board}
+              key={b}
             >
               <BoardItem>/{b}/</BoardItem>
               <Text size={"medium"} align="right" color={"black"} bold>
@@ -240,10 +193,6 @@ const Page = styled.div`
   }
 
   @media all and (min-width: 480px) and (max-width: 768px) {
-    width: 100%;
-  }
-
-  @media all and (max-width: 480px) {
     width: 100%;
   }
 
@@ -322,13 +271,6 @@ const BoardRoot = styled.div`
   width: 100%;
   max-height: 100vh;
   height: 100%;
-`;
-
-const TitleContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
 `;
 
 const HomeNavBar = styled.div`

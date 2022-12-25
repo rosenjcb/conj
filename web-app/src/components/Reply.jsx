@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Formik, Form, Field } from "formik";
-import { Checkbox, RoundButton, RoundImage } from "./index";
+import { Checkbox, RoundButton, RoundImage, Modal } from "./index";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { updateEntry, resetPost } from "../slices/postSlice";
@@ -15,27 +15,7 @@ import toast from "react-hot-toast";
 import { useThread } from "../hooks/useThread";
 import { Login } from "./Login";
 import { useMeQuery } from "../api/account";
-import ReactModal from "react-modal";
 import _ from "lodash";
-
-const customStyle = {
-  overlay: {
-    zIndex: 2,
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
-  },
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    padding: "0",
-    border: "none",
-    borderRadius: "0px",
-    background: "none",
-  },
-};
 
 export const Reply = (props) => {
   const { className, isNewThread } = props;
@@ -120,13 +100,9 @@ export const Reply = (props) => {
     return (
       <ReplyRoot>
         {me === null ? (
-          <ReactModal
-            style={customStyle}
-            isOpen={loginOpen}
-            onRequestClose={closeLogin}
-          >
-            <Login />
-          </ReactModal>
+          <Modal isOpen={loginOpen} onRequestClose={closeLogin} title="Login">
+            <Login completeAction={closeLogin} />
+          </Modal>
         ) : null}
         <Formik initialValues={post} onSubmit={submitPost}>
           {(props) => (
@@ -161,7 +137,7 @@ export const Reply = (props) => {
                     <Checkbox
                       disabled={me === null}
                       checked={check}
-                      onClick={toggleCheck}
+                      onChange={toggleCheck}
                       label="Anonymous?"
                     />
                   ) : null}

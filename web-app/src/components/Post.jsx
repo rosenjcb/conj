@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Text, Avatar } from "./index";
+import { Text, Avatar, Modal } from "./index";
 import { processPostText } from "../util/post";
 import { useDispatch } from "react-redux";
 import { insertPostLink } from "../slices/postSlice";
@@ -8,9 +8,6 @@ import { Link } from "react-router-dom";
 import chroma from "chroma-js";
 import { BiMessageDetail } from "react-icons/bi";
 import { Reply } from "./Reply";
-import Modal from "react-modal";
-
-Modal.defaultStyles.overlay.backgroundColor = "rgba(0, 0, 0, 0.7)";
 
 const WithText = ({ direction, component, text }) => {
   return (
@@ -19,21 +16,6 @@ const WithText = ({ direction, component, text }) => {
       <IconText>{text}</IconText>
     </WithTextRoot>
   );
-};
-
-const customStyles = {
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    padding: "0",
-    border: "none",
-    borderRadius: "0px",
-    background: "none",
-  },
 };
 
 const handlePostDate = (time) => {
@@ -107,23 +89,15 @@ export const Post = (props) => {
 
   return (
     <div>
-      <Modal
-        style={customStyles}
-        isOpen={enlargePostImage}
-        onRequestClose={closePostImage}
-      >
+      <Modal isOpen={enlargePostImage} onRequestClose={closePostImage}>
         {image ? <ModalImage src={image.location} /> : null}
       </Modal>
-      <Modal
-        style={customStyles}
-        isOpen={enlargeAvatar}
-        onRequestClose={closeAvatar}
-      >
+      <Modal isOpen={enlargeAvatar} onRequestClose={closeAvatar}>
         <ModalImage src={avatar} />
       </Modal>
       {isOriginalPost ? (
         <OriginalPost
-          key={post.id}
+          key={id}
           preview={preview}
           highlight={false}
           postHref={postHref}
@@ -375,7 +349,7 @@ const ModalImage = styled(CenteredImage)`
 
 const IconText = styled.p`
   font-size: 1.25rem;
-  padding-bottom 8px;
+  padding-bottom: 8px;
   align-self: center;
   margin: 0;
 `;

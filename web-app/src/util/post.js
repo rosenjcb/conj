@@ -11,12 +11,16 @@ const processLine = (opNo, line) => {
   const matches = line.match(reHash);
   const links =
     matches && matches.length > 0
-      ? matches.map((m) => <PostLink href={`${opNo}${m}`}>{m}</PostLink>)
+      ? matches.map((m) => (
+          <PostLink key={m} href={`${opNo}${m}`}>
+            {m}
+          </PostLink>
+        ))
       : [];
   const rest = line
     .split(reHash)
     .filter((t) => t !== "")
-    .map((t) => <span>{t}</span>);
+    .map((t, i) => <span key={i}>{t}</span>);
   const res = _.zip(links, rest);
   return res;
 };

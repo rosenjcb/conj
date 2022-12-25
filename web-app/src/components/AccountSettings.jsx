@@ -2,9 +2,12 @@ import React from "react";
 import styled from "styled-components";
 import { Formik, Field } from "formik";
 import { Header, RoundButton, InputField, InputFile } from "./index";
-import { useMeQuery, useUpdateMeMutation } from "../api/account";
+import {
+  useMeQuery,
+  useUpdateMeMutation,
+  useFinishOnboardingMutation,
+} from "../api/account";
 import toast from "react-hot-toast";
-import { parseError } from "../util/error";
 import chroma from "chroma-js";
 
 export function AccountSettings({ onFinish }) {
@@ -13,7 +16,11 @@ export function AccountSettings({ onFinish }) {
   const { data: me, error } = useMeQuery();
 
   if (error) {
-    toast.error(parseError(error));
+    if (error.data) {
+      toast.error(error.data);
+    } else {
+      toast.error("Something unexpected went wrong");
+    }
   }
 
   const handleUpdate = async (values, actions) => {
@@ -74,10 +81,79 @@ export function AccountSettings({ onFinish }) {
   );
 }
 
+export function CompleteOnboarding() {
+  const [finishOnboarding] = useFinishOnboardingMutation();
+
+  const { data: me, error } = useMeQuery();
+
+  if (error) {
+    if (error.data) {
+      toast.error(error.data);
+    } else {
+      toast.error("Something unexpected went wrong");
+    }
+  }
+
+  const handleSubmit = async (values, actions) => {
+    try {
+      actions.setSubmitting(false);
+      var formData = new FormData();
+      for (var key in values) {
+        if (values[key] !== null && values[key] !== "") {
+          formData.append(key, values[key]);
+        }
+      }
+      await finishOnboarding(formData).unwrap();
+      toast.success("Welcome to Conj!");
+    } catch (e) {
+      if (e.data) toast.error(e.data);
+    }
+  };
+
+  return (
+    <Root>
+      {me ? (
+        <Formik
+          initialValues={{
+            username: null,
+            avatar: null,
+          }}
+          onSubmit={handleSubmit}
+        >
+          {(props) => (
+            <StyledForm onSubmit={props.handleSubmit}>
+              <ContentDetails>
+                <Field
+                  label="AVATAR"
+                  type="AVATAR"
+                  name="avatar"
+                  placeholder={me.avatar}
+                  component={InputFile}
+                />
+                <Field
+                  label="USERNAME"
+                  type="username"
+                  name="username"
+                  placeholder={me.username}
+                  component={InputField}
+                />
+              </ContentDetails>
+              <SubmitOptions>
+                <RoundButton type="submit">Finish</RoundButton>
+              </SubmitOptions>
+            </StyledForm>
+          )}
+        </Formik>
+      ) : null}
+    </Root>
+  );
+}
+
 const ContentDetails = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
+  align-items: flex-end;
 `;
 
 const SubmitOptions = styled.div`
@@ -100,7 +176,7 @@ const Root = styled.div`
   margin: 0 auto;
   background-color: ${(props) => chroma(props.theme.colors.white)};
   text-align: center;
-  padding: 2rem;
+  padding: 1em;
   border-radius: 8px;
   width: 20vw;
 
