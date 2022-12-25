@@ -82,7 +82,11 @@ export const WithNavBar = ({ component }) => {
       <Modal isOpen={is_onboarding} title="Let's Finish Account Setup" noExit>
         <CompleteOnboarding />
       </Modal>
-      <Modal isOpen={accountIsOpen} onRequestClose={closeAccount}>
+      <Modal
+        isOpen={accountIsOpen}
+        onRequestClose={closeAccount}
+        title="Account Info"
+      >
         <AccountSettings onFinish={closeAccount} />
       </Modal>
       <Modal isOpen={loginOpen} onRequestClose={closeLogin} title="Login">

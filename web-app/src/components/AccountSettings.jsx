@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Formik, Field } from "formik";
-import { Header, RoundButton, InputField, InputFile } from "./index";
+import { RoundButton, InputField, InputFile } from "./index";
 import {
   useMeQuery,
   useUpdateMeMutation,
@@ -41,9 +41,6 @@ export function AccountSettings({ onFinish }) {
 
   return (
     <Root>
-      <Header bold size="large">
-        Account
-      </Header>
       {me ? (
         <Formik
           initialValues={{
