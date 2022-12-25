@@ -1,104 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import { Formik, Field } from "formik";
-import { useLoginMutation, useSignupMutation } from "../api/account";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { useLoginMutation } from "../api/account";
 import chroma from "chroma-js";
-import { Header, RoundButton, Back, InputField, Text } from "./index";
+import { Header } from "./index";
 import toast from "react-hot-toast";
 import PropTypes from "prop-types";
 import { useGoogleLogin } from "@react-oauth/google";
 import { GoogleLoginButton } from "react-social-login-buttons";
 
-// function SignUp({ onClick }) {
-//   const history = useHistory();
-
-//   const [signUp] = useSignupMutation();
-
-//   const handleSignup = async (values) => {
-//     var formData = new FormData();
-//     for (var key in values) {
-//       formData.append(key, values[key]);
-//     }
-//     try {
-//       await signUp(formData).unwrap();
-//       history.push("/");
-//       history.go();
-//     } catch (e) {
-//       toast.error(e.data);
-//     }
-//   };
-
-//   return (
-//     <Root>
-//       <Header bold size="large">
-//         Signup
-//       </Header>
-//       <Formik
-//         initialValues={{
-//           email: "",
-//           pass: "",
-//           username: "",
-//         }}
-//         onSubmit={handleSignup}
-//       >
-//         {(props) => (
-//           <StyledForm onSubmit={props.handleSubmit}>
-//             <Back onClick={onClick} />
-//             <Header size="medium" bold>
-//               Welcome to Conj!
-//             </Header>
-//             <Field
-//               label="EMAIL"
-//               type="email"
-//               autocomplete="email"
-//               name="email"
-//               placeholder="user@domain.com"
-//               component={InputField}
-//             />
-//             <Field
-//               label="PASSWORD"
-//               type="password"
-//               autocomplete="current-password"
-//               name="pass"
-//               secret={true}
-//               component={InputField}
-//             />
-//             <Field
-//               label="USERNAME"
-//               type="username"
-//               name="username"
-//               placeholder="Username"
-//               component={InputField}
-//             />
-//             <SubmitOptions>
-//               <RoundButton type="submit">Complete Signup</RoundButton>
-//             </SubmitOptions>
-//           </StyledForm>
-//         )}
-//       </Formik>
-//     </Root>
-//   );
-// }
-
-// SignUp.propTypes = {
-//   onClick: PropTypes.func,
-// };
-
 export function Login({ completeAction }) {
-  // const [signUp, setSignUp] = useState(false);
-
   const [login] = useLoginMutation();
-
-  // const handleLogin = async () => {
-  //   try {
-  //     toast.success("Welcome back!");
-  //   } catch (e) {
-  //     toast.error(e.data);
-  //   } finally {
-  //     completeAction();
-  //   }
-  // };
 
   const handleOauth = async (res) => {
     const { code } = res;
@@ -109,7 +20,6 @@ export function Login({ completeAction }) {
         code,
         redirectUri: "postmessage",
       }).unwrap();
-      console.log(account);
       if (account?.is_onboarding === false) toast.success("Welcome Back!");
     } catch (e) {
       toast.error(e.data);
@@ -148,15 +58,7 @@ const SubmitOptions = styled.div`
   padding-bottom: 1rem;
   padding-top: 1rem;
   margin: 0 auto;
-`;
-
-const StyledForm = styled.form`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  flex-wrap: wrap;
-  padding: 10px;
-  width: 200px;
+  max-width: 250px;
 `;
 
 const Root = styled.div`

@@ -3,49 +3,11 @@ import styled from "styled-components";
 import chroma from "chroma-js";
 import { BsFillPersonFill } from "react-icons/bs";
 import { BiArrowBack } from "react-icons/bi";
-import { RxCross1 } from "react-icons/ri";
 import { useState } from "react";
 import ReactModal from "react-modal";
 import { detectMobile } from "../util/window";
 
-// const customStyle = {
-//   overlay: {
-//     inset: 0,
-//     zIndex: 2,
-//   },
-//   content: {
-//     inset: 0,
-//     right: 0,
-//     padding: 0,
-//     margin: 0,
-//     width: '100%',
-//     height: '100%',
-//     backgroundColor: 'white',
-//     borderRadius: '0px',
-//     border: 'none'
-//   },
-// };
-
-// const customStyle = {
-//   overlay: {
-//     zIndex: 2,
-//     backgroundColor: "rgba(0, 0, 0, 0.3)",
-//   },
-//   content: {
-//     top: "50%",
-//     left: "50%",
-//     right: "auto",
-//     bottom: "auto",
-//     marginRight: "-50%",
-//     transform: "translate(-50%, -50%)",
-//     padding: "0",
-//     border: "none",
-//     borderRadius: "0px",
-//     background: "none",
-//   },
-// };
-
-export const ModalBase = ({
+const ModalBase = ({
   children,
   isOpen,
   onRequestClose,
@@ -74,7 +36,13 @@ export const ModalBase = ({
           ) : (
             <span />
           )}
-          {title ? <Header bold>{title}</Header> : null}
+          {title ? (
+            <Offset distance={isMobile ? "38px" : "0"}>
+              <Header size="large" bold>
+                {title}
+              </Header>
+            </Offset>
+          ) : null}
           <span />
         </TitleBar>
         {children}
@@ -88,6 +56,10 @@ ModalBase.propTypes = {
   onRequestClose: PropTypes.func,
   title: PropTypes.string,
 };
+
+const Offset = styled.div`
+  margin-right: ${(props) => props.distance};
+`;
 
 const ModalRoot = styled.div`
   display: flex;
@@ -128,25 +100,30 @@ export const Modal = styled(ModalBase)`
     bottom: auto;
     margin-right: -50%;
     transform: translate(-50%, -50%);
-    padding: 0;
+    padding: 8px;
     border: none;
-    border-radius: 0px;
+    border-radius: 4px;
     background-color: ${(props) => props.theme.colors.white};
 
     @media all and (min-width: 1024px) and (max-width: 1280px) {
       width: 400px;
+      border-radius: 4px;
     }
 
     @media all and (min-width: 768px) and (max-width: 1024px) {
       width: 400px;
+      border-radius: 4px;
     }
 
     @media all and (min-width: 480px) and (max-width: 768px) {
       width: 400px;
+      border-radius: 4px;
     }
 
     @media all and (max-width: 480px) {
       width: 100%;
+      border-radius: 0px;
+      padding: 0px;
     }
   }
 

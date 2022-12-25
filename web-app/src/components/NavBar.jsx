@@ -17,7 +17,6 @@ import { AccountSettings, CompleteOnboarding } from "./AccountSettings";
 import { Login } from "./Login";
 import { useMeQuery } from "../api/account";
 import toast from "react-hot-toast";
-import { useEffect } from "react";
 
 export const WithNavBar = ({ component }) => {
   const [logout] = useLogoutMutation();
@@ -274,17 +273,10 @@ const BoardRoot = styled.div`
   height: 100%;
 `;
 
-const TitleContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
-`;
-
 const HomeNavBar = styled.div`
   display: flex;
   position: fixed;
-  /* z-index: 1; */
+  z-index: 1;
   justify-content: space-between;
   gap: 10px;
   flex-direction: row;

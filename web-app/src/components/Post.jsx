@@ -9,8 +9,6 @@ import chroma from "chroma-js";
 import { BiMessageDetail } from "react-icons/bi";
 import { Reply } from "./Reply";
 
-// Modal.defaultStyles.overlay.backgroundColor = "rgba(0, 0, 0, 0.7)";
-
 const WithText = ({ direction, component, text }) => {
   return (
     <WithTextRoot direction={direction}>
@@ -19,21 +17,6 @@ const WithText = ({ direction, component, text }) => {
     </WithTextRoot>
   );
 };
-
-// const customStyles = {
-//   content: {
-//     top: "50%",
-//     left: "50%",
-//     right: "auto",
-//     bottom: "auto",
-//     marginRight: "-50%",
-//     transform: "translate(-50%, -50%)",
-//     padding: "0",
-//     border: "none",
-//     borderRadius: "0px",
-//     background: "none",
-//   },
-// };
 
 const handlePostDate = (time) => {
   const now = new Date();
