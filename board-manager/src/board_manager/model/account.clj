@@ -31,6 +31,15 @@
 
 (def is-onboarding :is_onboarding)
 
+(def status :status)
+
+(def status-active "active")
+
+(def status-banned "banned")
+
+(defn- valid-status [status]
+  (#{status-active status-banned}))
+
 (def schema 
   [:map
    [id number?]
@@ -41,7 +50,8 @@
    [role [:enum user-role admin-role]]
    [username string?]
    [avatar util.uri/uri?]
-   [is-onboarding boolean?]])
+   [is-onboarding boolean?]
+   [status [:enum status-active status-banned]]])
 
 (def default 
   {role user-role
@@ -50,13 +60,14 @@
    username ""
    avatar ""
    provider conj-provider
+   status status-active
    is-onboarding true})
 
 (defn new-account
   [account]
   (let [populated-username (or (username account) (apply str (repeatedly 8 #(rand-nth "abcdefghijklmnopqrstuvwxyz"))))
         populated-email (or (email account) (apply str populated-username "@fake.com"))]
-    (-> (merge default)
+    (-> (merge default account)
         (assoc username populated-username email populated-email)
         (select-keys (keys default)))))
 

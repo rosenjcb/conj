@@ -21,6 +21,17 @@
       (handler request)
       {:status 401 :headers {} :body "You need to complete onboarding before doing that."}))))
 
+(defn wrap-status [handler]
+  (fn [request]
+  (let [{:keys [auth]} (fetch-cookie&account request)
+    db-conn (get-in request [:components :db-conn])
+    account-id (m.account/id auth)
+    account (q.account/find-account-by-id! db-conn account-id)
+    status (m.account/status account)]
+  (if (not (= status m.account/status-banned))
+    (handler request)
+    {:status 401 :headers {} :body "You are banned. Please contact the administrator for further support."}))))
+
 (defn wrap-auth [handler]
   (fn [request]
     (try
@@ -42,7 +53,8 @@
 (defn full-wrap-auth [handler]
   (-> handler
       wrap-auth
-      wrap-onboarding))
+      wrap-onboarding
+      wrap-status))
 
 (defn wrap-admin [handler]
   (fn [request]
