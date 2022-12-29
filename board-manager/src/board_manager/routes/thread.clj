@@ -64,6 +64,7 @@
         (response/bad-request (.getMessage e))))))
 
 (defn kill-thread-or-post! [req]
+  (log/infof "Debug log test for req %s" req)
   (let [db-conn (get-in req [:components :db-conn])
         redis-conn (get-in req [:components :redis-conn])
         s3-client (get-in req [:components :s3-client])
@@ -71,9 +72,11 @@
         board (get-in req [:parameters :path :board])
         reply-no (get-in req [:parameters :query :replyNo])
         thread (query.thread/find-thread-by-id! db-conn s3-client board thread-id)
+        _ (log/infof "Found thread %s" thread)
         post (m.thread/find-post thread reply-no)
         account-id (m.post/account-id post)
         account (q.account/find-account-by-id! db-conn account-id)
+        _ (log/infof "Found account owner delete post %s" account)
         ban (get-in req [:parameters :query :ban])
         delete-reply? (some? reply-no)
         success-message (if delete-reply?
@@ -91,7 +94,7 @@
         (query.thread/delete-thread-by-id! db-conn redis-conn s3-client board thread-id))
       (response/response success-message)
       (catch Exception e
-        (log/infof "%s" (.getMessage e))
+        (log/infof "Something went wrong trying to delete this post/thread %s" (.getMessage e))
         (response/bad-request (.getMessage e))))))
 
 (defn nuke-threads! [req]
