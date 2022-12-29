@@ -11,10 +11,10 @@
 
 #_{:clj-kondo/ignore [:redefined-var]}
 (defn set [redis-conn key value]
-  (car/wcar redis-conn (car/set key value)))
+  (future (car/wcar redis-conn (car/set key value))))
 
 (defn del [redis-conn key]
-  (car/wcar redis-conn (car/del key)))
+  (future (car/wcar redis-conn (car/del key))))
 
 (defn flush-all [redis-conn]
   (car/wcar redis-conn (car/flushall)))

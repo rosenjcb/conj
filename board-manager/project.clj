@@ -78,6 +78,6 @@
                :redis-host "conj-redis-cluster.ghplor.ng.0001.usw2.cache.amazonaws.com"
                :redis-port 6379
                :host "0.0.0.0"
-               :port 8080}
+               :port 8080
                :google-client-id "602129467689-pe4l4im2nr62t14ae50quc1uj2dd5um1.apps.googleusercontent.com"
-               :google-client-secret "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"}})
+               :google-client-secret "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"}}})
