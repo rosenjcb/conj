@@ -65,38 +65,38 @@
 
 (defn kill-thread-or-post! [req]
   (log/infof "Debug log test for req %s" req)
-  (let [db-conn (get-in req [:components :db-conn])
-        redis-conn (get-in req [:components :redis-conn])
-        s3-client (get-in req [:components :s3-client])
-        thread-id (get-in req [:parameters :path :id])
-        board (get-in req [:parameters :path :board])
-        reply-no (get-in req [:parameters :query :replyNo])
-        _ (log/info "Successfully loaded dependencies + rest req")
-        thread (query.thread/find-thread-by-id! db-conn s3-client board thread-id)
-        _ (log/infof "Found thread %s" thread)
-        post (m.thread/find-post thread reply-no)
-        account-id (m.post/account-id post)
-        account (q.account/find-account-by-id! db-conn account-id)
-        _ (log/infof "Found account owner delete post %s" account)
-        ban (get-in req [:parameters :query :ban])
-        delete-reply? (some? reply-no)
-        success-message (if delete-reply?
-                          (format "Reply No. %s of Thread No. %s deleted" reply-no thread-id)
-                          (format "Thread No. %s has been deleted" thread-id))]
-    (try
-      (when (= ban true)
-        (log/infof "Banning account-id %s" account-id)
-        (q.account/update-account!
-         db-conn
-         (assoc account m.account/status m.account/status-banned)
-         account-id))
-      (if delete-reply?
-        (query.thread/delete-post-by-id! db-conn redis-conn s3-client board thread-id reply-no)
-        (query.thread/delete-thread-by-id! db-conn redis-conn s3-client board thread-id))
-      (response/response success-message)
+  (try
+    (let [db-conn (get-in req [:components :db-conn])
+          redis-conn (get-in req [:components :redis-conn])
+          s3-client (get-in req [:components :s3-client])
+          thread-id (get-in req [:parameters :path :id])
+          board (get-in req [:parameters :path :board])
+          reply-no (get-in req [:parameters :query :replyNo])
+          _ (log/info "Successfully loaded dependencies + rest req")
+          thread (query.thread/find-thread-by-id! db-conn s3-client board thread-id)
+          _ (log/infof "Found thread %s" thread)
+          post (m.thread/find-post thread reply-no)
+          account-id (m.post/account-id post)
+          account (q.account/find-account-by-id! db-conn account-id)
+          _ (log/infof "Found account owner delete post %s" account)
+          ban (get-in req [:parameters :query :ban])
+          delete-reply? (some? reply-no)
+          success-message (if delete-reply?
+                            (format "Reply No. %s of Thread No. %s deleted" reply-no thread-id)
+                            (format "Thread No. %s has been deleted" thread-id))]
+        (when (= ban true)
+          (log/infof "Banning account-id %s" account-id)
+          (q.account/update-account!
+          db-conn
+          (assoc account m.account/status m.account/status-banned)
+          account-id))
+        (if delete-reply?
+          (query.thread/delete-post-by-id! db-conn redis-conn s3-client board thread-id reply-no)
+          (query.thread/delete-thread-by-id! db-conn redis-conn s3-client board thread-id))
+        (response/response success-message))
       (catch Exception e
         (log/infof "Something went wrong trying to delete this post/thread %s" (.getMessage e))
-        (response/bad-request (.getMessage e))))))
+        (response/bad-request (.getMessage e)))))
 
 (defn nuke-threads! [req]
   (let [db-conn (get-in req [:components :db-conn])

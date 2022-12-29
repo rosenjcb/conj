@@ -225,6 +225,7 @@
     (cond
       (or (= post nil) (= thread nil))
       (throw (Exception. (format "Post No %s of Thread No %s not found" reply-id (m.post/id op))))
+
       ;; for now we just delete the entire thread
       (= op? true) 
       (delete-thread-by-id! db-conn redis-conn s3-client board thread-id)
