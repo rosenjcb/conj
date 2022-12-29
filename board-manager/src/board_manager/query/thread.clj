@@ -31,8 +31,15 @@
         avatar (m.account/avatar account)]
     (api.post/model->response post username avatar)))
 
+(defn- purge-image-by-post [s3-client post]
+  (let [post-id (m.post/id post)
+        image (m.post/image post)]
+    (when image
+      (log/infof "Deleting image %s from expired post %s" image post-id)
+      (db.s3/delete-object s3-client s3-folder (:filename image)))))
+
 (defn- post&account [accounts post]
-  (let [account (first (filter #(= (m.post/account_id post) (m.account/id %)) accounts))]
+  (let [account (first (filter #(= (m.post/account-id post) (m.account/id %)) accounts))]
     [post account]))
 
 (defn- maybe-trim-post [anonymous? post]
@@ -46,7 +53,7 @@
   ([posts] (stitch-threads posts []))
   ([posts state]
   (let [post (first posts)
-        anonymous? (if-some [val (m.post/is_anonymous post)] val (m.thread/anonymous? (last state)))
+        anonymous? (if-some [val (m.post/is-anonymous post)] val (m.thread/anonymous? (last state)))
         trimmed-post (maybe-trim-post anonymous? post)
         rest (into [] (rest posts))
         thread (or (last state) [])
@@ -63,7 +70,7 @@
 (defn ^:private ^:test enrich-threads [db-conn enrich? threads]
   (if (and enrich? (seq threads))
     (let [posts (flatten threads)
-          account-ids (set (mapv m.post/account_id posts))
+          account-ids (set (mapv m.post/account-id posts))
           accounts (q.account/find-accounts-by-ids! db-conn account-ids)
           posts&accounts (mapv (partial post&account accounts) posts)
           enriched-posts (mapv enrich-post posts&accounts)
@@ -147,10 +154,6 @@
   [s3-client {:keys [filename tempfile]}]
   (db.s3/upload-object s3-client s3-folder filename (io/input-stream tempfile)))
 
-(defn- delete-image 
-  [s3-client filename]
-  (db.s3/delete-object s3-client s3-folder filename))
-
 (defn find-thread-by-id!
   [db-conn redis-conn board id]
   (let [threads (fetch-threads! db-conn redis-conn board {:enrich? true :sort? true})]
@@ -166,12 +169,8 @@
     (if thread
       (do 
         (delete-thread redis-conn board thread-id)
-        (doseq [post thread
-                :let [post-id (m.post/id post)
-                      image (m.post/image post)]]
-          (when image
-            (log/infof "Deleting image %s from expired post %s" image post-id)
-            (delete-image s3-client (:filename image)))))
+        (doseq [post thread]
+          (purge-image-by-post s3-client post)))
       (throw (Exception. (format "Thread No. %s not found." thread-id))))))
 
 (defn ^:test ^:private add-thread-to-board! [db-conn redis-conn s3-client board thread]
@@ -212,6 +211,30 @@
         new-threads (mapv #(if (= (m.post/id (first %)) thread-id) final-thread %) old-threads)]
     (db.redis/set redis-conn board new-threads)
     final-thread))
+
+;; Useful later but not in this PR (72-add-post-delete-on-thread-delete-route)
+;; (defn- purge-post [post]
+;;   (assoc post m.post/comment "DELETED POST" m.post/image nil m.post/is-anonymous true))
+
+(defn delete-post-by-id! [db-conn redis-conn s3-client board thread-id reply-id]
+  (let [thread (find-thread-by-id! db-conn redis-conn board thread-id)
+        op (m.thread/op thread)
+        op? (= (m.post/id op) reply-id)
+        post (m.thread/find-post thread reply-id)
+        trimmed-thread (into [] (filter #(not (= reply-id (m.post/id %))) thread))]
+    (cond
+      (or (= post nil) (= thread nil))
+      (throw (Exception. (format "Post No %s of Thread No %s not found" reply-id (m.post/id op))))
+      ;; for now we just delete the entire thread
+      (= op? true) 
+      (delete-thread-by-id! db-conn redis-conn s3-client board thread-id)
+
+      (some? thread)
+      (if thread
+        (do
+          (purge-image-by-post s3-client post)
+          (update-thread! redis-conn board thread-id trimmed-thread))
+        (throw (Exception. (format "Thread No. %s not found" thread-id)))))))
 
 (defn ^:private ^:test validate-thread-lock 
   [board thread]

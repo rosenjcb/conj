@@ -25,7 +25,7 @@
 (defn anonymous?
   [thread]
   (->> (first thread)
-        m.post/is_anonymous))
+        m.post/is-anonymous))
 
 (defn add-post [post thread]
   (conj thread post))
@@ -36,3 +36,6 @@
 
 (defn op [thread]
   (first thread))
+
+(defn find-post [thread post-id]
+  (first (filter #(= (m.post/id %) post-id) thread)))

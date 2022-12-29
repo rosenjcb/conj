@@ -51,12 +51,11 @@ export const Reply = (props) => {
         if (val !== null) formData.append(key, val);
       }
       if (threadNo !== null) {
-        const res = await updateThread({
+        await updateThread({
           board,
           threadNo,
           post: formData,
         }).unwrap();
-        console.log(`Hey just posted to the thread! ${res}`);
       } else {
         const res = await createThread({ board, post: formData }).unwrap();
         const op = res[0];
