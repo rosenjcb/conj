@@ -1,11 +1,15 @@
 (ns board-manager.routes.thread
   (:require [board-manager.middleware :as middleware]
+            [board-manager.model.account :as m.account]
+            [board-manager.model.thread :as m.thread]
+            [board-manager.query.account :as q.account]
             [board-manager.query.board :as query.board]
             [board-manager.query.db.redis :as db.redis]
             [board-manager.query.thread :as query.thread]
             [clojure.tools.logging :as log]
             [reitit.coercion.malli :as malli.coercion]
-            [ring.util.response :as response]))
+            [ring.util.response :as response]
+            [board-manager.model.post :as m.post]))
 
 (defn peek-threads! [req]
   (let [db-conn (get-in req [:components :db-conn])
@@ -59,15 +63,33 @@
         (log/infof "%s" (.getMessage e))
         (response/bad-request (.getMessage e))))))
 
-(defn kill-thread! [req]
+(defn kill-thread-or-post! [req]
   (let [db-conn (get-in req [:components :db-conn])
         redis-conn (get-in req [:components :redis-conn])
         s3-client (get-in req [:components :s3-client])
         thread-id (get-in req [:parameters :path :id])
-        board (get-in req [:parameters :path :board])]
+        board (get-in req [:parameters :path :board])
+        reply-no (get-in req [:parameters :query :replyNo])
+        thread (query.thread/find-thread-by-id! db-conn s3-client board thread-id)
+        post (m.thread/find-post thread reply-no)
+        account-id (m.post/account-id post)
+        account (q.account/find-account-by-id! db-conn account-id)
+        ban (get-in req [:parameters :query :ban])
+        delete-reply? (some? reply-no)
+        success-message (if delete-reply?
+                          (format "Reply No. %s of Thread No. %s deleted" reply-no thread-id)
+                          (format "Thread No. %s has been deleted" thread-id))]
     (try
-      (query.thread/delete-thread-by-id! db-conn redis-conn s3-client board thread-id)
-      (response/response (format "Thread No. %s has been deleted" thread-id))
+      (when (= ban true)
+        (log/infof "Banning account-id %s" account-id)
+        (q.account/update-account!
+         db-conn
+         (assoc account m.account/status m.account/status-banned)
+         account-id))
+      (if delete-reply?
+        (query.thread/delete-post-by-id! db-conn redis-conn s3-client board thread-id reply-no)
+        (query.thread/delete-thread-by-id! db-conn redis-conn s3-client board thread-id))
+      (response/response success-message)
       (catch Exception e
         (log/infof "%s" (.getMessage e))
         (response/bad-request (.getMessage e))))))
@@ -94,20 +116,25 @@
    [:board string?]
    [:id int?]])
 
+(def thread-query
+  [:map
+   [:replyNo {:optional true} int?]
+   [:ban {:optional true} boolean?]])
+
 (def post-body
   [:map
-   [:subject string?
-    :comment string?
-    :image string?]])
+   [:subject string?]
+   [:comment string?]
+   [:image string?]])
 
 (def thread-body
   [:map
-    [:subject {:optional true} string?]
-    [:comment {:optional true} string?]
-    [:image [:map
-             [:filename string?]
-             [:tempfile any?]]
-     :is_anonymous boolean?]])
+   [:subject {:optional true} string?]
+   [:comment {:optional true} string?]
+   [:image [:map
+            [:filename string?]
+            [:tempfile any?]]]
+   [:is_anonymous boolean?]])
 
 (def thread-routes
   [["/boards"
@@ -136,8 +163,9 @@
             :coercion malli.coercion/coercion
             :middleware [[middleware/full-wrap-auth]]
             :handler put-thread!}
-      :delete {:summary "Deletes a thread"
-               :parameters {:path thread-path}
+      :delete {:summary "Deletes a thread (or reply). Pass an optional parameter to ban the post author."
+               :parameters {:path thread-path
+                            :query thread-query}
                :coercion malli.coercion/coercion
                :middleware [[middleware/wrap-admin]]
-               :handler kill-thread!}}]])
+               :handler kill-thread-or-post!}}]])

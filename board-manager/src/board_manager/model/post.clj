@@ -28,9 +28,9 @@
 #_{:clj-kondo/ignore [:redefined-var]}
 (def name :name)
 
-(def is_anonymous :is_anonymous)
+(def is-anonymous :is_anonymous)
 
-(def account_id :account_id)
+(def account-id :account_id)
 
 (defn op? [post]
-  (some? (is_anonymous post)))
+  (some? (is-anonymous post)))

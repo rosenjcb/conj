@@ -18,6 +18,7 @@
             [ring.util.response :as response]
             [ring.middleware.cookies :as cookies]
             [ring.middleware.multipart-params :as multipart]
+            [ring.middleware.params :as params]
             [board-manager.services.google-client :as google.client])
   (:import (com.zaxxer.hikari HikariDataSource))
   (:gen-class))
@@ -60,6 +61,7 @@
              [muuntaja/format-middleware
               cookies/wrap-cookies
               multipart/wrap-multipart-params
+              params/wrap-params
               coercion/coerce-exceptions-middleware
               coercion/coerce-request-middleware
               coercion/coerce-response-middleware]}
