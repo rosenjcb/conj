@@ -71,6 +71,7 @@
         thread-id (get-in req [:parameters :path :id])
         board (get-in req [:parameters :path :board])
         reply-no (get-in req [:parameters :query :replyNo])
+        _ (log/info "Successfully loaded dependencies + rest req")
         thread (query.thread/find-thread-by-id! db-conn s3-client board thread-id)
         _ (log/infof "Found thread %s" thread)
         post (m.thread/find-post thread reply-no)

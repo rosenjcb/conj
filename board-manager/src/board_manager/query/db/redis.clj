@@ -3,11 +3,11 @@
    [taoensso.carmine :as car]))
 
 (defn get-keys [redis-conn pattern]
-  (car/wcar redis-conn (car/keys pattern)))
+  @(future (car/wcar redis-conn (car/keys pattern))))
 
 #_{:clj-kondo/ignore [:redefined-var]}
 (defn get [redis-conn key]
-  (car/wcar redis-conn (car/get key)))
+  @(future (car/wcar redis-conn (car/get key))))
 
 #_{:clj-kondo/ignore [:redefined-var]}
 (defn set [redis-conn key value]
@@ -17,4 +17,4 @@
   (future (car/wcar redis-conn (car/del key))))
 
 (defn flush-all [redis-conn]
-  (car/wcar redis-conn (car/flushall)))
+  (future (car/wcar redis-conn (car/flushall))))
