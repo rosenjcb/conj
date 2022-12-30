@@ -64,7 +64,6 @@
         (response/bad-request (.getMessage e))))))
 
 (defn kill-thread-or-post! [req]
-  (log/infof "Debug log test for req %s" req)
   (try
     (let [db-conn (get-in req [:components :db-conn])
           redis-conn (get-in req [:components :redis-conn])
@@ -72,13 +71,10 @@
           thread-id (get-in req [:parameters :path :id])
           board (get-in req [:parameters :path :board])
           reply-no (get-in req [:parameters :query :replyNo])
-          _ (log/info "Successfully loaded dependencies + rest req")
           thread (query.thread/find-thread-by-id! db-conn redis-conn board thread-id)
-          _ (log/infof "Found thread %s" thread)
           post (m.thread/find-post thread reply-no)
           account-id (m.post/account-id post)
           account (q.account/find-account-by-id! db-conn account-id)
-          _ (log/infof "Found account owner delete post %s" account)
           ban (get-in req [:parameters :query :ban])
           delete-reply? (some? reply-no)
           success-message (if delete-reply?

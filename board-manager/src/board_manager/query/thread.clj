@@ -35,7 +35,7 @@
   (let [post-id (m.post/id post)
         image (m.post/image post)]
     (when image
-      (log/infof "Deleting image %s from expired post %s" image post-id)
+      (log/infof "Deleting image %s (found in post %s) from s3" image post-id)
       (db.s3/delete-object s3-client s3-folder (:filename image)))))
 
 (defn- post&account [accounts post]
