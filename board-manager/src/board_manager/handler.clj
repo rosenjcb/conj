@@ -1,25 +1,26 @@
 (ns board-manager.handler
-  (:require [compojure.core :refer :all]
-            [ring.adapter.jetty :as jetty]
-            [reitit.ring :as ring]
+  (:require [board-manager.routes.account :as account]
             [board-manager.routes.thread :as thread]
-            [reitit.ring.coercion :as coercion]
-            [reitit.ring.middleware.muuntaja :as muuntaja]
-            [muuntaja.core :as m]
-            [reitit.coercion.spec :as spec]
-            [environ.core :refer [env]]
-            [com.stuartsierra.component :as component]
-            [next.jdbc.connection :as connection]
+            [board-manager.services.auth :as auth.service]
+            [board-manager.services.google-client :as google.client]
             [clojure.tools.logging :as log]
             [clojure.tools.logging.impl :as log-impl]
-            [board-manager.routes.account :as account]
-            [board-manager.services.auth :as auth.service]
             [cognitect.aws.client.api :as aws]
-            [ring.util.response :as response]
+            [com.stuartsierra.component :as component]
+            [compojure.core :refer :all]
+            [environ.core :refer [env]]
+            [muuntaja.core :as m]
+            [next.jdbc.connection :as connection]
+            [reitit.coercion.spec :as spec]
+            [reitit.ring :as ring]
+            [reitit.ring.coercion :as coercion]
+            [reitit.ring.middleware.muuntaja :as muuntaja]
+            [ring.adapter.jetty :as jetty]
             [ring.middleware.cookies :as cookies]
             [ring.middleware.multipart-params :as multipart]
             [ring.middleware.params :as params]
-            [board-manager.services.google-client :as google.client])
+            [ring.util.response :as response]
+            [taoensso.carmine :as car])
   (:import (com.zaxxer.hikari HikariDataSource))
   (:gen-class))
 
@@ -99,12 +100,14 @@
 (defn new-server [port]
   (map->JettyServer {:port port}))
 
+(defonce redis-conn-pool (car/connection-pool {}))
+
 (defn system [config]
   (let [{:keys [db-host db-port db-name db-user db-pass port redis-host redis-port passphrase
                 google-client-id google-client-secret]} config
         s3-client (aws/client {:api :s3 :region :us-west-2})
         db-spec {:dbtype "postgresql" :host db-host :port db-port :dbname db-name :username db-user :password db-pass}
-        redis-conn {:pool {} :spec {:uri (str "redis://" redis-host ":" redis-port)}}]
+        redis-conn {:pool redis-conn-pool :spec {:uri (str "redis://" redis-host ":" redis-port)}}]
     (component/system-map
      :auth-conf {:privkey "auth_privkey.pem" :passphrase passphrase}
      :db-conn (connection/component HikariDataSource db-spec)
