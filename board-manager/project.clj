@@ -52,6 +52,7 @@
                       :db "postgres://localhost:5432/postgres?user=admin&password=pass"}
            :source-paths ["dev"]
            :env {:passphrase "Frameshare8*8"
+                 :env "local" 
                  :db-host "localhost"
                  :db-user "admin"
                  :db-pass "pass"
@@ -70,6 +71,7 @@
                     :db "postgres://conj-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com:5432/postgres?user=postgres&password=Frameshare8*8"}
          :source-paths ["dev"]
          :env {:passphrase "Frameshare8*8"
+               :env "dev" 
                :db-host "conj-db.c0l4wnpjgjdh.us-west-2.rds.amazonaws.com"
                :db-user "postgres"
                :db-pass "Frameshare8*8"

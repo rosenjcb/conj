@@ -19,7 +19,10 @@
 (def ^:const max-thread-count 30)
 (def ^:const max-post-count 30)
 
-(def ^:const s3-folder "conj-images")
+(def ^:const s3-bucket "conj-images")
+
+(defn- s3-image-path [env board-name thread-id]
+  (str "/" env "/boards/" board-name "/" thread-id "/"))
 
 (defn- sort-threads [sort? threads]
   (if sort?
@@ -31,12 +34,13 @@
         avatar (m.account/avatar account)]
     (api.post/model->response post username avatar)))
 
-(defn- purge-image-by-post [s3-client post]
+(defn- purge-image-by-post [s3-client env board-name thread-id post]
   (let [post-id (m.post/id post)
-        image (m.post/image post)]
+        image (m.post/image post)
+        path (s3-image-path env board-name thread-id)]
     (when image
       (log/infof "Deleting image %s (found in post %s) from s3" image post-id)
-      (db.s3/delete-object s3-client s3-folder (:filename image)))))
+      (db.s3/delete-object s3-client s3-bucket path (:filename image)))))
 
 (defn- post&account [accounts post]
   (let [account (first (filter #(= (m.post/account-id post) (m.account/id %)) accounts))]
@@ -150,9 +154,10 @@
     (when (< lapsed-time 60)
       (throw (Exception. (format "Only %s seconds have passed since your last reply. You must wait 60 seconds between replies." lapsed-time))))))
 
+
 (defn- upload-image
-  [s3-client {:keys [filename tempfile]}]
-  (db.s3/upload-object s3-client s3-folder filename (io/input-stream tempfile)))
+  [s3-client env board-name thread-id {:keys [filename tempfile]}]
+  (db.s3/upload-object s3-client s3-bucket (s3-image-path env board-name thread-id) filename (io/input-stream tempfile)))
 
 (defn find-thread-by-id!
   [db-conn redis-conn board id]
@@ -164,16 +169,16 @@
         new-threads (filter #((complement =) thread-id (m.post/id (first %))) threads)]
       (db.redis/set redis-conn board new-threads)))
 
-(defn delete-thread-by-id! [db-conn redis-conn s3-client board thread-id]
+(defn delete-thread-by-id! [db-conn redis-conn s3-client env board thread-id]
   (let [thread (find-thread-by-id! db-conn redis-conn board thread-id)]
     (if thread
       (do 
         (delete-thread redis-conn board thread-id)
         (doseq [post thread]
-          (purge-image-by-post s3-client post)))
+          (purge-image-by-post s3-client env board thread-id post)))
       (throw (Exception. (format "Thread No. %s not found." thread-id))))))
 
-(defn ^:test ^:private add-thread-to-board! [db-conn redis-conn s3-client board thread]
+(defn ^:test ^:private add-thread-to-board! [db-conn redis-conn s3-client env board thread]
   (let [sorted-threads (fetch-threads! db-conn redis-conn board {:sort? true})
         thread-count (count sorted-threads)
         expired-threads (when (> thread-count max-thread-count) (subvec sorted-threads max-thread-count thread-count))
@@ -182,11 +187,11 @@
             :let [post-id (m.post/id original-post)]]
       (when post-id 
         (log/infof "Deleting expired thread %s" post-id)
-        (delete-thread-by-id! db-conn redis-conn s3-client board post-id)))
+        (delete-thread-by-id! db-conn redis-conn s3-client env board post-id)))
     (db.redis/set redis-conn board new-threads)))
 
 (defn create-thread! 
-  [db-conn s3-client redis-conn board account req]
+  [db-conn s3-client redis-conn env board account req]
   (let [account-id (:id account)
         db-account (q.account/find-account-by-id! db-conn account-id)
         account-id (m.account/id db-account)
@@ -194,13 +199,13 @@
         thread (m.thread/->thread req account-id post-count)
         anonymous? (m.thread/anonymous? thread)
         op (first thread)
-        _ (validate-thread-time db-account)
+        ;; _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         image (m.post/image op)
-        uploaded-image (upload-image s3-client image)
+        uploaded-image (upload-image s3-client env board (m.post/id op) image)
         updated-op (assoc op :image uploaded-image :time (t/zoned-date-time) :is_anonymous anonymous?)
         final-thread (vector updated-op)]
-    (add-thread-to-board! db-conn redis-conn s3-client board final-thread)
+    (add-thread-to-board! db-conn redis-conn s3-client env board final-thread)
     (q.board/increment-counter! db-conn board)
     (q.account/update-last-thread! db-conn account-id)
     final-thread))
@@ -216,7 +221,7 @@
 ;; (defn- purge-post [post]
 ;;   (assoc post m.post/comment "DELETED POST" m.post/image nil m.post/is-anonymous true))
 
-(defn delete-post-by-id! [db-conn redis-conn s3-client board thread-id reply-id]
+(defn delete-post-by-id! [db-conn redis-conn s3-client env board thread-id reply-id]
   (let [thread (find-thread-by-id! db-conn redis-conn board thread-id)
         op (m.thread/op thread)
         op? (= (m.post/id op) reply-id)
@@ -228,12 +233,12 @@
 
       ;; for now we just delete the entire thread
       (= op? true) 
-      (delete-thread-by-id! db-conn redis-conn s3-client board thread-id)
+      (delete-thread-by-id! db-conn redis-conn s3-client env board thread-id)
 
       (some? thread)
       (if thread
         (do
-          (purge-image-by-post s3-client post)
+          (purge-image-by-post s3-client env board thread-id post)
           (update-thread! redis-conn board thread-id trimmed-thread))
         (throw (Exception. (format "Thread No. %s not found" thread-id)))))))
 
@@ -248,19 +253,19 @@
 
 (defn add-post!
   "Grabs a thread by its id, adds a post to it, and saves it to the database"  
-  [db-conn s3-client redis-conn account board thread-id post-body]
+  [db-conn s3-client redis-conn env account board thread-id post-body]
   (let [account-id (:id account)
         old-thread (find-thread-by-id! db-conn redis-conn board thread-id)
         _ (validate-thread-lock board old-thread)
         db-account (q.account/find-account-by-id! db-conn account-id)
         account-id (m.account/id db-account)
-        _ (validate-reply-time db-account)
+        ;; _ (validate-reply-time db-account)
         post-count (q.board/get-count! db-conn board)
         post (m.post/->post post-body account-id post-count)
         _ (validate-add-post post)
         image (m.post/image post)
         _ (when (nil? old-thread) (throw (Exception. "Thread does not exist")))
-        uploaded-image (when image (upload-image s3-client image))
+        uploaded-image (when image (upload-image s3-client env board thread-id image))
         enriched-post (assoc post :image uploaded-image :time (t/zoned-date-time))
         updated-thread (m.thread/add-post enriched-post old-thread)] 
     (update-thread! redis-conn board thread-id updated-thread)
@@ -269,7 +274,7 @@
     updated-thread))
 
 ;; can probably be replaced with generic "del all redis keys and images" without validating the relationships 
-(defn delete-all-threads! [db-conn redis-conn s3-client board]
+(defn delete-all-threads! [db-conn redis-conn s3-client env board]
   (let [threads (fetch-threads! nil redis-conn board)]
     (dorun 
-     (map #(delete-thread-by-id! db-conn redis-conn s3-client board (m.post/id (first %))) threads))))
+     (map #(delete-thread-by-id! db-conn redis-conn s3-client env board (m.post/id (first %))) threads))))
