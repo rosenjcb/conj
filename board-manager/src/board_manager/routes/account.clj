@@ -25,17 +25,21 @@
 (defn- set-cookies [response {:keys [access-token refresh-token]}]
   (assoc response :cookies {"refresh_token" refresh-token "access_token" access-token}))
 
-(defn- upload-avatar
-  [s3-client {:keys [filename tempfile]}]
-  (db.s3/upload-object s3-client "conj-images" (str "avatars/" filename) (io/input-stream tempfile)))
+(defn- replace-avatar
+  [s3-client env old-avatar {:keys [filename tempfile]}]
+  (let [path (str "/" env "/avatars/")
+        old-avatar-filename (:filename old-avatar)]
+    (when old-avatar-filename (db.s3/delete-object s3-client "conj-images" path old-avatar-filename))
+    (db.s3/upload-object s3-client "conj-images" path filename (io/input-stream tempfile))))
 
 (defn create-account! [req]
   (let [auth-service (get-in req [:components :auth-service])
         s3-client (get-in req [:components :s3-client])
+        env (get-in req [:components :env])
         account-req (:multipart-params req)]
     (try 
       (let [avatar (get account-req "image")
-            {:keys [location]} (when avatar (upload-avatar s3-client avatar))
+            {:keys [location]} (when avatar (replace-avatar s3-client env nil avatar))
             account (->> (assoc account-req m.account/avatar location m.account/provider m.account/conj-provider)
                          walk/keywordize-keys
                          (s.auth/add-account! auth-service :conj))]
@@ -86,11 +90,13 @@
 (defn update-account! [req]
   (let [db (get-in req [:components :db-conn])
         s3-client (get-in req [:components :s3-client])
+        env (get-in req [:components :env])
         account-id (get-in req [:account :id])
         account (q.account/find-account-by-id! db account-id)
+        old-avatar (m.account/avatar account)
         update (walk/keywordize-keys (:multipart-params req))
         avatar (m.account/avatar update)
-        {:keys [location]} (when avatar (upload-avatar s3-client avatar))
+        {:keys [location]} (when avatar (replace-avatar s3-client env old-avatar avatar))
         final (assoc update m.account/avatar (or location (m.account/avatar account)))]
     (try
       (some-> (q.account/update-account! db final account-id)
@@ -103,11 +109,12 @@
 (defn onboard-account! [req]
   (let [db (get-in req [:components :db-conn])
         s3-client (get-in req [:components :s3-client])
+        env (get-in req [:components :env])
         account-id (get-in req [:account :id])
         account (q.account/find-account-by-id! db account-id)
         {:keys [avatar username]} (walk/keywordize-keys (:multipart-params req))
         is-onboarding (m.account/is-onboarding account)
-        {:keys [location]} (when avatar (upload-avatar s3-client avatar))
+        {:keys [location]} (when avatar (replace-avatar s3-client env nil avatar))
         final (m.account/finish-onboarding account username (or location (m.account/avatar account)))]
     (if is-onboarding
       (try
