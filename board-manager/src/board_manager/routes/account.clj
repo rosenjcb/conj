@@ -14,6 +14,8 @@
             [board-manager.services.google-client :as google.client])
   (:import [org.postgresql.util PSQLException]))
 
+(def ^:private conj-bucket "conj-images")
+
 (defn get-my-account! [req]
   (let [db-conn (get-in req [:components :db-conn])
         account-id (get-in req [:account :id])
@@ -27,10 +29,11 @@
 
 (defn- replace-avatar
   [s3-client env old-avatar {:keys [filename tempfile]}]
-  (let [path (str "/" env "/avatars/")
-        old-avatar-filename (:filename old-avatar)]
-    (when old-avatar-filename (db.s3/delete-object s3-client "conj-images" path old-avatar-filename))
-    (db.s3/upload-object s3-client "conj-images" path filename (io/input-stream tempfile))))
+  (let [path (str "/" env "/avatars/")]
+    (when old-avatar 
+      (log/infof "Deleting old avatar %s" old-avatar)
+      (db.s3/delete-object s3-client conj-bucket path old-avatar))
+    (db.s3/upload-object s3-client conj-bucket path filename (io/input-stream tempfile))))
 
 (defn create-account! [req]
   (let [auth-service (get-in req [:components :auth-service])
