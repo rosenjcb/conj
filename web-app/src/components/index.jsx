@@ -139,8 +139,8 @@ export const RoundImage = styled.img`
 `;
 
 const ExistingAvatar = styled.img`
-  width: 64px;
-  height: 64px;
+  width: ${(props) => props.size ?? "64"}px;
+  height: ${(props) => props.size ?? "64"}px;
   border-radius: 50%;
 
   &:hover {
@@ -148,17 +148,17 @@ const ExistingAvatar = styled.img`
   }
 `;
 
-export const Avatar = ({ avatar, onClick }) => {
+export const Avatar = ({ avatar, onClick, size }) => {
   if (avatar) {
-    return <ExistingAvatar onClick={onClick} src={avatar} />;
+    return <ExistingAvatar onClick={onClick} src={avatar} size={size} />;
   } else {
-    return <AnonymousAvatar onClick={onClick} />;
+    return <AnonymousAvatar onClick={onClick} size={size} />;
   }
 };
 
 export const AnonymousAvatar = styled(BsFillPersonFill)`
-  width: 64px;
-  height: 64px;
+  width: ${(props) => props.size ?? "64"}px;
+  height: ${(props) => props.size ?? "64"}px;
   border-radius: 50%;
 
   &:hover {

@@ -33,7 +33,8 @@
     "build-storybook": "build-storybook -s public",
     "lint": "eslint --color --ext .html,.js,.json,.jsx,.md,.ts,.tsx src",
     "lint:fix": "yarn lint --fix",
-    "prepare": "cd .. && husky install"
+    "prepare": "cd .. && husky install",
+    "pretty": "pretty-quick"
   },
   "eslintConfig": {
     "extends": [

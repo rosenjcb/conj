@@ -167,7 +167,7 @@ export const WithNavBar = ({ component }) => {
             <BoardDrawer fill={true} boards={boards} />
           </ReactModal>
         )}
-        {component}
+        <ComponentDiv>{component}</ComponentDiv>
       </Page>
     </BoardRoot>
   );
@@ -217,6 +217,9 @@ const BoardDrawer = (props) => {
           </Text>
         )}
       </BoardList>
+      <SearchForm onSubmit={handleSubmit}>
+        <Input type="text" />
+      </SearchForm>
     </BoardDrawerRoot>
   );
 };
@@ -232,7 +235,7 @@ const Page = styled.div`
   max-height: calc(100vh - 5rem);
 
   @media all and (min-width: 1024px) {
-    width: 40%;
+    width: 65%;
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
@@ -246,10 +249,21 @@ const Page = styled.div`
   @media all and (max-width: 480px) {
     width: 100%;
   }
+`;
 
-  @media all and (max-width: 480px) {
-    width: 100%;
-  }
+const SearchForm = styled.form`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 10px;
+`;
+
+const Input = styled.input`
+  border-radius: 80px;
+  font-size: 2rem;
+  width: 60%;
+  margin-bottom: 10px;
+  padding: 0;
 `;
 
 const BoardList = styled.ul`
@@ -271,7 +285,7 @@ const BoardRow = styled.div`
   flex-direction: row;
   margin-left: 1rem;
   margin-right: 1rem;
-  border-radius: 4px;
+  border-radius: 9000px;
 `;
 
 const HighlightBoardRow = styled(BoardRow)`
@@ -352,7 +366,9 @@ const HomeNavBar = styled.div`
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 100%;
+    width: 60%;
+    padding-left: 20%;
+    padding-right: 20%;
   }
 
   @media all and (min-width: 480px) and (max-width: 768px) {
@@ -471,5 +487,23 @@ const SettingText = styled(Text)`
   &:hover {
     background-color: ${(props) =>
       chroma(props.theme.colors.grey).brighten(0.6).hex()};
+  }
+`;
+
+const ComponentDiv = styled.div`
+  @media all and (min-width: 1024px) {
+    max-width: 600px;
+  }
+
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    max-width: 600px;
+  }
+
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    width: 100%;
+  }
+
+  @media all and (max-width: 480px) {
+    width: 100%;
   }
 `;

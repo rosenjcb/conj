@@ -9,6 +9,7 @@ import chroma from "chroma-js";
 import { BiMessageDetail } from "react-icons/bi";
 import { Reply } from "./Reply";
 import Modal from "react-modal";
+import { AboutUser } from "./AboutUser";
 
 Modal.defaultStyles.overlay.backgroundColor = "rgba(0, 0, 0, 0.7)";
 
@@ -86,6 +87,16 @@ export const Post = (props) => {
     setEnlargeAvatar(false);
   };
 
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const openProfile = () => {
+    setProfileOpen(true);
+  };
+
+  const closeProfile = () => {
+    setProfileOpen(false);
+  };
+
   const { post, handleRef, highlight, preview, replyCount, opNo } = props;
 
   const { username, subject, id, comment, image, time, avatar } = post;
@@ -106,7 +117,7 @@ export const Post = (props) => {
   const formattedTime = handlePostDate(time);
 
   return (
-    <div>
+    <Root>
       <Modal
         style={customStyles}
         isOpen={enlargePostImage}
@@ -120,6 +131,13 @@ export const Post = (props) => {
         onRequestClose={closeAvatar}
       >
         <ModalImage src={avatar} />
+      </Modal>
+      <Modal
+        style={customStyles}
+        isOpen={profileOpen}
+        onRequestClose={closeProfile}
+      >
+        <AboutUser />
       </Modal>
       {isOriginalPost ? (
         <OriginalPost
@@ -141,6 +159,7 @@ export const Post = (props) => {
           image={image}
           replyCount={replyCount}
           avatar={avatar}
+          openProfile={openProfile}
         />
       ) : (
         <ReplyPost
@@ -160,9 +179,10 @@ export const Post = (props) => {
           formattedTime={formattedTime}
           image={image}
           avatar={avatar}
+          openProfile={openProfile}
         />
       )}
-    </div>
+    </Root>
   );
 };
 
@@ -183,6 +203,7 @@ const OriginalPost = ({
   preview,
   avatar,
   openAvatar,
+  openProfile,
 }) => {
   return (
     <PostRoot key={id} ref={handleRef}>
@@ -190,7 +211,7 @@ const OriginalPost = ({
         <Avatar onClick={openAvatar} avatar={avatar} />
         <TextContainer>
           <Text bold size="medium">
-            {username ?? "Anonymous"}
+            <p onClick={openProfile}>{username ?? "Anonymous"}</p>
           </Text>
           <PostLink to={postHref} onClick={handleClick}>
             #{id}
@@ -244,6 +265,7 @@ const ReplyPost = ({
   image,
   avatar,
   openAvatar,
+  openProfile,
 }) => {
   return (
     <PostRoot highlight={highlight}>
@@ -254,7 +276,7 @@ const ReplyPost = ({
             <Avatar onClick={openAvatar} avatar={avatar} />
             <InfoContent>
               <TextContainer>
-                <Text>{username ?? "Anonymous"}</Text>
+                <Text onClick={openProfile}>{username ?? "Anonymous"}</Text>
                 <PostLink to={postHref} onClick={handleClick}>
                   #{id}
                 </PostLink>
@@ -337,14 +359,31 @@ const UserInfo = styled.div`
 const ReplyUserInfo = styled(UserInfo)``;
 
 const Image = styled.img`
-  max-width: 100%;
-  max-height: 100%;
   border-radius: 8px;
   margin-right: 10px;
   float: left;
 
   &:hover {
     cursor: pointer;
+  }
+
+  @media all and (min-width: 1024px) {
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  @media all and (max-width: 480px) {
+    width: 100%;
   }
 `;
 
@@ -455,3 +494,5 @@ const InfoContent = styled.div`
   flex-direction: row;
   width: 100%;
 `;
+
+const Root = styled.div``;
