@@ -52,8 +52,7 @@ const Root = styled.div`
   justify-content: flex-start;
   gap: 1rem;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
-    0 8px 10px -6px rgb(0 0 0 / 0.1);
+  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
 
   @media all and (min-width: 1024px) {
     border-radius: 8px;

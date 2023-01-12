@@ -63,9 +63,7 @@ const ThreadPreviewRoot = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  height: calc(100vh - 96px);
   width: 100%;
-  gap: 0.5rem;
   margin: 0 auto;
 `;
 
@@ -74,10 +72,8 @@ const HomeReplyRoot = styled.div`
   justify-content: center;
   flex-direction: row;
   align-items: flex-start;
-  margin-top: 10px;
-  margin-bottom: 3rem;
+  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
   width: 100%;
-  gap: 10px;
 `;
 
 const BoardRoot = styled.div`

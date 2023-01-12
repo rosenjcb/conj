@@ -27,7 +27,7 @@ export const theme = {
     warning: "#eed202",
     black: "black",
     white: "white",
-    grey: "#b9bbbe",
+    grey: "#EDEDED",
   },
 };
 

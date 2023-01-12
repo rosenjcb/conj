@@ -93,30 +93,36 @@ export const WithNavBar = ({ component }) => {
         <Login completeAction={closeLogin} />
       </Modal>
       <HomeNavBar>
-        <HamburgerMenu onClick={openDrawer} />
         <Header bold onClick={redirectHome}>
-          conj.app
+          Conj
         </Header>
-        <IconContainer>
-          <SettingsIcon onClick={toggleVisible} />
-          <SettingsContent visible={isComponentVisible} ref={ref}>
-            {me === null ? (
-              <Link onClick={openLogin}>
-                <SettingText align="center">Login</SettingText>
-              </Link>
-            ) : null}
-            {me !== null ? (
-              <Link onClick={handleLogout}>
-                <SettingText align="center">Logout</SettingText>
-              </Link>
-            ) : null}
-            {me !== null ? (
-              <Link onClick={openAccount}>
-                <SettingText align="center">Account</SettingText>
-              </Link>
-            ) : null}
-          </SettingsContent>
-        </IconContainer>
+        <NavItemsContainer>
+          {isMobile ? (
+            <IconContainer>
+              <HamburgerMenu onClick={openDrawer} />
+            </IconContainer>
+          ) : null}
+          <IconContainer>
+            <SettingsIcon onClick={toggleVisible} />
+            <SettingsContent visible={isComponentVisible} ref={ref}>
+              {me === null ? (
+                <Link onClick={openLogin}>
+                  <SettingText align="center">Login</SettingText>
+                </Link>
+              ) : null}
+              {me !== null ? (
+                <Link onClick={handleLogout}>
+                  <SettingText align="center">Logout</SettingText>
+                </Link>
+              ) : null}
+              {me !== null ? (
+                <Link onClick={openAccount}>
+                  <SettingText align="center">Account</SettingText>
+                </Link>
+              ) : null}
+            </SettingsContent>
+          </IconContainer>
+        </NavItemsContainer>
       </HomeNavBar>
       <Page>
         {!isMobile ? (
@@ -178,18 +184,21 @@ const BoardDrawer = (props) => {
   );
 };
 
+const NavItemsContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  gap: 2px;
+  flex-direction: row;
+`;
+
 const Page = styled.div`
   display: flex;
   justify-content: flex-start;
-  padding-top: 5rem;
   flex-direction: row;
   margin: 0 auto;
-  margin-bottom: 1rem;
-  gap: 3rem;
-  max-height: calc(100vh - 5rem);
 
   @media all and (min-width: 1024px) {
-    width: 40%;
+    width: 100%;
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
@@ -279,58 +288,23 @@ const BoardRoot = styled.div`
 
 const HomeNavBar = styled.div`
   display: flex;
-  position: fixed;
+  position: sticky;
+  top: 0;
   z-index: 1;
   justify-content: space-between;
   gap: 10px;
   flex-direction: row;
   background-color: ${(props) => props.theme.colors.white};
   align-items: center;
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
-    0 8px 10px -6px rgb(0 0 0 / 0.1);
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-
-  @media all and (min-width: 1024px) {
-    width: 60%;
-    padding-left: 20%;
-    padding-right: 20%;
-  }
-
-  @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 100%;
-  }
-
-  @media all and (min-width: 480px) and (max-width: 768px) {
-    width: 100%;
-  }
-
-  @media all and (max-width: 480px) {
-    width: 100%;
-  }
+  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
+  width: calc(100% - 8px);
+  padding: 4px;
 `;
 
 const HamburgerMenu = styled(FiMenu)`
   color: ${(props) => props.theme.colors.black};
-  width: 48px;
-  height: 48px;
-  padding-right: 10px;
-
-  @media all and (min-width: 1024px) {
-    visibility: hidden;
-  }
-
-  @media all and (min-width: 768px) and (max-width: 1024px) {
-    visibility: hidden;
-  }
-
-  @media all and (min-width: 480px) and (max-width: 768px) {
-    visibility: visible;
-  }
-
-  @media all and (max-width: 480px) {
-    visibility: visible;
-  }
+  width: 36px;
+  height: 36px;
 `;
 
 const BoardIcon = styled(RiDiscussFill)`
@@ -386,21 +360,21 @@ const SettingsContent = styled.div`
 
 const SettingsIcon = styled(GoGear)`
   cursor: pointer;
-  width: 40px;
+  width: 36px;
+  height: 36px;
   align-self: center;
-  height: 40px;
   display: inline-block;
   position: relative;
 `;
 
 const IconContainer = styled.div`
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 9000px;
   display: flex;
   justify-content: center;
-  background-color: ${(props) =>
-    chroma(props.theme.colors.grey).brighten(0.6).hex()};
+  align-items: center;
+  background-color: ${(props) => props.theme.colors.grey};
 `;
 
 const Link = styled.div`
