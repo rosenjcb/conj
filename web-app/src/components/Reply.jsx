@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Formik, Form, Field } from "formik";
-import { Checkbox, RoundButton, RoundImage, Modal } from "./index";
+import { Checkbox, RoundButton, RoundImage, Modal, Avatar } from "./index";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { updateEntry, resetPost } from "../slices/postSlice";
@@ -17,7 +17,7 @@ import { Login } from "./Login";
 import { useMeQuery } from "../api/account";
 import _ from "lodash";
 
-export const Reply = (props) => {
+const FullReply = (props) => {
   const { className, isNewThread } = props;
 
   const post = useSelector((state) => state.post);
@@ -97,7 +97,7 @@ export const Reply = (props) => {
     return <div />;
   } else {
     return (
-      <ReplyRoot>
+      <FullReplyRoot>
         {me === null ? (
           <Modal isOpen={loginOpen} onRequestClose={closeLogin} title="Login">
             <Login completeAction={closeLogin} />
@@ -148,15 +148,83 @@ export const Reply = (props) => {
             </StyledForm>
           )}
         </Formik>
-      </ReplyRoot>
+      </FullReplyRoot>
     );
   }
 };
 
+const FakeReply = ({ onClick }) => {
+  const { data: me } = useMeQuery();
+
+  return (
+    <FakeReplyRoot onClick={onClick}>
+      <Avatar avatar={me?.avatar} />
+      <FakeTextBox disabled />
+    </FakeReplyRoot>
+  );
+};
+
+const FakeReplyRoot = styled.div`
+  display: flex;
+  position: sticky;
+  top: 50px;
+  left: 50px;
+  justify-content: flex-start;
+  align-items: center;
+  flex-direction: row;
+  background-color: ${(props) => props.theme.colors.white};
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  gap: 10px;
+  width: calc(100% - 20px);
+  height: 50%;
+`;
+
+const FakeTextBox = styled.input.attrs({
+  type: "text",
+})`
+  background-color: ${(props) => props.theme.colors.grey};
+  resize: vertical;
+  scrollbar-width: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  outline: none;
+  border: none;
+  height: 40px;
+`;
+
+export const Reply = (props) => {
+  const [open, setOpen] = useState(false);
+
+  const toggleModal = () => {
+    setOpen(!open);
+  };
+
+  const closeModal = () => {
+    setOpen(false);
+  };
+
+  return (
+    <ReplyRoot>
+      <Modal onRequestClose={closeModal} isOpen={open}>
+        <FullReply {...props} />
+      </Modal>
+      <FakeReply onClick={toggleModal} />
+    </ReplyRoot>
+  );
+};
+
 const ReplyRoot = styled.div`
   width: 100%;
-  padding-left: 1rem;
-  padding-right: 1rem;
+`;
+
+const FullReplyRoot = styled.div`
+  width: 100%;
+  margin: 0 auto;
+  max-width: 500px;
   background-color: ${(props) => props.theme.colors.white};
 
   @media all and (min-width: 1024px) {

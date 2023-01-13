@@ -272,8 +272,8 @@ export const RoundImage = styled.img`
 `;
 
 const ExistingAvatar = styled.img`
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
 
   &:hover {
@@ -290,8 +290,8 @@ export const Avatar = ({ avatar, onClick }) => {
 };
 
 export const AnonymousAvatar = styled(BsFillPersonFill)`
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
 
   &:hover {
