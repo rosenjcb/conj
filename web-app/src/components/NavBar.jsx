@@ -136,11 +136,33 @@ export const WithNavBar = ({ component }) => {
             <BoardDrawer fill={true} boards={boards} />
           </Modal>
         )}
-        {component}
+        <FixedWidth>{component}</FixedWidth>
       </Page>
     </BoardRoot>
   );
 };
+
+const FixedWidth = styled.div`
+  margin: 0 auto;
+  border-left: 2px solid ${(props) => props.theme.colors.grey};
+  border-right: 2px solid ${(props) => props.theme.colors.grey};
+
+  @media all and (min-width: 1024px) {
+    width: 900px;
+  }
+
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    width: 100%;
+  }
+
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    width: 100%;
+  }
+
+  @media all and (max-width: 480px) {
+    width: 100%;
+  }
+`;
 
 const BoardDrawer = (props) => {
   const { boards, fill } = props;
@@ -196,6 +218,7 @@ const Page = styled.div`
   justify-content: flex-start;
   flex-direction: row;
   margin: 0 auto;
+  height: 100%;
 
   @media all and (min-width: 1024px) {
     width: 100%;
@@ -264,8 +287,10 @@ const BoardDrawerRoot = styled.div`
     props.fill ? props.theme.colors.white : "inherit"};
   gap: 2rem;
   height: fit-content;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   width: 300px;
+  border-right: 2px solid ${(props) => props.theme.colors.grey};
+  height: 100%;
 
   @media all and (max-width: 480px) {
     width: 100%;

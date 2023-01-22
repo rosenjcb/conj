@@ -1,6 +1,7 @@
 import React from "react";
 import { Post } from "./Post";
 import styled from "styled-components";
+import { Reply } from "./Reply";
 
 export function Thread(props) {
   const { preview, thread, threadRef, replyIndex } = props;
@@ -26,6 +27,7 @@ export function Thread(props) {
 
   return (
     <Root>
+      <Reply />
       {thread && thread.length > 0 && threadRef && threadRef.current
         ? thread.map((post, index) => (
             <Post
@@ -45,25 +47,23 @@ export function Thread(props) {
 }
 
 const Root = styled.div`
-  width: 100%;
-  margin: 0 auto;
+  /* margin: 0 auto; */
   display: flex;
   background-color: ${(props) => props.theme.colors.white};
   justify-content: flex-start;
-  gap: 1rem;
+  /* gap: 1rem; */
   flex-direction: column;
-  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
 
   @media all and (min-width: 1024px) {
-    border-radius: 8px;
+    border-radius: 0px;
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
-    border-radius: 8px;
+    border-radius: 0px;
   }
 
   @media all and (min-width: 480px) and (max-width: 768px) {
-    border-radius: 8px;
+    border-radius: 0px;
   }
 
   @media all and (max-width: 480px) {

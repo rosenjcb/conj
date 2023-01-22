@@ -178,8 +178,8 @@ const FakeReplyRoot = styled.div`
   padding-top: 4px;
   padding-bottom: 4px;
   gap: 10px;
-  width: calc(100% - 20px);
   height: 50%;
+  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
 `;
 
 const FakeTextBox = styled.input.attrs({
@@ -222,31 +222,34 @@ const ReplyRoot = styled.div`
 `;
 
 const FullReplyRoot = styled.div`
-  width: 100%;
   margin: 0 auto;
   max-width: 500px;
   background-color: ${(props) => props.theme.colors.white};
 
   @media all and (min-width: 1024px) {
     border-radius: 8px;
+    width: 500px;
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
     border-radius: 8px;
+    width: 500px;
   }
 
   @media all and (min-width: 480px) and (max-width: 768px) {
     border-radius: 8px;
+    width: 500px;
   }
 
   @media all and (max-width: 480px) {
     border-radius: 0px;
+    width: 100%;
   }
 `;
 
 export const StyledForm = styled(Form)`
-  padding-bottom: 1.5rem;
-  padding-top: 1.5rem;
+  /* padding-bottom: 1.5rem;
+  padding-top: 1.5rem; */
   width: 100%;
   display: flex;
   justify-content: flex-start;

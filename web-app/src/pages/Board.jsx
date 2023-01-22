@@ -72,7 +72,7 @@ const HomeReplyRoot = styled.div`
   justify-content: center;
   flex-direction: row;
   align-items: flex-start;
-  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
+  /* border-bottom: 2px solid ${(props) => props.theme.colors.grey}; */
   width: 100%;
 `;
 

@@ -28,6 +28,7 @@ export const theme = {
     black: "black",
     white: "white",
     grey: "#EDEDED",
+    darkGrey: "#536471",
   },
 };
 
@@ -78,7 +79,7 @@ const AppRoot = styled.div`
   flex-direction: column;
   justify-content: center;
   height: 100vh;
-  background: linear-gradient(
+  /* background: linear-gradient(
     112deg,
     transparent 0,
     transparent 20%,
@@ -86,7 +87,8 @@ const AppRoot = styled.div`
     ${(props) => chroma(props.theme.colors.primary).alpha(0.1).hex()} 70%,
     transparent 80%,
     transparent 100%
-  );
+  ); */
+  background-color: white;
   overflow-x: hidden;
 `;
 

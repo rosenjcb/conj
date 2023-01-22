@@ -6,8 +6,7 @@ import { useDispatch } from "react-redux";
 import { insertPostLink } from "../slices/postSlice";
 import { Link } from "react-router-dom";
 import chroma from "chroma-js";
-import { BiMessageDetail } from "react-icons/bi";
-import { Reply } from "./Reply";
+import { BiMessageDetail, BiShareAlt } from "react-icons/bi";
 
 const WithText = ({ direction, component, text }) => {
   return (
@@ -39,7 +38,7 @@ const handlePostDate = (time) => {
         minutes === 1 ? "minute" : "minutes"
       } ago`;
     }
-    return `${Math.round(hours)} ${hours === 1 ? "hour" : "hours"} ago`;
+    return `${Math.round(hours)} ${hours === 1 ? "hr" : "hrs"} ago`;
   } else {
     return then.toLocaleDateString();
   }
@@ -170,19 +169,25 @@ const OriginalPost = ({
             #{id}
           </PostLink>
         </TextContainer>
-      </UserInfo>
-      <OriginalContentRoot>
-        <Text align="left" width="100%" size="x-large" color="primary">
-          {subject}
+        <Text size="medium" color="darkGrey" align="right">
+          {formattedTime}
         </Text>
+      </UserInfo>
+      <FullWidth>
         <CenteredImage
           fullScreen={fullScreen}
           onClick={() => openPostImage()}
           src={image.location}
         />
+      </FullWidth>
+      <OriginalContentRoot>
+        <Text align="left" width="100%" size="x-large" color="black">
+          {subject}
+        </Text>
         {processPostText(opNo, comment)}
       </OriginalContentRoot>
       <ActionsContainer>
+        <ShareMessage />
         <WithText
           component={
             <ThreadLink
@@ -194,11 +199,7 @@ const OriginalPost = ({
           direction="row"
           text={replyCount}
         />
-        <Text size="large" color="grey" align="right" bold>
-          {formattedTime}
-        </Text>
       </ActionsContainer>
-      {!preview ? <ThreadReply /> : null}
     </PostRoot>
   );
 };
@@ -238,11 +239,6 @@ const ReplyPost = ({
           </ReplyUserInfo>
         </BottomRow>
         <ContentRoot>
-          {subject ? (
-            <Text size="large" color="primary">
-              {subject}
-            </Text>
-          ) : null}
           {processPostText(opNo, comment)}
           {image && image.location ? (
             <Image
@@ -250,6 +246,11 @@ const ReplyPost = ({
               onClick={() => openPostImage()}
               src={image.location}
             />
+          ) : null}
+          {subject ? (
+            <Text size="large" color="primary">
+              {subject}
+            </Text>
           ) : null}
         </ContentRoot>
       </PostBody>
@@ -262,7 +263,7 @@ const PostBody = styled.div`
   justify-content: column;
   flex-direction: flex-start;
   flex-flow: wrap;
-  gap: 1rem;
+  /* gap: 1rem; */
   width: calc(100% - 1px - 1rem);
 `;
 
@@ -277,18 +278,28 @@ const BottomRow = styled.div`
 const WithTextRoot = styled.div`
   display: flex;
   flex-direction: ${(props) => props.direction ?? "row"};
-  color: ${(props) => chroma(props.theme.colors.grey).darken().hex()};
+  color: ${(props) => props.theme.colors.black};
 
   &:hover {
-    color: ${(props) => chroma(props.theme.colors.black).brighten().hex()};
+    cursor: pointer;
+    /* color: ${(props) => props.theme.colors.grey}; */
   }
 `;
 
 const MessageDetail = styled(BiMessageDetail)`
-  // color: ${(props) => chroma(props.theme.colors.grey).darken().hex()};
-  color: inherit;
+  color: ${(props) => props.theme.colors.black};
   width: 36px;
   height: 36px;
+`;
+
+const ShareMessage = styled(BiShareAlt)`
+  color: ${(props) => props.theme.colors.black};
+  width: 36px;
+  height: 36px;
+  &:hover {
+    cursor: pointer;
+    /* color: ${(props) => props.theme.colors.grey}; */
+  }
 `;
 
 const TextContainer = styled.div`
@@ -306,6 +317,8 @@ const UserInfo = styled.div`
   align-items: center;
   gap: 20px;
   width: 100%;
+  margin-left: 4px;
+  margin-right: 4px;
 `;
 
 const ReplyUserInfo = styled(UserInfo)``;
@@ -322,12 +335,23 @@ const Image = styled.img`
   }
 `;
 
+const FullWidth = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  background-color: ${(props) => props.theme.colors.grey};
+`;
+
 const CenteredImage = styled(Image)`
   float: none;
   margin: 0 auto;
+  /* aspect-ratio: 1/1; */
+  max-height: 600px;
+  border-radius: 0px;
 `;
 
-const ModalImage = styled(CenteredImage)`
+const ModalImage = styled(Image)`
   max-width: 50vw;
   max-height: 50vh;
 
@@ -361,7 +385,9 @@ const ContentRoot = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 1rem;
+  margin-left: 4px;
+  margin-right: 4px;
+  /* gap: 1rem; */
 `;
 
 const OriginalContentRoot = styled(ContentRoot)`
@@ -369,6 +395,7 @@ const OriginalContentRoot = styled(ContentRoot)`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
+  gap: 10px;
 `;
 
 const PostRoot = styled.div`
@@ -378,11 +405,14 @@ const PostRoot = styled.div`
   flex-direction: row;
   justify-content: flex-start;
   flex-flow: wrap;
-  width: calc(100% - 3rem);
+  /* width: calc(100% - 3rem); */
+  width: 100%;
   margin: 0 auto;
   background-color: ${(props) => props.theme.colors.white};
-  margin: 1.5rem;
-  gap: 1rem;
+  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
+  /* margin: 1.5rem; */
+  margin-top: 10px;
+  gap: 10px;
   text-align: left;
 `;
 
@@ -397,18 +427,14 @@ const PostLink = styled(Link)`
   margin: 0;
 `;
 
-const ThreadReply = styled(Reply)`
-  margin: 0 auto;
-  width: 100%;
-  margin-top: 2rem;
-`;
-
 const ActionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
   flex-direction: row;
   align-items: center;
+  margin-left: 4px;
+  margin-right: 4px;
 `;
 
 const ThreadLink = styled(Link)`
