@@ -5,7 +5,6 @@ import { processPostText } from "../util/post";
 import { useDispatch } from "react-redux";
 import { insertPostLink } from "../slices/postSlice";
 import { Link } from "react-router-dom";
-import chroma from "chroma-js";
 import { BiMessageDetail, BiShareAlt } from "react-icons/bi";
 
 const WithText = ({ direction, component, text }) => {
@@ -67,7 +66,7 @@ export const Post = (props) => {
     setEnlargeAvatar(false);
   };
 
-  const { post, handleRef, highlight, preview, replyCount, opNo } = props;
+  const { post, handleRef, preview, replyCount, opNo } = props;
 
   const { username, subject, id, comment, image, time, avatar } = post;
 
@@ -94,7 +93,55 @@ export const Post = (props) => {
       <Modal isOpen={enlargeAvatar} onRequestClose={closeAvatar}>
         <ModalImage src={avatar} />
       </Modal>
-      {isOriginalPost ? (
+      <PostRoot key={id} ref={handleRef}>
+        <UserInfo>
+          <Avatar onClick={openAvatar} avatar={avatar} />
+          <TextContainer>
+            <Text bold size="medium">
+              {username ?? "Anonymous"}
+            </Text>
+            <PostLink to={postHref} onClick={handleClick}>
+              #{id}
+            </PostLink>
+          </TextContainer>
+          <Text size="medium" color="darkGrey" align="right">
+            {formattedTime}
+          </Text>
+        </UserInfo>
+        {image && image.location ? (
+          <FullWidth>
+            <CenteredImage
+              onClick={() => openPostImage()}
+              src={image.location}
+            />
+          </FullWidth>
+        ) : null}
+        <OriginalContentRoot>
+          {subject ? (
+            <Text align="left" width="100%" size="x-large" color="black">
+              {subject}
+            </Text>
+          ) : null}
+          {processPostText(opNo, comment)}
+        </OriginalContentRoot>
+        <ActionsContainer>
+          <ShareMessage />
+          {preview ? (
+            <WithText
+              component={
+                <ThreadLink
+                  to={(location) => `${location.pathname}/thread/${opNo}`}
+                >
+                  <MessageDetail />
+                </ThreadLink>
+              }
+              direction="row"
+              text={replyCount}
+            />
+          ) : null}
+        </ActionsContainer>
+      </PostRoot>
+      {/* {isOriginalPost ? (
         <OriginalPost
           key={id}
           preview={preview}
@@ -134,146 +181,146 @@ export const Post = (props) => {
           image={image}
           avatar={avatar}
         />
-      )}
+      )} */}
     </div>
   );
 };
 
-const OriginalPost = ({
-  postHref,
-  handleRef,
-  fullScreen,
-  openPostImage,
-  id,
-  username,
-  handleClick,
-  opNo,
-  subject,
-  comment,
-  formattedTime,
-  image,
-  replyCount,
-  preview,
-  avatar,
-  openAvatar,
-}) => {
-  return (
-    <PostRoot key={id} ref={handleRef}>
-      <UserInfo>
-        <Avatar onClick={openAvatar} avatar={avatar} />
-        <TextContainer>
-          <Text bold size="medium">
-            {username ?? "Anonymous"}
-          </Text>
-          <PostLink to={postHref} onClick={handleClick}>
-            #{id}
-          </PostLink>
-        </TextContainer>
-        <Text size="medium" color="darkGrey" align="right">
-          {formattedTime}
-        </Text>
-      </UserInfo>
-      <FullWidth>
-        <CenteredImage
-          fullScreen={fullScreen}
-          onClick={() => openPostImage()}
-          src={image.location}
-        />
-      </FullWidth>
-      <OriginalContentRoot>
-        <Text align="left" width="100%" size="x-large" color="black">
-          {subject}
-        </Text>
-        {processPostText(opNo, comment)}
-      </OriginalContentRoot>
-      <ActionsContainer>
-        <ShareMessage />
-        <WithText
-          component={
-            <ThreadLink
-              to={(location) => `${location.pathname}/thread/${opNo}`}
-            >
-              <MessageDetail />
-            </ThreadLink>
-          }
-          direction="row"
-          text={replyCount}
-        />
-      </ActionsContainer>
-    </PostRoot>
-  );
-};
+// const OriginalPost = ({
+//   postHref,
+//   handleRef,
+//   fullScreen,
+//   openPostImage,
+//   id,
+//   username,
+//   handleClick,
+//   opNo,
+//   subject,
+//   comment,
+//   formattedTime,
+//   image,
+//   replyCount,
+//   preview,
+//   avatar,
+//   openAvatar,
+// }) => {
+//   return (
+//     <PostRoot key={id} ref={handleRef}>
+//       <UserInfo>
+//         <Avatar onClick={openAvatar} avatar={avatar} />
+//         <TextContainer>
+//           <Text bold size="medium">
+//             {username ?? "Anonymous"}
+//           </Text>
+//           <PostLink to={postHref} onClick={handleClick}>
+//             #{id}
+//           </PostLink>
+//         </TextContainer>
+//         <Text size="medium" color="darkGrey" align="right">
+//           {formattedTime}
+//         </Text>
+//       </UserInfo>
+//       <FullWidth>
+//         <CenteredImage
+//           fullScreen={fullScreen}
+//           onClick={() => openPostImage()}
+//           src={image.location}
+//         />
+//       </FullWidth>
+//       <OriginalContentRoot>
+//         <Text align="left" width="100%" size="x-large" color="black">
+//           {subject}
+//         </Text>
+//         {processPostText(opNo, comment)}
+//       </OriginalContentRoot>
+//       <ActionsContainer>
+//         <ShareMessage />
+//         <WithText
+//           component={
+//             <ThreadLink
+//               to={(location) => `${location.pathname}/thread/${opNo}`}
+//             >
+//               <MessageDetail />
+//             </ThreadLink>
+//           }
+//           direction="row"
+//           text={replyCount}
+//         />
+//       </ActionsContainer>
+//     </PostRoot>
+//   );
+// };
 
-const ReplyPost = ({
-  postHref,
-  highlight,
-  fullScreen,
-  openPostImage,
-  id,
-  username,
-  handleClick,
-  opNo,
-  subject,
-  comment,
-  formattedTime,
-  image,
-  avatar,
-  openAvatar,
-}) => {
-  return (
-    <PostRoot highlight={highlight}>
-      <FalseBorder />
-      <PostBody>
-        <BottomRow>
-          <ReplyUserInfo>
-            <Avatar onClick={openAvatar} avatar={avatar} />
-            <InfoContent>
-              <TextContainer>
-                <Text>{username ?? "Anonymous"}</Text>
-                <PostLink to={postHref} onClick={handleClick}>
-                  #{id}
-                </PostLink>
-              </TextContainer>
-              <Text align="right">{formattedTime}</Text>
-            </InfoContent>
-          </ReplyUserInfo>
-        </BottomRow>
-        <ContentRoot>
-          {processPostText(opNo, comment)}
-          {image && image.location ? (
-            <Image
-              fullScreen={fullScreen}
-              onClick={() => openPostImage()}
-              src={image.location}
-            />
-          ) : null}
-          {subject ? (
-            <Text size="large" color="primary">
-              {subject}
-            </Text>
-          ) : null}
-        </ContentRoot>
-      </PostBody>
-    </PostRoot>
-  );
-};
+// const ReplyPost = ({
+//   postHref,
+//   highlight,
+//   fullScreen,
+//   openPostImage,
+//   id,
+//   username,
+//   handleClick,
+//   opNo,
+//   subject,
+//   comment,
+//   formattedTime,
+//   image,
+//   avatar,
+//   openAvatar,
+// }) => {
+//   return (
+//     <PostRoot highlight={highlight}>
+//       <FalseBorder />
+//       <PostBody>
+//         <BottomRow>
+//           <ReplyUserInfo>
+//             <Avatar onClick={openAvatar} avatar={avatar} />
+//             <InfoContent>
+//               <TextContainer>
+//                 <Text>{username ?? "Anonymous"}</Text>
+//                 <PostLink to={postHref} onClick={handleClick}>
+//                   #{id}
+//                 </PostLink>
+//               </TextContainer>
+//               <Text align="right">{formattedTime}</Text>
+//             </InfoContent>
+//           </ReplyUserInfo>
+//         </BottomRow>
+//         <ContentRoot>
+//           {processPostText(opNo, comment)}
+//           {image && image.location ? (
+//             <Image
+//               fullScreen={fullScreen}
+//               onClick={() => openPostImage()}
+//               src={image.location}
+//             />
+//           ) : null}
+//           {subject ? (
+//             <Text size="large" color="primary">
+//               {subject}
+//             </Text>
+//           ) : null}
+//         </ContentRoot>
+//       </PostBody>
+//     </PostRoot>
+//   );
+// };
 
-const PostBody = styled.div`
-  display: flex;
-  justify-content: column;
-  flex-direction: flex-start;
-  flex-flow: wrap;
-  /* gap: 1rem; */
-  width: calc(100% - 1px - 1rem);
-`;
+// const PostBody = styled.div`
+//   display: flex;
+//   justify-content: column;
+//   flex-direction: flex-start;
+//   flex-flow: wrap;
+//   /* gap: 1rem; */
+//   width: calc(100% - 1px - 1rem);
+// `;
 
-const BottomRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  width: 100%;
-  align-items: center;
-`;
+// const BottomRow = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   flex-direction: row;
+//   width: 100%;
+//   align-items: center;
+// `;
 
 const WithTextRoot = styled.div`
   display: flex;
@@ -288,14 +335,14 @@ const WithTextRoot = styled.div`
 
 const MessageDetail = styled(BiMessageDetail)`
   color: ${(props) => props.theme.colors.black};
-  width: 36px;
-  height: 36px;
+  width: 24px;
+  height: 24px;
 `;
 
 const ShareMessage = styled(BiShareAlt)`
   color: ${(props) => props.theme.colors.black};
-  width: 36px;
-  height: 36px;
+  width: 24px;
+  height: 24px;
   &:hover {
     cursor: pointer;
     /* color: ${(props) => props.theme.colors.grey}; */
@@ -320,8 +367,6 @@ const UserInfo = styled.div`
   margin-left: 4px;
   margin-right: 4px;
 `;
-
-const ReplyUserInfo = styled(UserInfo)``;
 
 const Image = styled.img`
   max-width: 100%;
@@ -372,7 +417,7 @@ const ModalImage = styled(Image)`
 `;
 
 const IconText = styled.p`
-  font-size: 1.25rem;
+  /* font-size: 1.25rem; */
   padding-bottom: 8px;
   align-self: center;
   margin: 0;
@@ -411,7 +456,8 @@ const PostRoot = styled.div`
   background-color: ${(props) => props.theme.colors.white};
   border-bottom: 2px solid ${(props) => props.theme.colors.grey};
   /* margin: 1.5rem; */
-  margin-top: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   gap: 10px;
   text-align: left;
 `;
@@ -441,17 +487,17 @@ const ThreadLink = styled(Link)`
   color: inherit;
 `;
 
-const FalseBorder = styled.div`
-  width: 1px;
-  background-color: ${(props) =>
-    chroma(props.theme.colors.grey).brighten(0.5).hex()};
-`;
+// const FalseBorder = styled.div`
+//   width: 1px;
+//   background-color: ${(props) =>
+//     chroma(props.theme.colors.grey).brighten(0.5).hex()};
+// `;
 
-const InfoContent = styled.div`
-  height: 80%;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-direction: row;
-  width: 100%;
-`;
+// const InfoContent = styled.div`
+//   height: 80%;
+//   display: flex;
+//   justify-content: space-between;
+//   align-items: flex-start;
+//   flex-direction: row;
+//   width: 100%;
+// `;

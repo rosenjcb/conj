@@ -144,8 +144,16 @@ export const WithNavBar = ({ component }) => {
 
 const FixedWidth = styled.div`
   margin: 0 auto;
+  height: calc(
+    100vh - 40px - 8px - 2px
+  ); //full height - fixed navbar height - fixed navbar padding - border)
+  overflow-y: scroll;
   border-left: 2px solid ${(props) => props.theme.colors.grey};
   border-right: 2px solid ${(props) => props.theme.colors.grey};
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
 
   @media all and (min-width: 1024px) {
     width: 900px;
@@ -288,9 +296,10 @@ const BoardDrawerRoot = styled.div`
   gap: 2rem;
   height: fit-content;
   /* border-radius: 8px; */
-  width: 300px;
+  min-width: 300px;
   border-right: 2px solid ${(props) => props.theme.colors.grey};
-  height: 100%;
+  min-height: 100%;
+  height: auto;
 
   @media all and (max-width: 480px) {
     width: 100%;
@@ -323,6 +332,7 @@ const HomeNavBar = styled.div`
   align-items: center;
   border-bottom: 2px solid ${(props) => props.theme.colors.grey};
   width: calc(100% - 8px);
+  height: 40px;
   padding: 4px;
 `;
 

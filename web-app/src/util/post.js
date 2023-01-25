@@ -1,12 +1,13 @@
 import React from "react";
 import styled from "styled-components";
 import * as _ from "lodash";
+import { SpanText } from "../components";
 
 const reHash = /#[1-9]\d*\b/g;
 const reNewLine = /\r?\n/g;
 
 const processLine = (opNo, line) => {
-  if (line === "") return <br />;
+  if (line === "") return <span key={opNo} />;
   if (line[0] === ">") return <GreenText>{line}</GreenText>;
   const matches = line.match(reHash);
   const links =
@@ -20,7 +21,7 @@ const processLine = (opNo, line) => {
   const rest = line
     .split(reHash)
     .filter((t) => t !== "")
-    .map((t, i) => <span key={i}>{t}</span>);
+    .map((t, i) => <SpanText key={i}>{t}</SpanText>);
   const res = _.zip(links, rest);
   return res;
 };
@@ -45,6 +46,6 @@ export const Root = styled.div`
   flex-direction: column;
 `;
 
-export const GreenText = styled.span`
+export const GreenText = styled(SpanText)`
   color: green;
 `;

@@ -18,7 +18,7 @@ import { useMeQuery } from "../api/account";
 import _ from "lodash";
 
 const FullReply = (props) => {
-  const { className, isNewThread } = props;
+  const { className, isNewThread, handleClose } = props;
 
   const post = useSelector((state) => state.post);
 
@@ -66,6 +66,8 @@ const FullReply = (props) => {
     } catch (e) {
       console.log("uh woops");
       if (e.data) toast.error(e.data);
+    } finally {
+      handleClose();
     }
   };
 
@@ -210,7 +212,7 @@ export const Reply = (props) => {
   return (
     <ReplyRoot>
       <Modal onRequestClose={closeModal} isOpen={open}>
-        <FullReply {...props} />
+        <FullReply {...props} handleClose={closeModal} />
       </Modal>
       <FakeReply onClick={toggleModal} />
     </ReplyRoot>

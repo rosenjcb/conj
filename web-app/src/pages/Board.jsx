@@ -80,7 +80,7 @@ const BoardRoot = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-
+  height: inherit;
   overflow-y: scroll;
   scrollbar-width: none;
 

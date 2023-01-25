@@ -218,6 +218,17 @@ export const Text = styled.p`
   overflow-wrap: ${(props) => (props.noOverflow ? "initial" : "break-word")};
 `;
 
+export const SpanText = styled.span`
+  font-weight: ${(props) => (props.bold ? 700 : 500)};
+  font-size: ${(props) =>
+    props.size
+      ? sizeCompute("span", props.size)
+      : sizeCompute("span", "medium")};
+  text-align: ${(props) => props.align ?? "left"};
+  font-family: "Inter", arial, sans-serif;
+  color: ${(props) => computeColor(props.theme.colors, props.color)};
+`;
+
 export const Header = styled.h1`
   font-weight: ${(props) => (props.bold ? 700 : 500)};
   text-align: ${(props) => props.align ?? "center"};
