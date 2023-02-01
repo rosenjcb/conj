@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { Text, Avatar, Modal } from "./index";
 import { processPostText } from "../util/post";
@@ -6,6 +6,9 @@ import { useDispatch } from "react-redux";
 import { insertPostLink } from "../slices/postSlice";
 import { Link } from "react-router-dom";
 import { BiMessageDetail, BiShareAlt } from "react-icons/bi";
+import { VscEllipsis } from "react-icons/vsc";
+import { RiDeleteBin2Fill } from "react-icons/ri";
+import { useDetectOutsideClick } from "../hooks/useDetectOutsideClick";
 
 const WithText = ({ direction, component, text }) => {
   return (
@@ -85,6 +88,13 @@ export const Post = (props) => {
 
   const formattedTime = handlePostDate(time);
 
+  //I wonder if there is a way to make this cleaner.
+  const optionsRef = useRef(null);
+  const [expandOptions, setExpandOptions] = useState(false);
+  const closeOptions = () => setExpandOptions(false);
+  const openOptions = () => setExpandOptions(!expandOptions);
+  useDetectOutsideClick(optionsRef, closeOptions);
+
   return (
     <div>
       <Modal isOpen={enlargePostImage} onRequestClose={closePostImage}>
@@ -125,7 +135,17 @@ export const Post = (props) => {
           {processPostText(opNo, comment)}
         </OriginalContentRoot>
         <ActionsContainer>
-          <ShareMessage />
+          <OptionsDiv
+            ref={optionsRef}
+            expand={expandOptions}
+            onClick={openOptions}
+          >
+            {!expandOptions ? <EllipsisButton /> : null}
+            <ShareMessageButton />
+            <DeletePostButton
+              onClick={(e) => console.log("clicking delete button")}
+            />
+          </OptionsDiv>
           {preview ? (
             <WithText
               component={
@@ -234,7 +254,7 @@ export const Post = (props) => {
 //         {processPostText(opNo, comment)}
 //       </OriginalContentRoot>
 //       <ActionsContainer>
-//         <ShareMessage />
+//         <ShareMessageButton />
 //         <WithText
 //           component={
 //             <ThreadLink
@@ -339,7 +359,42 @@ const MessageDetail = styled(BiMessageDetail)`
   height: 24px;
 `;
 
-const ShareMessage = styled(BiShareAlt)`
+const OptionsDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  transition: all 0.3 ease;
+  max-width: ${(props) => (props.expand ? "100%" : "24px")};
+  overflow: hidden;
+  background-color: ${(props) => props.theme.colors.grey};
+  border-radius: 9000px;
+  gap: 2px;
+  padding: 2px;
+`;
+
+const EllipsisButton = styled(VscEllipsis)`
+  color: ${(props) => props.theme.colors.black};
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-width: 24px;
+  &:hover {
+    cursor: pointer;
+    /* color: ${(props) => props.theme.colors.grey}; */
+  }
+`;
+
+const ShareMessageButton = styled(BiShareAlt)`
+  color: ${(props) => props.theme.colors.black};
+  width: 24px;
+  height: 24px;
+  &:hover {
+    cursor: pointer;
+    /* color: ${(props) => props.theme.colors.grey}; */
+  }
+`;
+
+const DeletePostButton = styled(RiDeleteBin2Fill)`
   color: ${(props) => props.theme.colors.black};
   width: 24px;
   height: 24px;
@@ -392,7 +447,7 @@ const CenteredImage = styled(Image)`
   float: none;
   margin: 0 auto;
   /* aspect-ratio: 1/1; */
-  max-height: 600px;
+  max-height: 400px;
   border-radius: 0px;
 `;
 
