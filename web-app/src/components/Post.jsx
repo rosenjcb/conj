@@ -11,6 +11,7 @@ import { RiDeleteBin2Fill } from "react-icons/ri";
 import { useDetectOutsideClick } from "../hooks/useDetectOutsideClick";
 import { useDeleteThreadMutation } from "../api/thread";
 import { toast } from "react-hot-toast";
+import * as _ from "lodash";
 
 const WithText = ({ direction, component, text }) => {
   return (
@@ -99,12 +100,29 @@ export const Post = (props) => {
 
   const [deleteThread] = useDeleteThreadMutation();
 
+  const params = {
+    ban: false,
+    replyNo: !isOriginalPost ? id : null,
+  };
+
   const deleteReq = {
     board: board,
     threadNo: opNo,
+    params: _.omitBy(params, _.isNil),
     replyNo: !isOriginalPost ? id : null,
     ban: false,
   };
+
+  const deletePost = async () => {
+    try {
+      await deleteThread(deleteReq).unwrap();
+      toast.success(`Deleted Post #${id}`);
+    } catch (e) {
+      toast.error(e.data);
+    }
+  };
+
+  const postUrl = `https://conj.app/boards/${board}/thread/${opNo}#${id}`;
 
   return (
     <div>
@@ -152,13 +170,10 @@ export const Post = (props) => {
             onClick={openOptions}
           >
             {!expandOptions ? <EllipsisButton /> : null}
-            <ShareMessageButton />
-            <DeletePostButton
-              onClick={async (_) => {
-                await deleteThread(deleteReq);
-                toast.success(`Deleted Post #${id}`);
-              }}
+            <ShareMessageButton
+              onClick={() => navigator.clipboard.writeText(postUrl)}
             />
+            <DeletePostButton onClick={deletePost} />
           </OptionsDiv>
           {preview ? (
             <WithText
@@ -175,186 +190,9 @@ export const Post = (props) => {
           ) : null}
         </ActionsContainer>
       </PostRoot>
-      {/* {isOriginalPost ? (
-        <OriginalPost
-          key={id}
-          preview={preview}
-          highlight={false}
-          postHref={postHref}
-          handleRef={handleRef}
-          openAvatar={openAvatar}
-          openPostImage={openPostImage}
-          closePostImage={closePostImage}
-          id={id}
-          username={username}
-          handleClick={handleClick}
-          opNo={opNo}
-          subject={subject}
-          comment={comment}
-          formattedTime={formattedTime}
-          image={image}
-          replyCount={replyCount}
-          avatar={avatar}
-        />
-      ) : (
-        <ReplyPost
-          key={post.id}
-          highlight={highlight}
-          postHref={postHref}
-          handleRef={handleRef}
-          openAvatar={openAvatar}
-          openPostImage={openPostImage}
-          closePostImage={closePostImage}
-          id={id}
-          username={username}
-          handleClick={handleClick}
-          opNo={opNo}
-          subject={subject}
-          comment={comment}
-          formattedTime={formattedTime}
-          image={image}
-          avatar={avatar}
-        />
-      )} */}
     </div>
   );
 };
-
-// const OriginalPost = ({
-//   postHref,
-//   handleRef,
-//   fullScreen,
-//   openPostImage,
-//   id,
-//   username,
-//   handleClick,
-//   opNo,
-//   subject,
-//   comment,
-//   formattedTime,
-//   image,
-//   replyCount,
-//   preview,
-//   avatar,
-//   openAvatar,
-// }) => {
-//   return (
-//     <PostRoot key={id} ref={handleRef}>
-//       <UserInfo>
-//         <Avatar onClick={openAvatar} avatar={avatar} />
-//         <TextContainer>
-//           <Text bold size="medium">
-//             {username ?? "Anonymous"}
-//           </Text>
-//           <PostLink to={postHref} onClick={handleClick}>
-//             #{id}
-//           </PostLink>
-//         </TextContainer>
-//         <Text size="medium" color="darkGrey" align="right">
-//           {formattedTime}
-//         </Text>
-//       </UserInfo>
-//       <FullWidth>
-//         <CenteredImage
-//           fullScreen={fullScreen}
-//           onClick={() => openPostImage()}
-//           src={image.location}
-//         />
-//       </FullWidth>
-//       <OriginalContentRoot>
-//         <Text align="left" width="100%" size="x-large" color="black">
-//           {subject}
-//         </Text>
-//         {processPostText(opNo, comment)}
-//       </OriginalContentRoot>
-//       <ActionsContainer>
-//         <ShareMessageButton />
-//         <WithText
-//           component={
-//             <ThreadLink
-//               to={(location) => `${location.pathname}/thread/${opNo}`}
-//             >
-//               <MessageDetail />
-//             </ThreadLink>
-//           }
-//           direction="row"
-//           text={replyCount}
-//         />
-//       </ActionsContainer>
-//     </PostRoot>
-//   );
-// };
-
-// const ReplyPost = ({
-//   postHref,
-//   highlight,
-//   fullScreen,
-//   openPostImage,
-//   id,
-//   username,
-//   handleClick,
-//   opNo,
-//   subject,
-//   comment,
-//   formattedTime,
-//   image,
-//   avatar,
-//   openAvatar,
-// }) => {
-//   return (
-//     <PostRoot highlight={highlight}>
-//       <FalseBorder />
-//       <PostBody>
-//         <BottomRow>
-//           <ReplyUserInfo>
-//             <Avatar onClick={openAvatar} avatar={avatar} />
-//             <InfoContent>
-//               <TextContainer>
-//                 <Text>{username ?? "Anonymous"}</Text>
-//                 <PostLink to={postHref} onClick={handleClick}>
-//                   #{id}
-//                 </PostLink>
-//               </TextContainer>
-//               <Text align="right">{formattedTime}</Text>
-//             </InfoContent>
-//           </ReplyUserInfo>
-//         </BottomRow>
-//         <ContentRoot>
-//           {processPostText(opNo, comment)}
-//           {image && image.location ? (
-//             <Image
-//               fullScreen={fullScreen}
-//               onClick={() => openPostImage()}
-//               src={image.location}
-//             />
-//           ) : null}
-//           {subject ? (
-//             <Text size="large" color="primary">
-//               {subject}
-//             </Text>
-//           ) : null}
-//         </ContentRoot>
-//       </PostBody>
-//     </PostRoot>
-//   );
-// };
-
-// const PostBody = styled.div`
-//   display: flex;
-//   justify-content: column;
-//   flex-direction: flex-start;
-//   flex-flow: wrap;
-//   /* gap: 1rem; */
-//   width: calc(100% - 1px - 1rem);
-// `;
-
-// const BottomRow = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   flex-direction: row;
-//   width: 100%;
-//   align-items: center;
-// `;
 
 const WithTextRoot = styled.div`
   display: flex;

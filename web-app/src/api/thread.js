@@ -36,13 +36,11 @@ export const threadApi = createApi({
       providesTags: ["Threads"],
     }),
     deleteThread: builder.mutation({
-      query: ({ board, threadNo, replyNo, ban }) => ({
+      query: ({ board, threadNo, params }) => ({
         method: "DELETE",
         url: `/${board}/threads/${threadNo}`,
-        body: {
-          replyNo,
-          ban,
-        },
+        params: params,
+        responseHandler: (resp) => resp.text(),
       }),
       invalidatesTags: ["Threads", "Thread"],
     }),

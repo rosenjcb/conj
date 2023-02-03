@@ -75,28 +75,28 @@
           thread-id (get-in req [:parameters :path :id])
           board (get-in req [:parameters :path :board])
           reply-no (get-in req [:parameters :query :replyNo])
+          ban (get-in req [:parameters :query :ban])
           request-account (get-in req [:account])
           thread (query.thread/find-thread-by-id! db-conn redis-conn board thread-id)
-          post (m.thread/find-post thread (or reply-no (m.thread/op thread)))
+          post (or (m.thread/find-post thread reply-no) (m.thread/op thread))
           author-account-id (m.post/account-id post)
           author-account (q.account/find-account-by-id! db-conn author-account-id)
-          ban (get-in req [:parameters :query :ban])
           delete-reply? (some? reply-no)
           can-ban? (= (m.account/role request-account) m.account/admin-role)
           can-delete? (or (= (m.account/id request-account) author-account-id) can-ban?)
           success-message (if delete-reply?
                             (format "Reply No. %s of Thread No. %s deleted" reply-no thread-id)
                             (format "Thread No. %s has been deleted" thread-id))]
-      (when (and (= ban true) can-ban?)
+      (when (not can-delete?) (throw (Exception. "You cannot delete posts that aren't yours.")))
+      (when (and ban can-ban?)
         (log/infof "Banning account-id %s" author-account-id)
         (q.account/update-account!
          db-conn
          (assoc author-account m.account/status m.account/status-banned)
          author-account-id))
-      (when can-delete?
-        (if delete-reply?
-          (query.thread/delete-post-by-id! db-conn redis-conn s3-client env board thread-id reply-no)
-          (query.thread/delete-thread-by-id! db-conn redis-conn s3-client env board thread-id)))
+      (if delete-reply?
+        (query.thread/delete-post-by-id! db-conn redis-conn s3-client env board thread-id reply-no)
+        (query.thread/delete-thread-by-id! db-conn redis-conn s3-client env board thread-id))
       (response/response success-message))
     (catch Exception e
       (log/infof "Something went wrong trying to delete this post/thread %s" (.getMessage e))
