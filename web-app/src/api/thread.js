@@ -35,6 +35,17 @@ export const threadApi = createApi({
       }),
       providesTags: ["Threads"],
     }),
+    deleteThread: builder.mutation({
+      query: ({ board, threadNo, replyNo, ban }) => ({
+        method: "DELETE",
+        url: `/${board}/threads/${threadNo}`,
+        body: {
+          replyNo,
+          ban,
+        },
+      }),
+      invalidatesTags: ["Threads", "Thread"],
+    }),
   }),
 });
 
@@ -43,4 +54,5 @@ export const {
   useUpdateThreadMutation,
   useFetchThreadQuery,
   useFetchThreadsQuery,
+  useDeleteThreadMutation,
 } = threadApi;

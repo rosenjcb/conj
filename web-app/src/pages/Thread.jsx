@@ -49,6 +49,7 @@ export function ThreadPage() {
         threadRef={threadRef}
         preview={false}
         thread={current}
+        board={board}
       />
     </Root>
   );

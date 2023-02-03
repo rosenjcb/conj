@@ -9,6 +9,8 @@ import { BiMessageDetail, BiShareAlt } from "react-icons/bi";
 import { VscEllipsis } from "react-icons/vsc";
 import { RiDeleteBin2Fill } from "react-icons/ri";
 import { useDetectOutsideClick } from "../hooks/useDetectOutsideClick";
+import { useDeleteThreadMutation } from "../api/thread";
+import { toast } from "react-hot-toast";
 
 const WithText = ({ direction, component, text }) => {
   return (
@@ -69,7 +71,7 @@ export const Post = (props) => {
     setEnlargeAvatar(false);
   };
 
-  const { post, handleRef, preview, replyCount, opNo } = props;
+  const { post, handleRef, preview, replyCount, opNo, board } = props;
 
   const { username, subject, id, comment, image, time, avatar } = post;
 
@@ -94,6 +96,15 @@ export const Post = (props) => {
   const closeOptions = () => setExpandOptions(false);
   const openOptions = () => setExpandOptions(!expandOptions);
   useDetectOutsideClick(optionsRef, closeOptions);
+
+  const [deleteThread] = useDeleteThreadMutation();
+
+  const deleteReq = {
+    board: board,
+    threadNo: opNo,
+    replyNo: !isOriginalPost ? id : null,
+    ban: false,
+  };
 
   return (
     <div>
@@ -143,7 +154,10 @@ export const Post = (props) => {
             {!expandOptions ? <EllipsisButton /> : null}
             <ShareMessageButton />
             <DeletePostButton
-              onClick={(e) => console.log("clicking delete button")}
+              onClick={async (_) => {
+                await deleteThread(deleteReq);
+                toast.success(`Deleted Post #${id}`);
+              }}
             />
           </OptionsDiv>
           {preview ? (

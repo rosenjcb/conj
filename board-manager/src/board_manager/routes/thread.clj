@@ -75,28 +75,32 @@
           thread-id (get-in req [:parameters :path :id])
           board (get-in req [:parameters :path :board])
           reply-no (get-in req [:parameters :query :replyNo])
+          request-account (get-in req [:account])
           thread (query.thread/find-thread-by-id! db-conn redis-conn board thread-id)
-          post (m.thread/find-post thread reply-no)
-          account-id (m.post/account-id post)
-          account (q.account/find-account-by-id! db-conn account-id)
+          post (m.thread/find-post thread (or reply-no (m.thread/op thread)))
+          author-account-id (m.post/account-id post)
+          author-account (q.account/find-account-by-id! db-conn author-account-id)
           ban (get-in req [:parameters :query :ban])
           delete-reply? (some? reply-no)
+          can-ban? (= (m.account/role request-account) m.account/admin-role)
+          can-delete? (or (= (m.account/id request-account) author-account-id) can-ban?)
           success-message (if delete-reply?
                             (format "Reply No. %s of Thread No. %s deleted" reply-no thread-id)
                             (format "Thread No. %s has been deleted" thread-id))]
-        (when (= ban true)
-          (log/infof "Banning account-id %s" account-id)
-          (q.account/update-account!
-          db-conn
-          (assoc account m.account/status m.account/status-banned)
-          account-id))
+      (when (and (= ban true) can-ban?)
+        (log/infof "Banning account-id %s" author-account-id)
+        (q.account/update-account!
+         db-conn
+         (assoc author-account m.account/status m.account/status-banned)
+         author-account-id))
+      (when can-delete?
         (if delete-reply?
           (query.thread/delete-post-by-id! db-conn redis-conn s3-client env board thread-id reply-no)
-          (query.thread/delete-thread-by-id! db-conn redis-conn s3-client env board thread-id))
-        (response/response success-message))
-      (catch Exception e
-        (log/infof "Something went wrong trying to delete this post/thread %s" (.getMessage e))
-        (response/bad-request (.getMessage e)))))
+          (query.thread/delete-thread-by-id! db-conn redis-conn s3-client env board thread-id)))
+      (response/response success-message))
+    (catch Exception e
+      (log/infof "Something went wrong trying to delete this post/thread %s" (.getMessage e))
+      (response/bad-request (.getMessage e)))))
 
 (defn nuke-threads! [req]
   (let [db-conn (get-in req [:components :db-conn])
@@ -176,5 +180,5 @@
                :parameters {:path thread-path
                             :query thread-query}
                :coercion malli.coercion/coercion
-               :middleware [[middleware/wrap-admin]]
+               :middleware [[middleware/full-wrap-auth]]
                :handler kill-thread-or-post!}}]])
