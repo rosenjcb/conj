@@ -7,40 +7,23 @@ import chroma from "chroma-js";
 import { FiMenu } from "react-icons/fi";
 import { RiDiscussFill } from "react-icons/ri";
 import { BsFillBarChartFill } from "react-icons/bs";
-import { Text } from "./index";
+import { Text, Modal } from "./index";
 import { useThread } from "../hooks/useThread";
 import { detectMobile } from "../util/window";
-import ReactModal from "react-modal";
 import { Header } from "./index";
 import { GoGear } from "react-icons/go";
 import { useComponentVisible } from "../hooks/useComponentVisible";
-import { AccountSettings } from "./AccountSettings";
+import { AccountSettings, CompleteOnboarding } from "./AccountSettings";
 import { Login } from "./Login";
 import { useMeQuery } from "../api/account";
 import toast from "react-hot-toast";
-
-// const customStyle = {
-//   overlay: {
-//     inset: 0,
-//     zIndex: 2,
-//   },
-//   content: {
-//     inset: 0,
-//     right: 0,
-//     padding: 0,
-//     margin: 0,
-//     width: '100%',
-//     height: '100%',
-//     backgroundColor: 'white',
-//     borderRadius: '0px',
-//     border: 'none'
-//   },
-// };
 
 export const WithNavBar = ({ component }) => {
   const [logout] = useLogoutMutation();
 
   const { data: me, isLoading } = useMeQuery();
+
+  const { is_onboarding } = me || {};
 
   const { data: boards } = useFetchBoardsQuery();
 
@@ -90,88 +73,104 @@ export const WithNavBar = ({ component }) => {
 
   const openLogin = () => setLoginOpen(true);
 
-  const customStyle = {
-    overlay: {
-      zIndex: 2,
-      backgroundColor: "rgba(0, 0, 0, 0.3)",
-    },
-    content: {
-      top: "50%",
-      left: "50%",
-      right: "auto",
-      bottom: "auto",
-      marginRight: "-50%",
-      transform: "translate(-50%, -50%)",
-      padding: "0",
-      border: "none",
-      borderRadius: "0px",
-      background: "none",
-    },
-  };
-
   if (isLoading) {
     return <div />;
   }
 
   return (
     <BoardRoot>
-      <ReactModal
-        style={customStyle}
+      <Modal isOpen={is_onboarding} title="Let's Finish Account Setup" noExit>
+        <CompleteOnboarding />
+      </Modal>
+      <Modal
         isOpen={accountIsOpen}
         onRequestClose={closeAccount}
+        title="Account Info"
       >
         <AccountSettings onFinish={closeAccount} />
-      </ReactModal>
-      <ReactModal
-        style={customStyle}
-        isOpen={loginOpen}
-        onRequestClose={closeLogin}
-      >
+      </Modal>
+      <Modal isOpen={loginOpen} onRequestClose={closeLogin} title="Login">
         <Login completeAction={closeLogin} />
-      </ReactModal>
+      </Modal>
       <HomeNavBar>
-        <HamburgerMenu onClick={openDrawer} />
         <Header bold onClick={redirectHome}>
-          conj.app
+          Conj
         </Header>
-        <IconContainer>
-          <SettingsIcon onClick={toggleVisible} />
-          <SettingsContent visible={isComponentVisible} ref={ref}>
-            {me === null ? (
-              <Link onClick={openLogin}>
-                <SettingText align="center">Login</SettingText>
-              </Link>
-            ) : null}
-            {me !== null ? (
-              <Link onClick={handleLogout}>
-                <SettingText align="center">Logout</SettingText>
-              </Link>
-            ) : null}
-            {me !== null ? (
-              <Link onClick={openAccount}>
-                <SettingText align="center">Account</SettingText>
-              </Link>
-            ) : null}
-          </SettingsContent>
-        </IconContainer>
+        <NavItemsContainer>
+          {isMobile ? (
+            <IconContainer>
+              <HamburgerMenu onClick={openDrawer} />
+            </IconContainer>
+          ) : null}
+          <IconContainer>
+            <SettingsIcon onClick={toggleVisible} />
+            <SettingsContent visible={isComponentVisible} ref={ref}>
+              {me === null ? (
+                <Link onClick={openLogin}>
+                  <SettingText align="center">Login</SettingText>
+                </Link>
+              ) : null}
+              {me !== null ? (
+                <Link onClick={handleLogout}>
+                  <SettingText align="center">Logout</SettingText>
+                </Link>
+              ) : null}
+              {me !== null ? (
+                <Link onClick={openAccount}>
+                  <SettingText align="center">Account</SettingText>
+                </Link>
+              ) : null}
+            </SettingsContent>
+          </IconContainer>
+        </NavItemsContainer>
       </HomeNavBar>
       <Page>
         {!isMobile ? (
           <BoardDrawer boards={boards} />
         ) : (
-          <ReactModal
-            style={customStyle}
+          <Modal
             isOpen={drawerOpen}
             onRequestClose={closeDrawer}
+            title="Most Popular Boards"
           >
             <BoardDrawer fill={true} boards={boards} />
-          </ReactModal>
+          </Modal>
         )}
-        <ComponentDiv>{component}</ComponentDiv>
+        <FixedWidth>{component}</FixedWidth>
       </Page>
     </BoardRoot>
   );
 };
+
+const FixedWidth = styled.div`
+  margin: 0 auto;
+  height: calc(
+    100vh - 40px - 8px - 2px
+  ); //full height - fixed navbar height - fixed navbar padding - border)
+  overflow-y: scroll;
+  border-left: 2px solid ${(props) => props.theme.colors.grey};
+  border-right: 2px solid ${(props) => props.theme.colors.grey};
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media all and (min-width: 1024px) {
+    width: 900px;
+  }
+
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    width: 100%;
+  }
+
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    width: 100%;
+  }
+
+  @media all and (max-width: 480px) {
+    width: 100%;
+  }
+`;
 
 const BoardDrawer = (props) => {
   const { boards, fill } = props;
@@ -180,10 +179,6 @@ const BoardDrawer = (props) => {
 
   const { board } = useThread();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-  };
-
   const handleClick = (board) => {
     console.log(board);
     history.push(`/boards/${board}`);
@@ -191,9 +186,6 @@ const BoardDrawer = (props) => {
 
   return (
     <BoardDrawerRoot fill={fill}>
-      <TitleContainer>
-        <Header bold>Most Popular Boards</Header>
-      </TitleContainer>
       <BoardList>
         <BoardRow>
           <BoardIcon />
@@ -204,6 +196,7 @@ const BoardDrawer = (props) => {
             <HighlightBoardRow
               onClick={() => handleClick(b)}
               selected={b === board}
+              key={b}
             >
               <BoardItem>/{b}/</BoardItem>
               <Text size={"medium"} align="right" color={"black"} bold>
@@ -224,18 +217,22 @@ const BoardDrawer = (props) => {
   );
 };
 
+const NavItemsContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  gap: 2px;
+  flex-direction: row;
+`;
+
 const Page = styled.div`
   display: flex;
   justify-content: flex-start;
-  padding-top: 5rem;
   flex-direction: row;
   margin: 0 auto;
-  margin-bottom: 1rem;
-  gap: 3rem;
-  max-height: calc(100vh - 5rem);
+  height: 100%;
 
   @media all and (min-width: 1024px) {
-    width: 65%;
+    width: 100%;
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
@@ -249,21 +246,6 @@ const Page = styled.div`
   @media all and (max-width: 480px) {
     width: 100%;
   }
-`;
-
-const SearchForm = styled.form`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  gap: 10px;
-`;
-
-const Input = styled.input`
-  border-radius: 80px;
-  font-size: 2rem;
-  width: 60%;
-  margin-bottom: 10px;
-  padding: 0;
 `;
 
 const BoardList = styled.ul`
@@ -316,8 +298,11 @@ const BoardDrawerRoot = styled.div`
     props.fill ? props.theme.colors.white : "inherit"};
   gap: 2rem;
   height: fit-content;
-  border-radius: 8px;
-  width: 300px;
+  /* border-radius: 8px; */
+  min-width: 300px;
+  border-right: 2px solid ${(props) => props.theme.colors.grey};
+  min-height: 100%;
+  height: auto;
 
   @media all and (max-width: 480px) {
     width: 100%;
@@ -338,69 +323,26 @@ const BoardRoot = styled.div`
   height: 100%;
 `;
 
-const TitleContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
-`;
-
 const HomeNavBar = styled.div`
   display: flex;
-  position: fixed;
+  position: sticky;
+  top: 0;
   z-index: 1;
   justify-content: space-between;
   gap: 10px;
   flex-direction: row;
   background-color: ${(props) => props.theme.colors.white};
   align-items: center;
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1),
-    0 8px 10px -6px rgb(0 0 0 / 0.1);
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-
-  @media all and (min-width: 1024px) {
-    width: 60%;
-    padding-left: 20%;
-    padding-right: 20%;
-  }
-
-  @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 60%;
-    padding-left: 20%;
-    padding-right: 20%;
-  }
-
-  @media all and (min-width: 480px) and (max-width: 768px) {
-    width: 100%;
-  }
-
-  @media all and (max-width: 480px) {
-    width: 100%;
-  }
+  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
+  width: calc(100% - 8px);
+  height: 40px;
+  padding: 4px;
 `;
 
 const HamburgerMenu = styled(FiMenu)`
   color: ${(props) => props.theme.colors.black};
-  width: 48px;
-  height: 48px;
-  padding-right: 10px;
-
-  @media all and (min-width: 1024px) {
-    visibility: hidden;
-  }
-
-  @media all and (min-width: 768px) and (max-width: 1024px) {
-    visibility: hidden;
-  }
-
-  @media all and (min-width: 480px) and (max-width: 768px) {
-    visibility: visible;
-  }
-
-  @media all and (max-width: 480px) {
-    visibility: visible;
-  }
+  width: 36px;
+  height: 36px;
 `;
 
 const BoardIcon = styled(RiDiscussFill)`
@@ -456,21 +398,21 @@ const SettingsContent = styled.div`
 
 const SettingsIcon = styled(GoGear)`
   cursor: pointer;
-  width: 40px;
+  width: 36px;
+  height: 36px;
   align-self: center;
-  height: 40px;
   display: inline-block;
   position: relative;
 `;
 
 const IconContainer = styled.div`
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 9000px;
   display: flex;
   justify-content: center;
-  background-color: ${(props) =>
-    chroma(props.theme.colors.grey).brighten(0.6).hex()};
+  align-items: center;
+  background-color: ${(props) => props.theme.colors.grey};
 `;
 
 const Link = styled.div`
