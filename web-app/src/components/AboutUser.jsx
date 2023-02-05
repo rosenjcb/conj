@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useMeQuery } from "../api/account";
 import { Text, Avatar } from "./index.jsx";
@@ -6,14 +6,19 @@ import { Text, Avatar } from "./index.jsx";
 export const AboutUser = () => {
   const { data: me } = useMeQuery();
 
+  useEffect(() => {
+    console.log(JSON.stringify(me, null, 2));
+  }, []);
+
   //const user = useFetchUserQuery({username: 'daiizy'})
 
   return (
     <Root>
       <AvatarModal size={100} avatar={me.avatar} />
       <DetailsContainer>
-        <Text>{me.username}</Text>
-        <Text>test</Text>
+        {/* <Form>
+            <input type="text" placeholder={me.username} />
+        </Form> */}
       </DetailsContainer>
     </Root>
   );
@@ -22,11 +27,11 @@ export const AboutUser = () => {
 const Root = styled.div`
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+  gap: 20px;
   margin: 0 auto;
-  padding: 1rem;
-  align-self: center;
-  background-color: white;
-  border-radius: 4px;
 `;
 
 const AvatarModal = styled(Avatar)`
@@ -37,10 +42,10 @@ const AvatarModal = styled(Avatar)`
 
 const DetailsContainer = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 25px;
+  gap: 20px;
   margin: 0 auto;
-  align-self: flex-start;
-  width: 70%;
-  row-gap: 0.5rem;
-  padding-left: 1rem;
 `;

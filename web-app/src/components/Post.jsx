@@ -104,6 +104,9 @@ export const Post = (props) => {
       <Modal isOpen={enlargeAvatar} onRequestClose={closeAvatar}>
         <ModalImage src={avatar} />
       </Modal>
+      <Modal isOpen={profileOpen} onRequestClose={closeProfile}>
+        <AboutUser />
+      </Modal>
       <PostRoot key={id} ref={handleRef}>
         <UserInfo>
           <Avatar onClick={openAvatar} avatar={avatar} />
