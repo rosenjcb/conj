@@ -15,12 +15,12 @@
 (def expired-token-response 
   {:status 401
    :headers {}
-   :body "Access token does not exist or has expired."})
+   :body "You need to re-login before doing that."})
 
 (def no-token-response
   {:status 401 
    :headers {}
-   :body "No access token found."})
+   :body "You're not logged in."})
 
 (def insufficient-permissions-response 
   {:status 401 
