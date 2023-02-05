@@ -32,7 +32,7 @@ export function ThreadPage() {
   useEffect(() => {
     // console.log(`thread has been updated ${JSON.stringify(result, null, 2)}`)
     // console.log(`This is your threadRef: ${JSON.stringify(threadRef, null, 2)}`);
-    if (lastPostRef !== undefined) {
+    if (lastPostRef !== undefined && lastPostRef !== null) {
       // console.log(`This is your lastPostRef: ${JSON.stringify(lastPostRef, null, 2)}`);
       lastPostRef.scrollIntoView({ behavior: "smooth" });
     }

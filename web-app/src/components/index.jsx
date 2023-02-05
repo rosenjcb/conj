@@ -5,7 +5,6 @@ import { BsFillPersonFill } from "react-icons/bs";
 import { BiArrowBack } from "react-icons/bi";
 import { useState } from "react";
 import ReactModal from "react-modal";
-import { detectMobile } from "../util/window";
 
 const ModalBase = ({
   children,
@@ -375,10 +374,6 @@ export const InputFile = ({ field, form, placeholder }) => {
     </label>
   );
 };
-
-const StyledInput = styled.input`
-  background-color: green;
-`;
 
 const InputFieldRoot = styled.div`
   display: flex;

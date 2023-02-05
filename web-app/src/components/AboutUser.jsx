@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { useMeQuery } from "../api/account";
-import { Text, Avatar } from "./index.jsx";
+import { Avatar } from "./index.jsx";
 
 export const AboutUser = () => {
   const { data: me } = useMeQuery();

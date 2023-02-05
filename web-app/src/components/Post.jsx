@@ -207,7 +207,7 @@ export const Post = (props) => {
           <Avatar onClick={openAvatar} avatar={avatar} />
           <TextContainer>
             <Text bold size="medium">
-              <span onClick={openProfile}>{username ?? "Anonymous"}</span>
+              <span>{username ?? "Anonymous"}</span>
             </Text>
             <PostLink to={postHref} onClick={handleClick}>
               #{id}
