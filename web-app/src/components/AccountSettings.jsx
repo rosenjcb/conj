@@ -60,16 +60,12 @@ export function AccountSettings({ onFinish }) {
                   component={InputFile}
                 />
                 <Field
-                  label="USERNAME"
-                  type="username"
                   name="username"
                   placeholder={me.username}
                   component={InputField}
                 />
+                <SquareButton type="submit">Update</SquareButton>
               </ContentDetails>
-              <SubmitOptions>
-                <RoundButton type="submit">Update</RoundButton>
-              </SubmitOptions>
             </StyledForm>
           )}
         </Formik>
@@ -128,8 +124,6 @@ export function CompleteOnboarding() {
                   component={InputFile}
                 />
                 <Field
-                  label="USERNAME"
-                  type="username"
                   name="username"
                   placeholder={me.username}
                   component={InputField}
@@ -150,7 +144,9 @@ const ContentDetails = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: flex-end;
+  align-items: center;
+  padding: 10px;
+  gap: 20px;
 `;
 
 const SubmitOptions = styled.div`
@@ -166,31 +162,47 @@ const StyledForm = styled.form`
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding: 10px;
+`;
+
+const SquareButton = styled.button`
+  box-sizing: boarder-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+
+  padding: 10px 15px;
+
+  width: auto;
+  height: auto;
+
+  background: #e2e1e5;
+  border: 1px solid #e2e1e5;
+  border-radius: 5px;
+  cursor: pointer;
 `;
 
 const Root = styled.div`
   margin: 0 auto;
   background-color: ${(props) => chroma(props.theme.colors.white)};
   text-align: center;
-  padding: 1em;
   border-radius: 8px;
-  width: 20vw;
+  width: 400px;
 
-  @media all and (min-width: 1024px) and (max-width: 1280px) {
-    width: 20vw;
-  }
+  // @media all and (min-width: 1024px) and (max-width: 1280px) {
+  //   width: 20vw;
+  // }
 
-  @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 20vw;
-  }
+  // @media all and (min-width: 768px) and (max-width: 1024px) {
+  //   width: 20vw;
+  // }
 
-  @media all and (min-width: 480px) and (max-width: 768px) {
-    width: 20vw;
-  }
+  // @media all and (min-width: 480px) and (max-width: 768px) {
+  //   width: 20vw;
+  // }
 
   @media all and (max-width: 480px) {
-    width: 100vw;
+    width: 100%;
     padding: 0;
     border-radius: 0px;
   }

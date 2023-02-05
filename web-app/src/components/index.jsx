@@ -65,6 +65,7 @@ const ModalRoot = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
+  width: fit-content;
 `;
 
 const TitleBar = styled.div`
@@ -104,24 +105,21 @@ export const Modal = styled(ModalBase)`
     border: none;
     border-radius: 4px;
     background-color: ${(props) => props.theme.colors.white};
+    width: fit-content;
 
     @media all and (min-width: 1024px) and (max-width: 1280px) {
-      width: 400px;
       border-radius: 4px;
     }
 
     @media all and (min-width: 768px) and (max-width: 1024px) {
-      width: 400px;
       border-radius: 4px;
     }
 
     @media all and (min-width: 480px) and (max-width: 768px) {
-      width: 400px;
       border-radius: 4px;
     }
 
     @media all and (max-width: 480px) {
-      width: 100%;
       border-radius: 0px;
       padding: 0px;
     }
@@ -376,6 +374,10 @@ export const InputFile = ({ field, form, placeholder }) => {
   );
 };
 
+const StyledInput = styled.input`
+  background-color: green;
+`;
+
 const InputFieldRoot = styled.div`
   display: flex;
   flex-direction: column;
@@ -397,9 +399,10 @@ const Label = styled.label`
 
 const TextField = styled.input`
   -webkit-text-security: ${(props) => (props.secret ? "circle" : "none")};
-  border-radius: 8px;
-  border-color: ${(props) => props.theme.colors.grey};
+  border-radius: 5px;
+  background-color: ${(props) => props.theme.colors.white};
   min-height: 2rem;
+  border: 1px solid ${(props) => props.theme.colors.grey}; ;
 `;
 
 const CheckBoxContainer = styled.div`

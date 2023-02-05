@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { insertPostLink } from "../slices/postSlice";
 import { Link } from "react-router-dom";
 import { BiMessageDetail, BiShareAlt } from "react-icons/bi";
+import { AboutUser } from "./AboutUser";
 
 const WithText = ({ direction, component, text }) => {
   return (
@@ -66,6 +67,16 @@ export const Post = (props) => {
     setEnlargeAvatar(false);
   };
 
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const openProfile = () => {
+    setProfileOpen(true);
+  };
+
+  const closeProfile = () => {
+    setProfileOpen(false);
+  };
+
   const { post, handleRef, preview, replyCount, opNo } = props;
 
   const { username, subject, id, comment, image, time, avatar } = post;
@@ -93,12 +104,15 @@ export const Post = (props) => {
       <Modal isOpen={enlargeAvatar} onRequestClose={closeAvatar}>
         <ModalImage src={avatar} />
       </Modal>
+      <Modal isOpen={profileOpen} onRequestClose={closeProfile}>
+        <AboutUser />
+      </Modal>
       <PostRoot key={id} ref={handleRef}>
         <UserInfo>
           <Avatar onClick={openAvatar} avatar={avatar} />
           <TextContainer>
             <Text bold size="medium">
-              {username ?? "Anonymous"}
+              <span onClick={openProfile}>{username ?? "Anonymous"}</span>
             </Text>
             <PostLink to={postHref} onClick={handleClick}>
               #{id}
