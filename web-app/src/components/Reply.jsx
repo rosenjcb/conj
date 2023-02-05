@@ -64,7 +64,7 @@ const FullReply = (props) => {
       }
       dispatch(resetPost());
     } catch (e) {
-      console.log("uh woops");
+      // console.log("uh woops");
       if (e.data) toast.error(e.data);
     } finally {
       handleClose();
@@ -73,8 +73,6 @@ const FullReply = (props) => {
 
   const { data: me, isLoading } = useMeQuery();
 
-  //const me = null;
-  //const isLoading = false;
   const [check, setChecked] = useState(post.is_anonymous);
 
   const handleClick = () => {
@@ -91,7 +89,6 @@ const FullReply = (props) => {
 
   const toggleCheck = () => {
     setChecked(!check);
-    console.log(check);
     dispatch(updateEntry({ key: "is_anonymous", value: !check }));
   };
 
@@ -124,7 +121,7 @@ const FullReply = (props) => {
                 disabled={me === null}
                 name="comment"
                 as="textarea"
-                placeholder="Whatchu' thinking about?"
+                placeholder="Brilliant thoughts go here."
                 value={post.comment}
                 onChange={(e) => handleChange(props.handleChange, e, "comment")}
               />
@@ -250,8 +247,6 @@ const FullReplyRoot = styled.div`
 `;
 
 export const StyledForm = styled(Form)`
-  /* padding-bottom: 1.5rem;
-  padding-top: 1.5rem; */
   width: 100%;
   display: flex;
   justify-content: flex-start;

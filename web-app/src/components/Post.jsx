@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import { Text, Avatar, Modal } from "./index";
+import { Text, Avatar, Modal, Checkbox, RoundButton } from "./index";
 import { processPostText } from "../util/post";
 import { useDispatch } from "react-redux";
 import { insertPostLink } from "../slices/postSlice";
@@ -12,6 +12,9 @@ import { useDetectOutsideClick } from "../hooks/useDetectOutsideClick";
 import { useDeleteThreadMutation } from "../api/thread";
 import { toast } from "react-hot-toast";
 import * as _ from "lodash";
+import { AccountSettings } from "./AccountSettings";
+import { useMeQuery } from "../api/account";
+import { useEffect } from "react";
 
 const WithText = ({ direction, component, text }) => {
   return (
@@ -48,6 +51,76 @@ const handlePostDate = (time) => {
     return then.toLocaleDateString();
   }
 };
+
+const DeleteDialog = (props) => {
+  const { board, threadNo, replyNo, closeAction } = props;
+
+  const { data: me } = useMeQuery();
+
+  const [banUser, setBanUser] = useState(false);
+  const toggleBanUser = () => setBanUser(!banUser);
+
+  const [deleteThread] = useDeleteThreadMutation();
+
+  const params = {
+    ban: banUser,
+    replyNo,
+  };
+
+  const deleteReq = {
+    board: board,
+    threadNo,
+    params: _.omitBy(params, _.isNil),
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await deleteThread(deleteReq).unwrap();
+      // console.log(JSON.stringify(deleteReq, null, 2));
+      toast.success(`Successfully deleted Post #${replyNo ?? threadNo}`);
+    } catch (e) {
+      toast.error(e.data);
+    } finally {
+      closeAction();
+    }
+  };
+
+  return (
+    <DeleteDialogRoot>
+      {me?.role === "admin" ? (
+        <Checkbox label="Ban User?" onChange={toggleBanUser} />
+      ) : null}
+      <SubmitOptions>
+        <RoundButton color="darkGrey" size="small" onClick={closeAction}>
+          Cancel
+        </RoundButton>
+        <RoundButton size="small" onClick={handleSubmit}>
+          Delete
+        </RoundButton>
+      </SubmitOptions>
+    </DeleteDialogRoot>
+  );
+};
+
+const SubmitOptions = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 10px;
+`;
+
+const DeleteDialogRoot = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  align-self: center;
+  width: fit-content;
+  max-width: 400px;
+  padding: 10px;
+  gap: 10px;
+`;
 
 export const Post = (props) => {
   const [enlargePostImage, setEnlargePostImage] = useState(false);
@@ -95,42 +168,41 @@ export const Post = (props) => {
   const optionsRef = useRef(null);
   const [expandOptions, setExpandOptions] = useState(false);
   const closeOptions = () => setExpandOptions(false);
-  const openOptions = () => setExpandOptions(!expandOptions);
+  const openOptions = () => setExpandOptions(true);
   useDetectOutsideClick(optionsRef, closeOptions);
 
-  const [deleteThread] = useDeleteThreadMutation();
-
-  const params = {
-    ban: false,
-    replyNo: !isOriginalPost ? id : null,
-  };
-
-  const deleteReq = {
-    board: board,
-    threadNo: opNo,
-    params: _.omitBy(params, _.isNil),
-    replyNo: !isOriginalPost ? id : null,
-    ban: false,
-  };
-
-  const deletePost = async () => {
-    try {
-      await deleteThread(deleteReq).unwrap();
-      toast.success(`Deleted Post #${id}`);
-    } catch (e) {
-      toast.error(e.data);
-    }
-  };
+  const [expandDeleteDialog, setExpandDeleteDialog] = useState(false);
+  const closeDeleteDialog = () => setExpandDeleteDialog(false);
+  const openDeleteDialog = () => setExpandDeleteDialog(true);
 
   const postUrl = `https://conj.app/boards/${board}/thread/${opNo}#${id}`;
 
   return (
     <div>
-      <Modal isOpen={enlargePostImage} onRequestClose={closePostImage}>
-        {image ? <ModalImage src={image.location} /> : null}
-      </Modal>
+      {image ? (
+        <Modal
+          isOpen={enlargePostImage}
+          onRequestClose={closePostImage}
+          title={image.filename}
+        >
+          <ModalImage src={image.location} />
+        </Modal>
+      ) : null}
       <Modal isOpen={enlargeAvatar} onRequestClose={closeAvatar}>
         <ModalImage src={avatar} />
+      </Modal>
+      <Modal
+        isOpen={expandDeleteDialog}
+        onRequestClose={closeDeleteDialog}
+        title="Delete Post"
+      >
+        <DeleteDialog
+          board={board}
+          threadNo={opNo}
+          postId={id}
+          replyNo={!isOriginalPost ? id : null}
+          closeAction={closeDeleteDialog}
+        />
       </Modal>
       <PostRoot key={id} ref={handleRef}>
         <UserInfo>
@@ -164,6 +236,7 @@ export const Post = (props) => {
           {processPostText(opNo, comment)}
         </OriginalContentRoot>
         <ActionsContainer>
+          {" "}
           <OptionsDiv
             ref={optionsRef}
             expand={expandOptions}
@@ -173,7 +246,7 @@ export const Post = (props) => {
             <ShareMessageButton
               onClick={() => navigator.clipboard.writeText(postUrl)}
             />
-            <DeletePostButton onClick={deletePost} />
+            <DeletePostButton onClick={openDeleteDialog} />
           </OptionsDiv>
           {preview ? (
             <WithText
@@ -393,18 +466,3 @@ const ActionsContainer = styled.div`
 const ThreadLink = styled(Link)`
   color: inherit;
 `;
-
-// const FalseBorder = styled.div`
-//   width: 1px;
-//   background-color: ${(props) =>
-//     chroma(props.theme.colors.grey).brighten(0.5).hex()};
-// `;
-
-// const InfoContent = styled.div`
-//   height: 80%;
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: flex-start;
-//   flex-direction: row;
-//   width: 100%;
-// `;

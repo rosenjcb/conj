@@ -18,8 +18,6 @@ const ModalBase = ({
   const contentClassName = `${className}__content`;
   const overlayClassName = `${className}__overlay`;
 
-  const isMobile = detectMobile();
-
   return (
     <ReactModal
       isOpen={isOpen}
@@ -31,18 +29,12 @@ const ModalBase = ({
     >
       <ModalRoot>
         <TitleBar>
-          {isMobile && noExit !== true ? (
-            <Back onClick={onRequestClose} />
-          ) : (
-            <span />
-          )}
-          {title ? (
-            <Offset distance={isMobile ? "38px" : "0"}>
-              <Header size="large" bold>
-                {title}
-              </Header>
-            </Offset>
-          ) : null}
+          <Back onClick={onRequestClose} />
+          <Offset distance={"28px"}>
+            <Header size="medium" bold>
+              {title}
+            </Header>
+          </Offset>
           <span />
         </TitleBar>
         {children}
@@ -71,9 +63,10 @@ const TitleBar = styled.div`
   display: flex;
   justify-content: center;
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
 
-  @media all and (min-width: 1024px) and (max-width: 1280px) {
+  /* @media all and (min-width: 1024px) and (max-width: 1280px) {
     justify-content: center;
   }
 
@@ -87,7 +80,7 @@ const TitleBar = styled.div`
 
   @media all and (max-width: 480px) {
     justify-content: space-between;
-  }
+  } */
 `;
 
 export const Modal = styled(ModalBase)`
@@ -104,19 +97,20 @@ export const Modal = styled(ModalBase)`
     border: none;
     border-radius: 4px;
     background-color: ${(props) => props.theme.colors.white};
+    width: fit-content;
 
     @media all and (min-width: 1024px) and (max-width: 1280px) {
-      width: 400px;
+      /* width: 400px; */
       border-radius: 4px;
     }
 
     @media all and (min-width: 768px) and (max-width: 1024px) {
-      width: 400px;
+      /* width: 400px; */
       border-radius: 4px;
     }
 
     @media all and (min-width: 480px) and (max-width: 768px) {
-      width: 400px;
+      /* width: 400px; */
       border-radius: 4px;
     }
 
@@ -175,6 +169,8 @@ const sizeCompute = (tag, size) => {
       break;
     case "h1":
       multiplier = 1.25;
+      break;
+    case "button":
       break;
     default:
       break;
@@ -242,13 +238,17 @@ export const Header = styled.h1`
 
 export const RoundButton = styled.button`
   color: ${(props) => chroma(props.theme.colors.white)};
-  background-color: ${(props) => props.theme.colors.primary};
+  background-color: ${(props) =>
+    props.theme.colors[props.color] ?? props.theme.colors.primary};
   border: none;
   border-radius: 9000px;
-  font-size: 1.5rem;
-  padding: 10px;
-  padding-left: 20px;
-  padding-right: 20px;
+  font-size: ${(props) =>
+    props.size
+      ? sizeCompute("button", props.size)
+      : sizeCompute("button", "medium")};
+  padding: 12px;
+  padding-left: 18px;
+  padding-right: 18px;
 
   &:hover {
     background-color: ${(props) =>
@@ -406,7 +406,7 @@ const CheckBoxContainer = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: row;
-  max-width: 100px;
+  /* max-width: 200px; */
   align-items: center;
 `;
 
@@ -416,8 +416,8 @@ const StyledCheckbox = styled.input.attrs((props) => ({ type: "checkbox" }))`
 `;
 
 export const Back = styled(BiArrowBack)`
-  width: 38px;
-  height: 38px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
 
   &:hover {

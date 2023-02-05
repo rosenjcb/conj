@@ -41,10 +41,10 @@
             (handler (assoc request :account auth))
             {:status 401
              :headers {}
-             :body "Access token does not exist or has expired."})
+             :body "You need to re-login before doing that."})
           {:status 401 
            :headers {}
-           :body "No access token found."}))
+           :body "You're not logged in."}))
       (catch Exception e
         {:status 401
          :headers {}
