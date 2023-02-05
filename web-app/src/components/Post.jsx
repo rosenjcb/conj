@@ -12,9 +12,7 @@ import { useDetectOutsideClick } from "../hooks/useDetectOutsideClick";
 import { useDeleteThreadMutation } from "../api/thread";
 import { toast } from "react-hot-toast";
 import * as _ from "lodash";
-import { AccountSettings } from "./AccountSettings";
 import { useMeQuery } from "../api/account";
-import { useEffect } from "react";
 
 const WithText = ({ direction, component, text }) => {
   return (
@@ -209,7 +207,7 @@ export const Post = (props) => {
           <Avatar onClick={openAvatar} avatar={avatar} />
           <TextContainer>
             <Text bold size="medium">
-              {username ?? "Anonymous"}
+              <span onClick={openProfile}>{username ?? "Anonymous"}</span>
             </Text>
             <PostLink to={postHref} onClick={handleClick}>
               #{id}
