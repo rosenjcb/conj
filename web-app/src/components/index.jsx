@@ -100,17 +100,14 @@ export const Modal = styled(ModalBase)`
     width: fit-content;
 
     @media all and (min-width: 1024px) and (max-width: 1280px) {
-      /* width: 400px; */
       border-radius: 4px;
     }
 
     @media all and (min-width: 768px) and (max-width: 1024px) {
-      /* width: 400px; */
       border-radius: 4px;
     }
 
     @media all and (min-width: 480px) and (max-width: 768px) {
-      /* width: 400px; */
       border-radius: 4px;
     }
 
@@ -374,6 +371,10 @@ export const InputFile = ({ field, form, placeholder }) => {
     </label>
   );
 };
+
+const StyledInput = styled.input`
+  background-color: green;
+`;
 
 const InputFieldRoot = styled.div`
   display: flex;
