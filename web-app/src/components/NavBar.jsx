@@ -105,21 +105,20 @@ export const WithNavBar = ({ component }) => {
           <IconContainer>
             <SettingsIcon onClick={toggleVisible} />
             <SettingsContent visible={isComponentVisible} ref={ref}>
-              {me === null ? (
-                <Link onClick={openLogin}>
-                  <SettingText align="center">Login</SettingText>
-                </Link>
-              ) : null}
-              {me !== null ? (
-                <Link onClick={handleLogout}>
-                  <SettingText align="center">Logout</SettingText>
-                </Link>
-              ) : null}
               {me !== null ? (
                 <Link onClick={openAccount}>
                   <SettingText align="center">Account</SettingText>
                 </Link>
               ) : null}
+              {me === null ? (
+                <Link onClick={openLogin}>
+                  <SettingText align="center">Login</SettingText>
+                </Link>
+              ) : (
+                <Link onClick={handleLogout}>
+                  <SettingText align="center">Logout</SettingText>
+                </Link>
+              )}
             </SettingsContent>
           </IconContainer>
         </NavItemsContainer>

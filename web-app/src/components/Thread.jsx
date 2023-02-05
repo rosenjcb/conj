@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { Reply } from "./Reply";
 
 export function Thread(props) {
-  const { preview, thread, threadRef, replyIndex } = props;
+  const { preview, thread, threadRef, replyIndex, board } = props;
 
   const op = thread[0];
 
@@ -17,6 +17,7 @@ export function Thread(props) {
           post={op}
           opNo={op.id}
           key={op.id}
+          board={board}
         />
       </Root>
     );
@@ -39,6 +40,7 @@ export function Thread(props) {
               handleRef={(el) => (threadRef.current[index] = el)}
               key={post.id}
               post={post}
+              board={board}
             />
           ))
         : null}

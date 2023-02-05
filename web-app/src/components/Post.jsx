@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import { Text, Avatar, Modal } from "./index";
+import { Text, Avatar, Modal, Checkbox, RoundButton } from "./index";
 import { processPostText } from "../util/post";
 import { useDispatch } from "react-redux";
 import { insertPostLink } from "../slices/postSlice";
 import { Link } from "react-router-dom";
 import { BiMessageDetail, BiShareAlt } from "react-icons/bi";
-import { AboutUser } from "./AboutUser";
+import { VscEllipsis } from "react-icons/vsc";
+import { RiDeleteBin2Fill } from "react-icons/ri";
+import { useDetectOutsideClick } from "../hooks/useDetectOutsideClick";
+import { useDeleteThreadMutation } from "../api/thread";
+import { toast } from "react-hot-toast";
+import * as _ from "lodash";
+import { useMeQuery } from "../api/account";
 
 const WithText = ({ direction, component, text }) => {
   return (
@@ -44,6 +50,76 @@ const handlePostDate = (time) => {
   }
 };
 
+const DeleteDialog = (props) => {
+  const { board, threadNo, replyNo, closeAction } = props;
+
+  const { data: me } = useMeQuery();
+
+  const [banUser, setBanUser] = useState(false);
+  const toggleBanUser = () => setBanUser(!banUser);
+
+  const [deleteThread] = useDeleteThreadMutation();
+
+  const params = {
+    ban: banUser,
+    replyNo,
+  };
+
+  const deleteReq = {
+    board: board,
+    threadNo,
+    params: _.omitBy(params, _.isNil),
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await deleteThread(deleteReq).unwrap();
+      // console.log(JSON.stringify(deleteReq, null, 2));
+      toast.success(`Successfully deleted Post #${replyNo ?? threadNo}`);
+    } catch (e) {
+      toast.error(e.data);
+    } finally {
+      closeAction();
+    }
+  };
+
+  return (
+    <DeleteDialogRoot>
+      {me?.role === "admin" ? (
+        <Checkbox label="Ban User?" onChange={toggleBanUser} />
+      ) : null}
+      <SubmitOptions>
+        <RoundButton color="darkGrey" size="small" onClick={closeAction}>
+          Cancel
+        </RoundButton>
+        <RoundButton size="small" onClick={handleSubmit}>
+          Delete
+        </RoundButton>
+      </SubmitOptions>
+    </DeleteDialogRoot>
+  );
+};
+
+const SubmitOptions = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 10px;
+`;
+
+const DeleteDialogRoot = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  align-self: center;
+  width: fit-content;
+  max-width: 400px;
+  padding: 10px;
+  gap: 10px;
+`;
+
 export const Post = (props) => {
   const [enlargePostImage, setEnlargePostImage] = useState(false);
 
@@ -67,17 +143,7 @@ export const Post = (props) => {
     setEnlargeAvatar(false);
   };
 
-  const [profileOpen, setProfileOpen] = useState(false);
-
-  const openProfile = () => {
-    setProfileOpen(true);
-  };
-
-  const closeProfile = () => {
-    setProfileOpen(false);
-  };
-
-  const { post, handleRef, preview, replyCount, opNo } = props;
+  const { post, handleRef, preview, replyCount, opNo, board } = props;
 
   const { username, subject, id, comment, image, time, avatar } = post;
 
@@ -96,23 +162,52 @@ export const Post = (props) => {
 
   const formattedTime = handlePostDate(time);
 
+  //I wonder if there is a way to make this cleaner.
+  const optionsRef = useRef(null);
+  const [expandOptions, setExpandOptions] = useState(false);
+  const closeOptions = () => setExpandOptions(false);
+  const openOptions = () => setExpandOptions(true);
+  useDetectOutsideClick(optionsRef, closeOptions);
+
+  const [expandDeleteDialog, setExpandDeleteDialog] = useState(false);
+  const closeDeleteDialog = () => setExpandDeleteDialog(false);
+  const openDeleteDialog = () => setExpandDeleteDialog(true);
+
+  const postUrl = `https://conj.app/boards/${board}/thread/${opNo}#${id}`;
+
   return (
     <div>
-      <Modal isOpen={enlargePostImage} onRequestClose={closePostImage}>
-        {image ? <ModalImage src={image.location} /> : null}
-      </Modal>
+      {image ? (
+        <Modal
+          isOpen={enlargePostImage}
+          onRequestClose={closePostImage}
+          title={image.filename}
+        >
+          <ModalImage src={image.location} />
+        </Modal>
+      ) : null}
       <Modal isOpen={enlargeAvatar} onRequestClose={closeAvatar}>
         <ModalImage src={avatar} />
       </Modal>
-      <Modal isOpen={profileOpen} onRequestClose={closeProfile}>
-        <AboutUser />
+      <Modal
+        isOpen={expandDeleteDialog}
+        onRequestClose={closeDeleteDialog}
+        title="Delete Post"
+      >
+        <DeleteDialog
+          board={board}
+          threadNo={opNo}
+          postId={id}
+          replyNo={!isOriginalPost ? id : null}
+          closeAction={closeDeleteDialog}
+        />
       </Modal>
       <PostRoot key={id} ref={handleRef}>
         <UserInfo>
           <Avatar onClick={openAvatar} avatar={avatar} />
           <TextContainer>
             <Text bold size="medium">
-              <span onClick={openProfile}>{username ?? "Anonymous"}</span>
+              <span>{username ?? "Anonymous"}</span>
             </Text>
             <PostLink to={postHref} onClick={handleClick}>
               #{id}
@@ -139,7 +234,18 @@ export const Post = (props) => {
           {processPostText(opNo, comment)}
         </OriginalContentRoot>
         <ActionsContainer>
-          <ShareMessage />
+          {" "}
+          <OptionsDiv
+            ref={optionsRef}
+            expand={expandOptions}
+            onClick={openOptions}
+          >
+            {!expandOptions ? <EllipsisButton /> : null}
+            <ShareMessageButton
+              onClick={() => navigator.clipboard.writeText(postUrl)}
+            />
+            <DeletePostButton onClick={openDeleteDialog} />
+          </OptionsDiv>
           {preview ? (
             <WithText
               component={
@@ -155,186 +261,9 @@ export const Post = (props) => {
           ) : null}
         </ActionsContainer>
       </PostRoot>
-      {/* {isOriginalPost ? (
-        <OriginalPost
-          key={id}
-          preview={preview}
-          highlight={false}
-          postHref={postHref}
-          handleRef={handleRef}
-          openAvatar={openAvatar}
-          openPostImage={openPostImage}
-          closePostImage={closePostImage}
-          id={id}
-          username={username}
-          handleClick={handleClick}
-          opNo={opNo}
-          subject={subject}
-          comment={comment}
-          formattedTime={formattedTime}
-          image={image}
-          replyCount={replyCount}
-          avatar={avatar}
-        />
-      ) : (
-        <ReplyPost
-          key={post.id}
-          highlight={highlight}
-          postHref={postHref}
-          handleRef={handleRef}
-          openAvatar={openAvatar}
-          openPostImage={openPostImage}
-          closePostImage={closePostImage}
-          id={id}
-          username={username}
-          handleClick={handleClick}
-          opNo={opNo}
-          subject={subject}
-          comment={comment}
-          formattedTime={formattedTime}
-          image={image}
-          avatar={avatar}
-        />
-      )} */}
     </div>
   );
 };
-
-// const OriginalPost = ({
-//   postHref,
-//   handleRef,
-//   fullScreen,
-//   openPostImage,
-//   id,
-//   username,
-//   handleClick,
-//   opNo,
-//   subject,
-//   comment,
-//   formattedTime,
-//   image,
-//   replyCount,
-//   preview,
-//   avatar,
-//   openAvatar,
-// }) => {
-//   return (
-//     <PostRoot key={id} ref={handleRef}>
-//       <UserInfo>
-//         <Avatar onClick={openAvatar} avatar={avatar} />
-//         <TextContainer>
-//           <Text bold size="medium">
-//             {username ?? "Anonymous"}
-//           </Text>
-//           <PostLink to={postHref} onClick={handleClick}>
-//             #{id}
-//           </PostLink>
-//         </TextContainer>
-//         <Text size="medium" color="darkGrey" align="right">
-//           {formattedTime}
-//         </Text>
-//       </UserInfo>
-//       <FullWidth>
-//         <CenteredImage
-//           fullScreen={fullScreen}
-//           onClick={() => openPostImage()}
-//           src={image.location}
-//         />
-//       </FullWidth>
-//       <OriginalContentRoot>
-//         <Text align="left" width="100%" size="x-large" color="black">
-//           {subject}
-//         </Text>
-//         {processPostText(opNo, comment)}
-//       </OriginalContentRoot>
-//       <ActionsContainer>
-//         <ShareMessage />
-//         <WithText
-//           component={
-//             <ThreadLink
-//               to={(location) => `${location.pathname}/thread/${opNo}`}
-//             >
-//               <MessageDetail />
-//             </ThreadLink>
-//           }
-//           direction="row"
-//           text={replyCount}
-//         />
-//       </ActionsContainer>
-//     </PostRoot>
-//   );
-// };
-
-// const ReplyPost = ({
-//   postHref,
-//   highlight,
-//   fullScreen,
-//   openPostImage,
-//   id,
-//   username,
-//   handleClick,
-//   opNo,
-//   subject,
-//   comment,
-//   formattedTime,
-//   image,
-//   avatar,
-//   openAvatar,
-// }) => {
-//   return (
-//     <PostRoot highlight={highlight}>
-//       <FalseBorder />
-//       <PostBody>
-//         <BottomRow>
-//           <ReplyUserInfo>
-//             <Avatar onClick={openAvatar} avatar={avatar} />
-//             <InfoContent>
-//               <TextContainer>
-//                 <Text>{username ?? "Anonymous"}</Text>
-//                 <PostLink to={postHref} onClick={handleClick}>
-//                   #{id}
-//                 </PostLink>
-//               </TextContainer>
-//               <Text align="right">{formattedTime}</Text>
-//             </InfoContent>
-//           </ReplyUserInfo>
-//         </BottomRow>
-//         <ContentRoot>
-//           {processPostText(opNo, comment)}
-//           {image && image.location ? (
-//             <Image
-//               fullScreen={fullScreen}
-//               onClick={() => openPostImage()}
-//               src={image.location}
-//             />
-//           ) : null}
-//           {subject ? (
-//             <Text size="large" color="primary">
-//               {subject}
-//             </Text>
-//           ) : null}
-//         </ContentRoot>
-//       </PostBody>
-//     </PostRoot>
-//   );
-// };
-
-// const PostBody = styled.div`
-//   display: flex;
-//   justify-content: column;
-//   flex-direction: flex-start;
-//   flex-flow: wrap;
-//   /* gap: 1rem; */
-//   width: calc(100% - 1px - 1rem);
-// `;
-
-// const BottomRow = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   flex-direction: row;
-//   width: 100%;
-//   align-items: center;
-// `;
 
 const WithTextRoot = styled.div`
   display: flex;
@@ -353,7 +282,42 @@ const MessageDetail = styled(BiMessageDetail)`
   height: 24px;
 `;
 
-const ShareMessage = styled(BiShareAlt)`
+const OptionsDiv = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  transition: all 0.3 ease;
+  max-width: ${(props) => (props.expand ? "100%" : "24px")};
+  overflow: hidden;
+  background-color: ${(props) => props.theme.colors.grey};
+  border-radius: 9000px;
+  gap: 2px;
+  padding: 2px;
+`;
+
+const EllipsisButton = styled(VscEllipsis)`
+  color: ${(props) => props.theme.colors.black};
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-width: 24px;
+  &:hover {
+    cursor: pointer;
+    /* color: ${(props) => props.theme.colors.grey}; */
+  }
+`;
+
+const ShareMessageButton = styled(BiShareAlt)`
+  color: ${(props) => props.theme.colors.black};
+  width: 24px;
+  height: 24px;
+  &:hover {
+    cursor: pointer;
+    /* color: ${(props) => props.theme.colors.grey}; */
+  }
+`;
+
+const DeletePostButton = styled(RiDeleteBin2Fill)`
   color: ${(props) => props.theme.colors.black};
   width: 24px;
   height: 24px;
@@ -406,7 +370,7 @@ const CenteredImage = styled(Image)`
   float: none;
   margin: 0 auto;
   /* aspect-ratio: 1/1; */
-  max-height: 600px;
+  max-height: 400px;
   border-radius: 0px;
 `;
 
@@ -500,18 +464,3 @@ const ActionsContainer = styled.div`
 const ThreadLink = styled(Link)`
   color: inherit;
 `;
-
-// const FalseBorder = styled.div`
-//   width: 1px;
-//   background-color: ${(props) =>
-//     chroma(props.theme.colors.grey).brighten(0.5).hex()};
-// `;
-
-// const InfoContent = styled.div`
-//   height: 80%;
-//   display: flex;
-//   justify-content: space-between;
-//   align-items: flex-start;
-//   flex-direction: row;
-//   width: 100%;
-// `;

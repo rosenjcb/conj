@@ -26,7 +26,7 @@ export const BoardPage = () => {
   return (
     <BoardRoot>
       <HomeReply />
-      <ThreadPreview threads={threads} />
+      <ThreadPreview threads={threads} board={board} />
     </BoardRoot>
   );
 };
@@ -40,14 +40,14 @@ const HomeReply = () => {
 };
 
 const ThreadPreview = (props) => {
-  const { threads } = props;
+  const { threads, board } = props;
 
   return (
     <ThreadPreviewRoot>
       {threads && threads.length > 0 ? (
         _.orderBy(threads, (o) => o[o.length - 1].id, ["desc"]).map(
           (thread, index) => (
-            <Thread board={""} key={index} preview={true} thread={thread} />
+            <Thread board={board} key={index} preview={true} thread={thread} />
           )
         )
       ) : (
