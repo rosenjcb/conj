@@ -187,8 +187,9 @@ const BoardDrawer = (props) => {
     <BoardDrawerRoot fill={fill}>
       <BoardList>
         <BoardRow>
-          <BoardIcon />
-          <BarChartIcon />
+          <Text size={"large"} bold>
+            Board
+          </Text>
         </BoardRow>
         {boards != null ? (
           boards.map((b) => (
@@ -268,12 +269,9 @@ const BoardRow = styled.div`
 
 const HighlightBoardRow = styled(BoardRow)`
   background-color: ${(props) =>
-    props.selected
-      ? chroma(props.theme.colors.primary).brighten(2.5).hex()
-      : "inherit"};
+    props.selected ? chroma(props.theme.colors.white) : "inherit"};
   &:hover {
-    background-color: ${(props) =>
-      chroma(props.theme.colors.primary).brighten(2.5).hex()};
+    background-color: ${(props) => chroma(props.theme.colors.white)};
     cursor: pointer;
   }
   min-width: 250px;
@@ -291,12 +289,13 @@ const BoardDrawerRoot = styled.div`
   justify-content: flex-start;
   flex-direction: column;
   background-color: ${(props) =>
-    props.fill ? props.theme.colors.white : "inherit"};
+    props.fill ? props.theme.colors.grey : "inherit"};
   gap: 2rem;
   height: fit-content;
   /* border-radius: 8px; */
   min-width: 300px;
   border-right: 2px solid ${(props) => props.theme.colors.grey};
+  background-color: ${(props) => props.theme.colors.grey};
   min-height: 100%;
   height: auto;
 
@@ -340,45 +339,6 @@ const HamburgerMenu = styled(FiMenu)`
   width: 36px;
   height: 36px;
 `;
-
-const BoardIcon = styled(RiDiscussFill)`
-  color: ${(props) => props.theme.colors.primary};
-  width: 48px;
-  height: 48px;
-`;
-
-const BarChartIcon = styled(BsFillBarChartFill)`
-  color: ${(props) => props.theme.colors.primary};
-  width: 48px;
-  height: 48px;
-`;
-
-// const ToolTip = styled.span`
-//   visibility: ${props => props.visibility ? "visible" : "hidden"};
-//   width: 100%;
-//   background-color: ${props => props.theme.colors.grey};
-//   color: white;
-//   font-weight: 650;
-//   text-align: center;
-//   border-radius: 6px;
-//   padding: 10px;
-//   position: relative;
-//   z-index: 1;
-//   bottom: 60px;
-//   left: 15%;
-//   margin-left: -100px;
-
-//   &:after {
-//     content: "";
-//     position: absolute;
-//     top: 100%;
-//     left: 50%;
-//     margin-left: -5px;
-//     border-width: 5px;
-//     border-style: solid;
-//     border-color: ${props => props.theme.colors.grey} transparent transparent transparent;
-//   };
-// `;
 
 const SettingsContent = styled.div`
   display: ${(props) => (props.visible ? "block" : "none")};
