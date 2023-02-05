@@ -87,7 +87,7 @@
           success-message (if delete-reply?
                             (format "Reply No. %s of Thread No. %s deleted" reply-no thread-id)
                             (format "Thread No. %s has been deleted" thread-id))]
-      (when (not can-delete?) (throw (Exception. "You cannot delete posts that aren't yours.")))
+      (when (not can-delete?) (throw (Exception. "You can only delete your own posts.")))
       (when (and ban can-ban?)
         (log/infof "Banning account-id %s" author-account-id)
         (q.account/update-account!
