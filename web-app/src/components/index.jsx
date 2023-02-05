@@ -56,7 +56,6 @@ const ModalRoot = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  width: fit-content;
 `;
 
 const TitleBar = styled.div`
@@ -114,6 +113,7 @@ export const Modal = styled(ModalBase)`
     @media all and (max-width: 480px) {
       border-radius: 0px;
       padding: 0px;
+      width: 100%;
     }
   }
 
