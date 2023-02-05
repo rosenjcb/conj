@@ -6,20 +6,10 @@ import { Text, Avatar } from "./index.jsx";
 export const AboutUser = () => {
   const { data: me } = useMeQuery();
 
-  useEffect(() => {
-    console.log(JSON.stringify(me, null, 2));
-  }, []);
-
-  //const user = useFetchUserQuery({username: 'daiizy'})
-
   return (
     <Root>
       <AvatarModal size={100} avatar={me.avatar} />
-      <DetailsContainer>
-        {/* <Form>
-            <input type="text" placeholder={me.username} />
-        </Form> */}
-      </DetailsContainer>
+      <DetailsContainer />
     </Root>
   );
 };
