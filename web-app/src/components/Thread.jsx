@@ -1,7 +1,6 @@
 import React from "react";
 import { Post } from "./Post";
 import styled from "styled-components";
-import { Reply } from "./Reply";
 
 export function Thread(props) {
   const { preview, thread, threadRef, replyIndex, board } = props;
@@ -70,10 +69,4 @@ const Root = styled.div`
   @media all and (max-width: 480px) {
     border-radius: 0px;
   }
-`;
-
-const StyledReply = styled(Reply)`
-  position: sticky;
-  ${(props) => (props.mobile ? "bottom: 0;" : "top: 0;")}
-  z-index: 1;
 `;

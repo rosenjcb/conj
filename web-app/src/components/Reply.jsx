@@ -176,19 +176,19 @@ const FakeReply = ({ onClick, className }) => {
 
 const FakeReplyRoot = styled.div`
   display: flex;
-  /* position: sticky;
-  top: 50px;
-  left: 50px; */
   justify-content: flex-start;
   align-items: center;
   flex-direction: row;
   background-color: ${(props) => props.theme.colors.white};
   padding-left: 10px;
   padding-right: 10px;
+  padding-top: 2px;
+  padding-bottom: 2px;
   box-sizing: border-box;
   width: 100%;
   gap: 10px;
-  height: 50px;
+  align-self: center;
+  height: 54px;
   /* border-bottom: 2px solid ${(props) => props.theme.colors.grey}; */
 `;
 
@@ -216,6 +216,10 @@ export const Reply = (props) => {
 
 const ReplyRoot = styled.div`
   width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const FullReplyRoot = styled.div`

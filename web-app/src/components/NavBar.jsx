@@ -136,27 +136,35 @@ export const WithNavBar = ({ component }) => {
             <BoardDrawer isMobile={isMobile} fill={true} boards={boards} />
           </Modal>
         )}
-        <FixedWidth mobile={isMobile}>
-          {!isMobile && board ? <Reply /> : null}
-          {component}
+        <PageWrapper>
+          <FixedWidth mobile={isMobile}>
+            {!isMobile && board ? <Reply /> : null}
+            {component}
+          </FixedWidth>
           {isMobile && board ? <StyledReply mobile={isMobile} /> : null}
-        </FixedWidth>
+        </PageWrapper>
       </Page>
     </BoardRoot>
   );
 };
 
+const PageWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+`;
+
 const StyledReply = styled(Reply)`
   position: absolute;
   bottom: 0;
-  z-index: 1;
 `;
 
 const FixedWidth = styled.div`
   margin: 0 auto;
   height: calc(
-    100vh - 40px - 8px - 2px - ${(props) => (props.mobile ? "58px" : "0px")}
-  ); //full height - fixed navbar height - fixed navbar padding - border)
+    100vh - 40px - 8px - 2px - ${(props) => (props.mobile ? "54px" : "0px")}
+  ); //full height - fixed navbar height - fixed navbar padding - border - fixed reply height)
   overflow-y: scroll;
   border-left: ${(props) => (!props.mobile ? "2" : "0")}px solid
     ${(props) => props.theme.colors.grey};

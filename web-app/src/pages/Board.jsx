@@ -1,20 +1,16 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Text } from "../components";
-import { Reply } from "../components/Reply";
 import { Thread } from "../components/Thread";
 import * as _ from "lodash";
 import { useFetchThreadsQuery } from "../api/thread";
 import toast from "react-hot-toast";
 import { useThread } from "../hooks/useThread";
-import { detectMobile } from "../util/window";
 
 export const BoardPage = () => {
   const { board } = useThread();
 
   const { data: threads, error, isLoading } = useFetchThreadsQuery(board);
-
-  const isMobile = detectMobile();
 
   useEffect(() => {
     if (error) {
@@ -30,16 +26,6 @@ export const BoardPage = () => {
     <BoardRoot>
       <ThreadPreview threads={threads} board={board} />
     </BoardRoot>
-  );
-};
-
-const HomeReply = (props) => {
-  const { mobile } = props;
-
-  return (
-    <HomeReplyRoot mobile={mobile}>
-      <Reply isNewThread />
-    </HomeReplyRoot>
   );
 };
 
@@ -81,18 +67,6 @@ const ThreadPreviewRoot = styled.div`
   width: 100%;
   margin: 0 auto;
   height: 100vh;
-`;
-
-const HomeReplyRoot = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  align-items: flex-start;
-  /* border-bottom: 2px solid ${(props) => props.theme.colors.grey}; */
-  width: 100%;
-  position: sticky;
-  ${(props) => (props.mobile ? "bottom: 0;" : "top: 0;")}
-  z-index: 1;
 `;
 
 const BoardRoot = styled.div`
