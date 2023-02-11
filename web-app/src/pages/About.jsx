@@ -121,7 +121,7 @@ const Root = styled.div`
   margin-right: 1rem;
   width: 100%;
   text-align: center;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   gap: 3rem;
 
   &::-webkit-scrollbar {

@@ -5,8 +5,6 @@ import { useLogoutMutation } from "../api/account";
 import { useFetchBoardsQuery } from "../api/board";
 import chroma from "chroma-js";
 import { FiMenu } from "react-icons/fi";
-import { RiDiscussFill } from "react-icons/ri";
-import { BsFillBarChartFill } from "react-icons/bs";
 import { Text, Modal } from "./index";
 import { useThread } from "../hooks/useThread";
 import { detectMobile } from "../util/window";
@@ -132,10 +130,10 @@ export const WithNavBar = ({ component }) => {
             onRequestClose={closeDrawer}
             title="Most Popular Boards"
           >
-            <BoardDrawer fill={true} boards={boards} />
+            <BoardDrawer isMobile={isMobile} fill={true} boards={boards} />
           </Modal>
         )}
-        <FixedWidth>{component}</FixedWidth>
+        <FixedWidth mobile={isMobile}>{component}</FixedWidth>
       </Page>
     </BoardRoot>
   );
@@ -147,8 +145,10 @@ const FixedWidth = styled.div`
     100vh - 40px - 8px - 2px
   ); //full height - fixed navbar height - fixed navbar padding - border)
   overflow-y: scroll;
-  border-left: 2px solid ${(props) => props.theme.colors.grey};
-  border-right: 2px solid ${(props) => props.theme.colors.grey};
+  border-left: ${(props) => (!props.mobile ? "2" : "0")}px solid
+    ${(props) => props.theme.colors.grey};
+  border-right: ${(props) => (!props.mobile ? "2" : "0")}px solid
+    ${(props) => props.theme.colors.grey};
 
   ::-webkit-scrollbar {
     display: none;
@@ -172,14 +172,13 @@ const FixedWidth = styled.div`
 `;
 
 const BoardDrawer = (props) => {
-  const { boards, fill } = props;
+  const { boards, fill, isMobile } = props;
 
   const history = useHistory();
 
   const { board } = useThread();
 
   const handleClick = (board) => {
-    console.log(board);
     history.push(`/boards/${board}`);
   };
 
@@ -187,9 +186,11 @@ const BoardDrawer = (props) => {
     <BoardDrawerRoot fill={fill}>
       <BoardList>
         <BoardRow>
-          <Text size={"large"} bold>
-            Board
-          </Text>
+          {!isMobile ? (
+            <Text size={"large"} align="center" bold>
+              Most Popular Boards
+            </Text>
+          ) : null}
         </BoardRow>
         {boards != null ? (
           boards.map((b) => (
@@ -198,10 +199,9 @@ const BoardDrawer = (props) => {
               selected={b === board}
               key={b}
             >
-              <BoardItem>/{b}/</BoardItem>
-              <Text size={"medium"} align="right" color={"black"} bold>
-                10+
-              </Text>
+              <BoardItem align={isMobile ? "center" : "inherit"}>
+                /{b}/
+              </BoardItem>
             </HighlightBoardRow>
           ))
         ) : (

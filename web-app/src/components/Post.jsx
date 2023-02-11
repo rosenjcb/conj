@@ -1,6 +1,13 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import { Text, Avatar, Modal, Checkbox, RoundButton } from "./index";
+import {
+  Text,
+  Avatar,
+  Modal,
+  Checkbox,
+  RoundButton,
+  AnonymousAvatar,
+} from "./index";
 import { processPostText } from "../util/post";
 import { useDispatch } from "react-redux";
 import { insertPostLink } from "../slices/postSlice";
@@ -187,7 +194,7 @@ export const Post = (props) => {
         </Modal>
       ) : null}
       <Modal isOpen={enlargeAvatar} onRequestClose={closeAvatar}>
-        <ModalImage src={avatar} />
+        <Avatar src={avatar}></Avatar>
       </Modal>
       <Modal
         isOpen={expandDeleteDialog}

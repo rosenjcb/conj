@@ -58,7 +58,7 @@ export function ThreadPage() {
 const Root = styled.div`
   width: 100%;
   margin: 0 auto;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
 
   &::-webkit-scrollbar {
     display: none;
