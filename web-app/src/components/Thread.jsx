@@ -2,11 +2,14 @@ import React from "react";
 import { Post } from "./Post";
 import styled from "styled-components";
 import { Reply } from "./Reply";
+import { detectMobile } from "../util/window";
 
 export function Thread(props) {
   const { preview, thread, threadRef, replyIndex, board } = props;
 
   const op = thread[0];
+
+  const isMobile = detectMobile();
 
   if (preview) {
     return (
@@ -28,7 +31,7 @@ export function Thread(props) {
 
   return (
     <Root>
-      <Reply />
+      {!isMobile ? <StyledReply mobile={isMobile} /> : null}
       {thread && thread.length > 0 && threadRef && threadRef.current
         ? thread.map((post, index) => (
             <Post
@@ -44,6 +47,7 @@ export function Thread(props) {
             />
           ))
         : null}
+      {isMobile ? <StyledReply mobile={isMobile} /> : null}
     </Root>
   );
 }
@@ -71,4 +75,10 @@ const Root = styled.div`
   @media all and (max-width: 480px) {
     border-radius: 0px;
   }
+`;
+
+const StyledReply = styled(Reply)`
+  position: sticky;
+  ${(props) => (props.mobile ? "bottom: 0;" : "top: 0;")}
+  z-index: 1;
 `;

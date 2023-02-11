@@ -5,8 +5,6 @@ import { useLogoutMutation } from "../api/account";
 import { useFetchBoardsQuery } from "../api/board";
 import chroma from "chroma-js";
 import { FiMenu } from "react-icons/fi";
-import { RiDiscussFill } from "react-icons/ri";
-import { BsFillBarChartFill } from "react-icons/bs";
 import { Text, Modal } from "./index";
 import { useThread } from "../hooks/useThread";
 import { detectMobile } from "../util/window";
@@ -132,10 +130,10 @@ export const WithNavBar = ({ component }) => {
             onRequestClose={closeDrawer}
             title="Most Popular Boards"
           >
-            <BoardDrawer fill={true} boards={boards} />
+            <BoardDrawer isMobile={isMobile} fill={true} boards={boards} />
           </Modal>
         )}
-        <FixedWidth>{component}</FixedWidth>
+        <FixedWidth mobile={isMobile}>{component}</FixedWidth>
       </Page>
     </BoardRoot>
   );
@@ -147,8 +145,10 @@ const FixedWidth = styled.div`
     100vh - 40px - 8px - 2px
   ); //full height - fixed navbar height - fixed navbar padding - border)
   overflow-y: scroll;
-  border-left: 2px solid ${(props) => props.theme.colors.grey};
-  border-right: 2px solid ${(props) => props.theme.colors.grey};
+  border-left: ${(props) => (!props.mobile ? "2" : "0")}px solid
+    ${(props) => props.theme.colors.grey};
+  border-right: ${(props) => (!props.mobile ? "2" : "0")}px solid
+    ${(props) => props.theme.colors.grey};
 
   ::-webkit-scrollbar {
     display: none;
@@ -172,14 +172,13 @@ const FixedWidth = styled.div`
 `;
 
 const BoardDrawer = (props) => {
-  const { boards, fill } = props;
+  const { boards, fill, isMobile } = props;
 
   const history = useHistory();
 
   const { board } = useThread();
 
   const handleClick = (board) => {
-    console.log(board);
     history.push(`/boards/${board}`);
   };
 
@@ -187,8 +186,11 @@ const BoardDrawer = (props) => {
     <BoardDrawerRoot fill={fill}>
       <BoardList>
         <BoardRow>
-          <BoardIcon />
-          <BarChartIcon />
+          {!isMobile ? (
+            <Text size={"large"} align="center" bold>
+              Most Popular Boards
+            </Text>
+          ) : null}
         </BoardRow>
         {boards != null ? (
           boards.map((b) => (
@@ -197,10 +199,9 @@ const BoardDrawer = (props) => {
               selected={b === board}
               key={b}
             >
-              <BoardItem>/{b}/</BoardItem>
-              <Text size={"medium"} align="right" color={"black"} bold>
-                10+
-              </Text>
+              <BoardItem align={isMobile ? "center" : "inherit"}>
+                /{b}/
+              </BoardItem>
             </HighlightBoardRow>
           ))
         ) : (
@@ -268,12 +269,9 @@ const BoardRow = styled.div`
 
 const HighlightBoardRow = styled(BoardRow)`
   background-color: ${(props) =>
-    props.selected
-      ? chroma(props.theme.colors.primary).brighten(2.5).hex()
-      : "inherit"};
+    props.selected ? chroma(props.theme.colors.white) : "inherit"};
   &:hover {
-    background-color: ${(props) =>
-      chroma(props.theme.colors.primary).brighten(2.5).hex()};
+    background-color: ${(props) => chroma(props.theme.colors.white)};
     cursor: pointer;
   }
   min-width: 250px;
@@ -291,12 +289,13 @@ const BoardDrawerRoot = styled.div`
   justify-content: flex-start;
   flex-direction: column;
   background-color: ${(props) =>
-    props.fill ? props.theme.colors.white : "inherit"};
+    props.fill ? props.theme.colors.grey : "inherit"};
   gap: 2rem;
   height: fit-content;
   /* border-radius: 8px; */
   min-width: 300px;
   border-right: 2px solid ${(props) => props.theme.colors.grey};
+  background-color: ${(props) => props.theme.colors.grey};
   min-height: 100%;
   height: auto;
 
@@ -340,45 +339,6 @@ const HamburgerMenu = styled(FiMenu)`
   width: 36px;
   height: 36px;
 `;
-
-const BoardIcon = styled(RiDiscussFill)`
-  color: ${(props) => props.theme.colors.primary};
-  width: 48px;
-  height: 48px;
-`;
-
-const BarChartIcon = styled(BsFillBarChartFill)`
-  color: ${(props) => props.theme.colors.primary};
-  width: 48px;
-  height: 48px;
-`;
-
-// const ToolTip = styled.span`
-//   visibility: ${props => props.visibility ? "visible" : "hidden"};
-//   width: 100%;
-//   background-color: ${props => props.theme.colors.grey};
-//   color: white;
-//   font-weight: 650;
-//   text-align: center;
-//   border-radius: 6px;
-//   padding: 10px;
-//   position: relative;
-//   z-index: 1;
-//   bottom: 60px;
-//   left: 15%;
-//   margin-left: -100px;
-
-//   &:after {
-//     content: "";
-//     position: absolute;
-//     top: 100%;
-//     left: 50%;
-//     margin-left: -5px;
-//     border-width: 5px;
-//     border-style: solid;
-//     border-color: ${props => props.theme.colors.grey} transparent transparent transparent;
-//   };
-// `;
 
 const SettingsContent = styled.div`
   display: ${(props) => (props.visible ? "block" : "none")};

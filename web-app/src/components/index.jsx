@@ -246,6 +246,12 @@ export const RoundButton = styled.button`
   padding-left: 18px;
   padding-right: 18px;
 
+  ${(props) =>
+    props.disabled
+      ? `cursor: not-allowed;
+   pointer-events: none;`
+      : null}
+
   &:hover {
     background-color: ${(props) =>
       chroma(props.theme.colors.primary).darken().hex()};
@@ -282,6 +288,7 @@ const ExistingAvatar = styled.img`
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  align-self: center;
 
   &:hover {
     cursor: pointer;
@@ -300,6 +307,7 @@ export const AnonymousAvatar = styled(BsFillPersonFill)`
   width: 48px;
   height: 48px;
   border-radius: 50%;
+  align-self: center;
 
   &:hover {
     cursor: pointer;
@@ -347,8 +355,9 @@ export const InputField = (props) => {
         name={type}
         autocomplete={autocomplete}
         secret={secret}
-        placeholder={props.placeholder}
+        // placeholder={placeholder}
         onChange={handleChange}
+        {...props}
       />
     </InputFieldRoot>
   );
@@ -372,18 +381,12 @@ export const InputFile = ({ field, form, placeholder }) => {
   );
 };
 
-const StyledInput = styled.input`
-  background-color: green;
-`;
-
 const InputFieldRoot = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  width: 70%;
+  width: 100%;
   margin: 0 auto;
-  margin-top: 12px;
-  margin-bottom: 12px;
 `;
 
 const Label = styled.label`

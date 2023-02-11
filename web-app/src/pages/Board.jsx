@@ -7,11 +7,14 @@ import * as _ from "lodash";
 import { useFetchThreadsQuery } from "../api/thread";
 import toast from "react-hot-toast";
 import { useThread } from "../hooks/useThread";
+import { detectMobile } from "../util/window";
 
 export const BoardPage = () => {
   const { board } = useThread();
 
   const { data: threads, error, isLoading } = useFetchThreadsQuery(board);
+
+  const isMobile = detectMobile();
 
   useEffect(() => {
     if (error) {
@@ -25,15 +28,18 @@ export const BoardPage = () => {
 
   return (
     <BoardRoot>
-      <HomeReply />
+      {!isMobile ? <HomeReply mobile={isMobile} /> : null}
       <ThreadPreview threads={threads} board={board} />
+      {isMobile ? <HomeReply mobile={isMobile} /> : null}
     </BoardRoot>
   );
 };
 
-const HomeReply = () => {
+const HomeReply = (props) => {
+  const { mobile } = props;
+
   return (
-    <HomeReplyRoot>
+    <HomeReplyRoot mobile={mobile}>
       <Reply isNewThread />
     </HomeReplyRoot>
   );
@@ -51,13 +57,24 @@ const ThreadPreview = (props) => {
           )
         )
       ) : (
-        <Text bold size="xx-large" align="center">
-          {threads ? "No threads yet. Make one?" : "This board does not exist"}
-        </Text>
+        <TextWrapper>
+          <Text bold size="xx-large" align="center">
+            {threads
+              ? "No threads yet. Make one?"
+              : "This board does not exist"}
+          </Text>
+        </TextWrapper>
       )}
     </ThreadPreviewRoot>
   );
 };
+
+const TextWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+`;
 
 const ThreadPreviewRoot = styled.div`
   display: flex;
@@ -65,6 +82,7 @@ const ThreadPreviewRoot = styled.div`
   flex-direction: column;
   width: 100%;
   margin: 0 auto;
+  height: 100vh;
 `;
 
 const HomeReplyRoot = styled.div`
@@ -74,6 +92,9 @@ const HomeReplyRoot = styled.div`
   align-items: flex-start;
   /* border-bottom: 2px solid ${(props) => props.theme.colors.grey}; */
   width: 100%;
+  position: sticky;
+  ${(props) => (props.mobile ? "bottom: 0;" : "top: 0;")}
+  z-index: 1;
 `;
 
 const BoardRoot = styled.div`
@@ -81,7 +102,7 @@ const BoardRoot = styled.div`
   display: flex;
   flex-direction: column;
   height: inherit;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
   scrollbar-width: none;
 
   &::-webkit-scrollbar {

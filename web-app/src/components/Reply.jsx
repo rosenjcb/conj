@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Formik, Form, Field } from "formik";
-import { Checkbox, RoundButton, RoundImage, Modal, Avatar } from "./index";
+import {
+  Checkbox,
+  RoundButton,
+  RoundImage,
+  Modal,
+  Avatar,
+  InputField,
+} from "./index";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { updateEntry, resetPost } from "../slices/postSlice";
@@ -34,10 +41,13 @@ const FullReply = (props) => {
     dispatch(updateEntry({ key: key, value: e.target.value }));
   };
 
+  const [loading, setLoading] = useState(false);
+
   const history = useHistory();
 
   const submitPost = async (values, actions) => {
     try {
+      setLoading(true);
       const req = _.pick(
         post,
         "name",
@@ -68,6 +78,7 @@ const FullReply = (props) => {
       if (e.data) toast.error(e.data);
     } finally {
       handleClose();
+      setLoading(false);
     }
   };
 
@@ -110,7 +121,7 @@ const FullReply = (props) => {
                   disabled={me === null}
                   name="subject"
                   as="input"
-                  placeholder="Title goes here"
+                  placeholder="Title"
                   value={post.subject ?? ""}
                   onChange={(e) => {
                     handleChange(props.handleChange, e, "subject");
@@ -121,7 +132,7 @@ const FullReply = (props) => {
                 disabled={me === null}
                 name="comment"
                 as="textarea"
-                placeholder="Brilliant thoughts go here."
+                placeholder="Comment here..."
                 value={post.comment}
                 onChange={(e) => handleChange(props.handleChange, e, "comment")}
               />
@@ -140,7 +151,7 @@ const FullReply = (props) => {
                     />
                   ) : null}
                 </OptionsContainer>
-                <RoundButton disabled={me === null} type="submit">
+                <RoundButton disabled={me === null || loading} type="submit">
                   Conj
                 </RoundButton>
               </ActionsContainer>
@@ -158,16 +169,16 @@ const FakeReply = ({ onClick }) => {
   return (
     <FakeReplyRoot onClick={onClick}>
       <Avatar avatar={me?.avatar} />
-      <FakeTextBox disabled />
+      <InputField disabled placeholder="Comment here..." />
     </FakeReplyRoot>
   );
 };
 
 const FakeReplyRoot = styled.div`
   display: flex;
-  position: sticky;
+  /* position: sticky;
   top: 50px;
-  left: 50px;
+  left: 50px; */
   justify-content: flex-start;
   align-items: center;
   flex-direction: row;
@@ -178,24 +189,11 @@ const FakeReplyRoot = styled.div`
   padding-bottom: 4px;
   gap: 10px;
   height: 50%;
-  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
-`;
-
-const FakeTextBox = styled.input.attrs({
-  type: "text",
-})`
-  background-color: ${(props) => props.theme.colors.grey};
-  resize: vertical;
-  scrollbar-width: none;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  outline: none;
-  border: none;
-  height: 40px;
+  /* border-bottom: 2px solid ${(props) => props.theme.colors.grey}; */
 `;
 
 export const Reply = (props) => {
+  const { className } = props;
   const [open, setOpen] = useState(false);
 
   const toggleModal = () => {
@@ -207,7 +205,7 @@ export const Reply = (props) => {
   };
 
   return (
-    <ReplyRoot>
+    <ReplyRoot className={className}>
       <Modal onRequestClose={closeModal} isOpen={open}>
         <FullReply {...props} handleClose={closeModal} />
       </Modal>
@@ -321,20 +319,19 @@ const CommentBody = styled(Field)`
 
 const SubjectInput = styled(Field).attrs((props) => ({ type: "text" }))`
   color: ${(props) => props.theme.colors.black};
-  font-size: 2.5rem;
+  font-size: 2rem;
   background-color: inherit;
   resize: none;
   appearance: none;
   margin: 0;
   width: 100%;
-  margin-bottom: 1rem;
   padding: 0;
   outline: none;
   border: none;
 
-  ::placeholder {
+  /* ::placeholder {
     color: ${(props) => props.theme.colors.grey};
-  }
+  } */
 `;
 
 const PreviewImageRoot = styled.div`
