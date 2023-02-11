@@ -156,7 +156,7 @@ const PageWrapper = styled.div`
 `;
 
 const StyledReply = styled(Reply)`
-  position: absolute;
+  position: fixed;
   bottom: 0;
 `;
 
