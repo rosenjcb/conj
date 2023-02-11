@@ -141,7 +141,7 @@ export const WithNavBar = ({ component }) => {
 
 const FixedWidth = styled.div`
   margin: 0 auto;
-  height: calc(
+  min-height: calc(
     100vh - 40px - 8px - 2px
   ); //full height - fixed navbar height - fixed navbar padding - border)
   overflow-y: scroll;
