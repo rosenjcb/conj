@@ -341,9 +341,7 @@ const BoardRoot = styled.div`
 
 const HomeNavBar = styled.div`
   display: flex;
-  position: sticky;
   top: 0;
-  z-index: 1;
   justify-content: space-between;
   gap: 10px;
   flex-direction: row;
