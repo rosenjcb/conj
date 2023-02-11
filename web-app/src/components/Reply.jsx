@@ -163,11 +163,11 @@ const FullReply = (props) => {
   }
 };
 
-const FakeReply = ({ onClick }) => {
+const FakeReply = ({ onClick, className }) => {
   const { data: me } = useMeQuery();
 
   return (
-    <FakeReplyRoot onClick={onClick}>
+    <FakeReplyRoot onClick={onClick} className={className}>
       <Avatar avatar={me?.avatar} />
       <InputField disabled placeholder="Comment here..." />
     </FakeReplyRoot>
@@ -185,10 +185,10 @@ const FakeReplyRoot = styled.div`
   background-color: ${(props) => props.theme.colors.white};
   padding-left: 10px;
   padding-right: 10px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  box-sizing: border-box;
+  width: 100%;
   gap: 10px;
-  height: 50%;
+  height: 50px;
   /* border-bottom: 2px solid ${(props) => props.theme.colors.grey}; */
 `;
 
@@ -205,11 +205,11 @@ export const Reply = (props) => {
   };
 
   return (
-    <ReplyRoot className={className}>
+    <ReplyRoot>
       <Modal onRequestClose={closeModal} isOpen={open}>
-        <FullReply {...props} handleClose={closeModal} />
+        <FullReply handleClose={closeModal} />
       </Modal>
-      <FakeReply onClick={toggleModal} />
+      <FakeReply className={className} onClick={toggleModal} />
     </ReplyRoot>
   );
 };

@@ -15,11 +15,14 @@ import { AccountSettings, CompleteOnboarding } from "./AccountSettings";
 import { Login } from "./Login";
 import { useMeQuery } from "../api/account";
 import toast from "react-hot-toast";
+import { Reply } from "./Reply";
 
 export const WithNavBar = ({ component }) => {
   const [logout] = useLogoutMutation();
 
   const { data: me, isLoading } = useMeQuery();
+
+  const { board } = useThread();
 
   const { is_onboarding } = me || {};
 
@@ -133,16 +136,26 @@ export const WithNavBar = ({ component }) => {
             <BoardDrawer isMobile={isMobile} fill={true} boards={boards} />
           </Modal>
         )}
-        <FixedWidth mobile={isMobile}>{component}</FixedWidth>
+        <FixedWidth mobile={isMobile}>
+          {!isMobile && board ? <Reply /> : null}
+          {component}
+          {isMobile && board ? <StyledReply mobile={isMobile} /> : null}
+        </FixedWidth>
       </Page>
     </BoardRoot>
   );
 };
 
+const StyledReply = styled(Reply)`
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+`;
+
 const FixedWidth = styled.div`
   margin: 0 auto;
   height: calc(
-    100vh - 40px - 8px - 2px
+    100vh - 40px - 8px - 2px - ${(props) => (props.mobile ? "58px" : "0px")}
   ); //full height - fixed navbar height - fixed navbar padding - border)
   overflow-y: scroll;
   border-left: ${(props) => (!props.mobile ? "2" : "0")}px solid

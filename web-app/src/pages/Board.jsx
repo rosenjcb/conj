@@ -28,9 +28,7 @@ export const BoardPage = () => {
 
   return (
     <BoardRoot>
-      {!isMobile ? <HomeReply mobile={isMobile} /> : null}
       <ThreadPreview threads={threads} board={board} />
-      {isMobile ? <HomeReply mobile={isMobile} /> : null}
     </BoardRoot>
   );
 };

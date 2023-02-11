@@ -194,7 +194,7 @@ export const Post = (props) => {
         </Modal>
       ) : null}
       <Modal isOpen={enlargeAvatar} onRequestClose={closeAvatar}>
-        <Avatar src={avatar}></Avatar>
+        {avatar ? <ModalImage src={avatar} /> : <AnonymousAvatar />}
       </Modal>
       <Modal
         isOpen={expandDeleteDialog}

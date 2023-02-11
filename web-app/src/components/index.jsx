@@ -349,7 +349,7 @@ export const InputField = (props) => {
 
   return (
     <InputFieldRoot>
-      <Label>{label}</Label>
+      {label ? <Label>{label}</Label> : null}
       <TextField
         type={type}
         name={type}
