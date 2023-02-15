@@ -193,11 +193,22 @@ const sizeCompute = (tag, size) => {
   return res;
 };
 
-const computeColor = (colors, selectedColor) => {
+interface Colors {
+  black: string;
+}
+
+const computeColor = (colors: any, selectedColor: string) => {
   return colors[selectedColor] ?? colors["black"];
 };
 
-export const Text = styled.p`
+export interface TextProps {
+  bold?: boolean;
+  size?: string;
+  align?: string;
+  noOverflow?: boolean;
+}
+
+export const Text = styled.p<TextProps>`
   font-weight: ${(props) => (props.bold ? 700 : 500)};
   font-size: ${(props) =>
     props.size ? sizeCompute("p", props.size) : sizeCompute("p", "medium")};

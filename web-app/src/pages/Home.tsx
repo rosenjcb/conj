@@ -4,17 +4,14 @@ import axios from "axios";
 import * as _ from "lodash";
 import { Thread } from "../components/Thread";
 import { HR } from "../components";
+import { useFetchThreadsQuery } from "../api/thread";
 
 export function Home() {
-  const [threads, setThreads] = useState([]);
+  const { data: threads, isLoading } = useFetchThreadsQuery("");
 
-  useEffect(() => {
-    async function fetchThreads() {
-      const res = await axios.get("/threads");
-      setThreads(res.data);
-    }
-    fetchThreads();
-  }, []);
+  if (isLoading) {
+    return <div>loading???</div>;
+  }
 
   return (
     <HomeRoot>

@@ -50,7 +50,7 @@ function App() {
                 <WithNavBar component={<BoardPage />} />
               </Route>
               <Route path="/boards/:board/thread/:id">
-                <WithNavBar component={<ThreadPage preview={true} />} />
+                <WithNavBar component={<ThreadPage />} />
               </Route>
               <Route exact path="/about">
                 <AboutPage />
