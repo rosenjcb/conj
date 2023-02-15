@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
 import { Thread } from "../components/Thread";
 import { useThread } from "../hooks/useThread";
@@ -11,15 +11,15 @@ export function ThreadPage() {
 
   const { board, threadNo, replyNo } = useThread();
 
-  const threadRef = useRef([]);
+  const threadRef = useRef<HTMLElement[]>([]);
 
-  const result = useFetchThreadQuery({ board, threadNo });
-  const { data: current } = result;
+  const { data: current } = useFetchThreadQuery({ board, threadNo });
 
   //This stuff is broken and needs to be fixed.
   const replyIndex =
-    replyNo && current ? current.findIndex((p) => p.id === replyNo) : null;
-  const lastPostRef = threadRef.current[current?.length ?? 0 - 1];
+    replyNo && current ? current.findIndex((p: any) => p.id === replyNo) : null;
+
+  const lastPostRef = threadRef.current[(current?.length ?? 1) - 1];
 
   //when post link is clicked
   useEffect(() => {
