@@ -3,12 +3,12 @@
   "name": "Conj",
   "icons": [
     {
-      "src": "logo192.png",
+      "src": "app.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "app.png",
       "type": "image/png",
       "sizes": "512x512"
     }
