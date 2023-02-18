@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 import { Formik, Field } from "formik";
 import { RoundButton, InputField, InputFile } from "./index";
@@ -10,7 +9,16 @@ import {
 import toast from "react-hot-toast";
 import chroma from "chroma-js";
 
-export function AccountSettings({ onFinish }) {
+export interface AccountSettingsProps {
+  onFinish(): any;
+}
+
+interface FormValues {
+  username: string | null;
+  avatar: Blob | null;
+}
+
+export function AccountSettings({ onFinish }: AccountSettingsProps) {
   const [updateMe] = useUpdateMeMutation();
 
   const { data: me, error } = useMeQuery();
@@ -39,16 +47,15 @@ export function AccountSettings({ onFinish }) {
     }
   };
 
+  const initialValues: FormValues = {
+    username: null,
+    avatar: null,
+  };
+
   return (
     <Root>
       {me ? (
-        <Formik
-          initialValues={{
-            username: null,
-            avatar: null,
-          }}
-          onSubmit={handleUpdate}
-        >
+        <Formik initialValues={initialValues} onSubmit={handleUpdate}>
           {(props) => (
             <StyledForm onSubmit={props.handleSubmit}>
               <ContentDetails>
@@ -87,7 +94,7 @@ export function CompleteOnboarding() {
     }
   }
 
-  const handleSubmit = async (values, actions) => {
+  const handleSubmit = async (values: any, actions: any) => {
     try {
       actions.setSubmitting(false);
       var formData = new FormData();
@@ -98,7 +105,7 @@ export function CompleteOnboarding() {
       }
       await finishOnboarding(formData).unwrap();
       toast.success("Welcome to Conj!");
-    } catch (e) {
+    } catch (e: any) {
       if (e.data) toast.error(e.data);
     }
   };

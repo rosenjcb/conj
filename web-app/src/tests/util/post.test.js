@@ -39,7 +39,7 @@ test("Arrows mid line should not create green text", () => {
   const result = processPostText(200, middleArrow);
   const expected = (
     <Root>
-      <span>this is not a greentext but saints > patriots</span>
+      <span>this is not a greentext but saints {">"} patriots</span>
     </Root>
   );
   expect(result.toString()).toEqual(expected.toString());

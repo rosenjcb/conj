@@ -1,4 +1,4 @@
-import styled, { ThemeProvider } from "styled-components";
+import styled, { DefaultTheme, ThemeProvider } from "styled-components";
 import {
   BrowserRouter as Router,
   Switch,
@@ -14,7 +14,7 @@ import { Toaster } from "react-hot-toast";
 import chroma from "chroma-js";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-export const theme = {
+export const theme: DefaultTheme = {
   colors: {
     primary: "#512B8F",
     accent: "#FFC75F",
