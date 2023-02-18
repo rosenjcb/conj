@@ -31,7 +31,7 @@ export function AccountSettings({ onFinish }: AccountSettingsProps) {
     }
   }
 
-  const handleUpdate = async (values, actions) => {
+  const handleUpdate = async (values: any, actions: any) => {
     try {
       actions.setSubmitting(false);
       var formData = new FormData();
@@ -42,7 +42,7 @@ export function AccountSettings({ onFinish }: AccountSettingsProps) {
       }
       await updateMe(formData).unwrap();
       onFinish();
-    } catch (e) {
+    } catch (e: any) {
       if (e.data) toast.error(e.data);
     }
   };
