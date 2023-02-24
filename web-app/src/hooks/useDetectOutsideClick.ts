@@ -1,13 +1,16 @@
-import { useEffect } from "react";
+import { RefObject, useEffect } from "react";
 
-export function useDetectOutsideClick(ref, closeFn) {
+export function useDetectOutsideClick(
+  ref: RefObject<HTMLElement>,
+  closeFn: () => any
+) {
   useEffect(() => {
     /**
      * Close if clicked on outside of element
      */
     // [...ref.current.children].any(r => r.current.contains(event.target))
-    function handleClickOutside(event) {
-      if (ref.current && !ref.current.contains(event.target)) {
+    function handleClickOutside(event: MouseEvent) {
+      if (ref && ref.current && !ref.current.contains(event.target as Node)) {
         // console.log("You clicked outside of me!");
         closeFn();
       }

@@ -7,7 +7,6 @@ import {
   useFinishOnboardingMutation,
 } from "../api/account";
 import toast from "react-hot-toast";
-import chroma from "chroma-js";
 
 export interface AccountSettingsProps {
   onFinish(): any;
@@ -23,12 +22,10 @@ export function AccountSettings({ onFinish }: AccountSettingsProps) {
 
   const { data: me, error } = useMeQuery();
 
-  if (error) {
-    if (error.data) {
-      toast.error(error.data);
-    } else {
-      toast.error("Something unexpected went wrong");
-    }
+  const safeError = error as any;
+
+  if (error && "status" in safeError) {
+    toast.error(JSON.stringify(safeError.data));
   }
 
   const handleUpdate = async (values: any, actions: any) => {
@@ -86,12 +83,10 @@ export function CompleteOnboarding() {
 
   const { data: me, error } = useMeQuery();
 
-  if (error) {
-    if (error.data) {
-      toast.error(error.data);
-    } else {
-      toast.error("Something unexpected went wrong");
-    }
+  const safeError = error as any;
+
+  if (error && "status" in safeError) {
+    toast.error(JSON.stringify(safeError.data));
   }
 
   const handleSubmit = async (values: any, actions: any) => {
@@ -191,7 +186,7 @@ const SquareButton = styled.button`
 
 const Root = styled.div`
   margin: 0 auto;
-  background-color: ${(props) => chroma(props.theme.colors.white)};
+  background-color: ${(props) => props.theme.colors.white};
   text-align: center;
   border-radius: 8px;
   width: 400px;

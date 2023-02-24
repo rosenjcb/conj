@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { Thread } from "../types";
 
 export interface FetchThreads {
   board: string;
@@ -29,26 +30,12 @@ export interface UpdateThread {
   post: FormData;
 }
 
-export interface Image {
-  filename: string;
-  location: string;
-}
-
-export interface Post {
-  id: number;
-  image: Image | null;
-  is_anonymous?: boolean;
-  subject: string;
-  comment: string;
-  time: string;
-}
-
 export const threadApi = createApi({
   reducerPath: "threadApi",
   baseQuery: fetchBaseQuery({ baseUrl: "/api/boards" }),
   tagTypes: ["Thread", "Threads"],
   endpoints: (builder) => ({
-    createThread: builder.mutation<Post[], CreateThread>({
+    createThread: builder.mutation<Thread, CreateThread>({
       query: ({ board, post }) => ({
         method: "POST",
         url: `/${board}`,
@@ -56,7 +43,7 @@ export const threadApi = createApi({
       }),
       invalidatesTags: ["Threads"],
     }),
-    updateThread: builder.mutation<Post[], UpdateThread>({
+    updateThread: builder.mutation<Thread, UpdateThread>({
       query: ({ board, threadNo, post }) => ({
         method: "PUT",
         url: `/${board}/threads/${threadNo}`,
@@ -64,14 +51,14 @@ export const threadApi = createApi({
       }),
       invalidatesTags: ["Thread"],
     }),
-    fetchThread: builder.query<Post[], any>({
+    fetchThread: builder.query<Thread, any>({
       query: ({ board, threadNo }) => ({
         method: "GET",
         url: `/${board}/threads/${threadNo}`,
       }),
       providesTags: ["Thread"],
     }),
-    fetchThreads: builder.query<Post[], FetchThreads>({
+    fetchThreads: builder.query<Thread[], string>({
       query: (board) => ({
         method: "GET",
         url: `/${board}`,

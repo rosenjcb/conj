@@ -1,5 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+interface PostState {
+  subject: string;
+  comment: string;
+  image: string | null;
+  hidden: boolean;
+  threadNo: number | null;
+  is_anonymous: boolean;
+}
+
 const initialState = {
   subject: "",
   comment: "",
@@ -7,7 +16,7 @@ const initialState = {
   hidden: true,
   threadNo: null,
   is_anonymous: false,
-};
+} as PostState;
 
 export const postSlice = createSlice({
   name: "post",

@@ -5,7 +5,7 @@ export const boardsApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: "/api/boards" }),
   tagTypes: ["Boards"],
   endpoints: (builder) => ({
-    fetchBoards: builder.query({
+    fetchBoards: builder.query<string[], void>({
       query: () => ({
         method: "GET",
         url: "",

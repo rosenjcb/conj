@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 
-export function useComponentVisible(initialIsVisible) {
+export function useComponentVisible(initialIsVisible: boolean) {
   const [isComponentVisible, setIsComponentVisible] =
     useState(initialIsVisible);
-  const ref = useRef(null);
+  const ref = useRef<HTMLElement>(null);
 
-  const handleClickOutside = (event) => {
-    if (ref.current && !ref.current.contains(event.target)) {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (ref.current && !ref.current.contains(event.target as Node)) {
       setIsComponentVisible(false);
     }
   };

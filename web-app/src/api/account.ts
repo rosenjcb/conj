@@ -1,13 +1,15 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import _ from "lodash";
+import { Account } from "../types";
 
-const fetchBaseQueryDefault = (queryOptions) => {
+const fetchBaseQueryDefault = (queryOptions: any) => {
   const baseQuery = fetchBaseQuery(queryOptions);
-  return async (args, api, extraOptions) => {
+  return async (args: any, api: any, extraOptions: any) => {
     const result = await baseQuery(args, api, extraOptions);
     const isMeQuery = args.url === "me" && args.method === "GET";
     if (result.error && isMeQuery) {
-      delete result.error;
-      return { ...result, data: null };
+      const final = { ...result, data: null };
+      return _.omit(final, "error");
     }
     return result;
   };
@@ -18,7 +20,7 @@ export const meApi = createApi({
   baseQuery: fetchBaseQueryDefault({ baseUrl: "/api/" }),
   tagTypes: ["Me"],
   endpoints: (builder) => ({
-    me: builder.query({
+    me: builder.query<Account, void>({
       query: () => ({
         method: "GET",
         url: "me",

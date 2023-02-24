@@ -1,43 +1,49 @@
-import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Text } from "../components";
-import { Thread } from "../components/Thread";
+import { Thread as ThreadComponent } from "../components/Thread";
 import * as _ from "lodash";
 import { useFetchThreadsQuery } from "../api/thread";
 import toast from "react-hot-toast";
 import { useThread } from "../hooks/useThread";
+import { Thread } from "../types";
 
 export const BoardPage = () => {
   const { board } = useThread();
 
-  const { data: threads, error, isLoading } = useFetchThreadsQuery(board);
+  const { data: threads, error, isLoading } = useFetchThreadsQuery(board ?? "");
 
-  useEffect(() => {
-    if (error) {
-      toast.error(error.data);
-    }
-  }, [error]);
+  if (error && "status" in error) {
+    toast.error(JSON.stringify(error.data));
+  }
 
-  if (isLoading) {
+  if (isLoading || !threads) {
     return <div />;
   }
 
   return (
     <BoardRoot>
-      <ThreadPreview threads={threads} board={board} />
+      <ThreadPreview threads={threads} board={board ?? ""} />
     </BoardRoot>
   );
 };
 
-const ThreadPreview = (props) => {
-  const { threads, board } = props;
+interface ThreadPreviewProps {
+  threads: Thread[];
+  board: string;
+}
 
+const ThreadPreview = ({ threads, board }: ThreadPreviewProps) => {
   return (
     <ThreadPreviewRoot>
       {threads && threads.length > 0 ? (
         _.orderBy(threads, (o) => o[o.length - 1].id, ["desc"]).map(
           (thread, index) => (
-            <Thread board={board} key={index} preview={true} thread={thread} />
+            <ThreadComponent
+              board={board}
+              key={index}
+              preview={true}
+              thread={thread}
+            />
           )
         )
       ) : (

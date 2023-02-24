@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import styled from "styled-components";
 import { Formik, Form, Field } from "formik";
 import {
@@ -9,7 +9,7 @@ import {
   Avatar,
   InputField,
 } from "./index";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { updateEntry, resetPost } from "../slices/postSlice";
 import {
@@ -23,11 +23,18 @@ import { useThread } from "../hooks/useThread";
 import { Login } from "./Login";
 import { useMeQuery } from "../api/account";
 import _ from "lodash";
+import { useAppSelector } from "../store";
 
-const FullReply = (props) => {
+interface FullReplyProps {
+  className?: string;
+  isNewThread?: boolean;
+  handleClose: () => void;
+}
+
+const FullReply = (props: FullReplyProps) => {
   const { className, isNewThread, handleClose } = props;
 
-  const post = useSelector((state) => state.post);
+  const post = useAppSelector((state) => state.post);
 
   const { board, threadNo } = useThread();
 
@@ -36,9 +43,14 @@ const FullReply = (props) => {
 
   const dispatch = useDispatch();
 
-  const handleChange = (formikHandler, e, key) => {
+  const handleChange = (
+    formikHandler: (x: any) => void,
+    e: SyntheticEvent,
+    key: string
+  ) => {
+    const target = e.target as HTMLInputElement;
     formikHandler(e);
-    dispatch(updateEntry({ key: key, value: e.target.value }));
+    dispatch(updateEntry({ key: key, value: target }));
   };
 
   const [loading, setLoading] = useState(false);
