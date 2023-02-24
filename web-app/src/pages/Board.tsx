@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Text } from "../components";
-import { Thread as ThreadComponent } from "../components/Thread";
+import { ThreadView } from "../components/Thread";
 import * as _ from "lodash";
 import { useFetchThreadsQuery } from "../api/thread";
 import toast from "react-hot-toast";
@@ -38,7 +38,7 @@ const ThreadPreview = ({ threads, board }: ThreadPreviewProps) => {
       {threads && threads.length > 0 ? (
         _.orderBy(threads, (o) => o[o.length - 1].id, ["desc"]).map(
           (thread, index) => (
-            <ThreadComponent
+            <ThreadView
               board={board}
               key={index}
               preview={true}

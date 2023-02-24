@@ -6,7 +6,7 @@ import { SpanText } from "../components";
 const reHash = /#[1-9]\d*\b/g;
 const reNewLine = /\r?\n/g;
 
-const processLine = (opNo, line) => {
+const processLine = (opNo: number, line: string) => {
   if (line === "") return <span key={opNo} />;
   if (line[0] === ">") return <GreenText>{line}</GreenText>;
   const matches = line.match(reHash);
@@ -26,7 +26,7 @@ const processLine = (opNo, line) => {
   return res;
 };
 
-export const processPostText = (opNo, text) => {
+export const processPostText = (opNo: number, text: string) => {
   const textTrim = text.trim();
   const lines = textTrim.split(reNewLine);
 

@@ -1,6 +1,6 @@
-import { SyntheticEvent, useState } from "react";
+import { ChangeEvent, SyntheticEvent, useState } from "react";
 import styled from "styled-components";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, FormikHelpers } from "formik";
 import {
   Checkbox,
   RoundButton,
@@ -11,7 +11,7 @@ import {
 } from "./index";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { updateEntry, resetPost } from "../slices/postSlice";
+import { updateEntry, resetPost, PostState } from "../slices/postSlice";
 import {
   useCreateThreadMutation,
   useUpdateThreadMutation,
@@ -50,14 +50,17 @@ const FullReply = (props: FullReplyProps) => {
   ) => {
     const target = e.target as HTMLInputElement;
     formikHandler(e);
-    dispatch(updateEntry({ key: key, value: target }));
+    dispatch(updateEntry({ key: key, value: target.value }));
   };
 
   const [loading, setLoading] = useState(false);
 
   const history = useHistory();
 
-  const submitPost = async (values, actions) => {
+  const submitPost = async (
+    values: PostState,
+    actions: FormikHelpers<PostState>
+  ) => {
     try {
       setLoading(true);
       const req = _.pick(
@@ -70,24 +73,29 @@ const FullReply = (props: FullReplyProps) => {
       );
       var formData = new FormData();
       for (let [key, val] of Object.entries(req)) {
-        if (val !== null) formData.append(key, val);
+        const stringified = val instanceof Blob ? val : JSON.stringify(val);
+        if (val !== null) formData.append(key, stringified);
       }
-      if (threadNo !== null) {
+      if (threadNo !== null && board !== null) {
         await updateThread({
           board,
           threadNo,
           post: formData,
         }).unwrap();
       } else {
-        const res = await createThread({ board, post: formData }).unwrap();
-        const op = res[0];
-        const newPost = res[res.length - 1];
-        history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
+        if (board !== null) {
+          const res = await createThread({ board, post: formData }).unwrap();
+          const op = res[0];
+          const newPost = res[res.length - 1];
+          history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);
+        }
       }
       dispatch(resetPost());
-    } catch (e) {
+    } catch (e: any) {
       // console.log("uh woops");
-      if (e.data) toast.error(e.data);
+      if (e && "status" in e) {
+        toast.error(JSON.stringify(e.data));
+      }
     } finally {
       handleClose();
       setLoading(false);
@@ -175,7 +183,12 @@ const FullReply = (props: FullReplyProps) => {
   }
 };
 
-const FakeReply = ({ onClick, className }) => {
+interface FakeReplyProps {
+  onClick: () => void;
+  className?: string;
+}
+
+const FakeReply = ({ onClick, className }: FakeReplyProps) => {
   const { data: me } = useMeQuery();
 
   return (
@@ -204,7 +217,11 @@ const FakeReplyRoot = styled.div`
   /* border-bottom: 2px solid ${(props) => props.theme.colors.grey}; */
 `;
 
-export const Reply = (props) => {
+interface ReplyProps {
+  className?: string;
+}
+
+export const Reply = (props: ReplyProps) => {
   const { className } = props;
   const [open, setOpen] = useState(false);
 
@@ -269,7 +286,11 @@ export const StyledForm = styled(Form)`
   gap: 1rem;
 `;
 
-const PreviewImage = ({ src }) => {
+interface PreviewImageProps {
+  src: string;
+}
+
+const PreviewImage = ({ src }: PreviewImageProps) => {
   const dispatch = useDispatch();
 
   const handleClick = () => {
@@ -286,11 +307,19 @@ const PreviewImage = ({ src }) => {
   );
 };
 
-const UploadImage = ({ disabled }) => {
+interface UploadImageProps {
+  disabled: boolean;
+}
+
+const UploadImage = ({ disabled }: UploadImageProps) => {
   const dispatch = useDispatch();
 
-  const handlePick = (e) => {
-    dispatch(updateEntry({ key: "image", value: e.target.files[0] }));
+  const handlePick = (e: ChangeEvent) => {
+    const input = e.target as HTMLInputElement;
+
+    if (input.files?.length) {
+      dispatch(updateEntry({ key: "image", value: input.files[0] }));
+    }
   };
 
   return (

@@ -24,10 +24,9 @@ export function Login({ completeAction }: LoginProps) {
         redirectUri: "postmessage",
       }).unwrap();
       if (account?.is_onboarding === false) toast.success("Welcome Back!");
-    } catch (e) {
-      const safeError = e as any;
-      if (safeError && "status" in safeError) {
-        toast.error(JSON.stringify(safeError.data));
+    } catch (e: any) {
+      if (e && "status" in e) {
+        toast.error(JSON.stringify(e.data));
       }
     } finally {
       completeAction();

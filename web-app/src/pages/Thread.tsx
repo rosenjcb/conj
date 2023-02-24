@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components";
-import { Thread } from "../components/Thread";
+import { ThreadView } from "../components/Thread";
 import { useThread } from "../hooks/useThread";
 import { useFetchThreadQuery } from "../api/thread";
 
@@ -42,9 +42,13 @@ export function ThreadPage() {
     return <div>Loading???</div>;
   }
 
+  if (board === null) {
+    return <div>Can't find the board</div>;
+  }
+
   return (
     <Root>
-      <Thread
+      <ThreadView
         replyIndex={replyIndex}
         threadRef={threadRef}
         preview={false}

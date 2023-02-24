@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-interface PostState {
+export interface PostState {
   subject: string;
   comment: string;
-  image: string | null;
+  image: Blob | null;
   hidden: boolean;
   threadNo: number | null;
   is_anonymous: boolean;

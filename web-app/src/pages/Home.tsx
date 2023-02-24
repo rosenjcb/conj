@@ -1,16 +1,21 @@
-import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import axios from "axios";
 import * as _ from "lodash";
-import { Thread } from "../components/Thread";
+import { ThreadView } from "../components/Thread";
 import { HR } from "../components";
 import { useFetchThreadsQuery } from "../api/thread";
+import { useThread } from "../hooks/useThread";
 
 export function Home() {
   const { data: threads, isLoading } = useFetchThreadsQuery("");
 
+  const { board } = useThread();
+
   if (isLoading) {
     return <div>loading???</div>;
+  }
+
+  if (!board) {
+    return <div>Not even sure how you got here.</div>;
   }
 
   return (
@@ -19,7 +24,7 @@ export function Home() {
         {_.orderBy(threads, (o) => o[o.length - 1].id, ["desc"]).map(
           (thread, index) => (
             <div key={index}>
-              <Thread preview={true} thread={thread} />
+              <ThreadView board={board} preview={true} thread={thread} />
               <HR />
             </div>
           )

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import chroma from "chroma-js";
 import { BsFillPersonFill } from "react-icons/bs";
 import { BiArrowBack } from "react-icons/bi";
-import { useState } from "react";
+import { InputHTMLAttributes, useState } from "react";
 import ReactModal from "react-modal";
 
 interface ModalBaseProps {
@@ -207,6 +207,7 @@ export interface TextProps {
   align?: string;
   noOverflow?: boolean;
   color?: string;
+  width?: string;
 }
 
 export const Text = styled.p<TextProps>`
@@ -216,7 +217,7 @@ export const Text = styled.p<TextProps>`
   text-align: ${(props) => props.align ?? "left"};
   font-family: "Inter", arial, sans-serif;
   color: ${(props) => computeColor(props.theme.colors, props.color)};
-  width: 100%;
+  width: ${(props) => props.width ?? "100%"};
   padding: 0;
   margin: 0;
   overflow-wrap: ${(props) => (props.noOverflow ? "initial" : "break-word")};
@@ -326,7 +327,7 @@ const ExistingAvatar = styled.img`
 `;
 
 interface AvatarProps {
-  avatar: string;
+  avatar?: string | null;
   onClick?(): void;
 }
 
@@ -356,8 +357,8 @@ export const Link = styled.a`
 interface CheckboxProps {
   label?: string;
   onChange(): void;
-  checked: boolean;
-  disabled: boolean;
+  checked?: boolean;
+  disabled?: boolean;
 }
 
 export const Checkbox = ({
@@ -382,13 +383,13 @@ export const Checkbox = ({
   );
 };
 
-interface InputFieldProps {
+interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   type?: string;
-  form: any;
+  form?: any;
   secret?: boolean;
   autocomplete?: boolean;
-  field: any;
+  field?: any;
 }
 
 export const InputField = (props: InputFieldProps) => {

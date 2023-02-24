@@ -1,9 +1,8 @@
-import React from "react";
 import styled from "styled-components";
 import Helmet from "react-helmet";
 import { Text, Header } from "../components";
 import { Login } from "../components/Login";
-import { Thread } from "../components/Thread";
+import { ThreadView } from "../components/Thread";
 import { detectMobile } from "../util/window";
 
 const exampleThread = [
@@ -41,11 +40,11 @@ export function AboutPage() {
         <Info
           reverse
           text={threadText}
-          component={<Thread preview={true} thread={exampleThread} />}
+          component={<ThreadView preview={true} thread={exampleThread} />}
         />
         <Info
           text="epsum lorem lololo"
-          component={<Thread preview={true} thread={exampleThread} />}
+          component={<ThreadView preview={true} thread={exampleThread} />}
         />
       </DetailsContainer>
       <Login />

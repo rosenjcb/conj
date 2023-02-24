@@ -35,9 +35,11 @@ export interface Post {
   id: number;
   image: Image | null;
   is_anonymous?: boolean;
-  subject: string;
+  subject: string | null;
   comment: string;
   time: string;
+  username: string;
+  avatar: string | null;
 }
 
 export type Thread = Post[];

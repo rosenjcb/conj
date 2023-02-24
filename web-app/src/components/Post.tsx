@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef, ReactNode, Ref } from "react";
 import styled from "styled-components";
 import {
   Text,
@@ -20,8 +20,15 @@ import { useDeleteThreadMutation } from "../api/thread";
 import { toast } from "react-hot-toast";
 import * as _ from "lodash";
 import { useMeQuery } from "../api/account";
+import { Post } from "../types";
 
-const WithText = ({ direction, component, text }) => {
+interface WithTextProps {
+  direction: string;
+  component: ReactNode | string;
+  text: string;
+}
+
+const WithText = ({ direction, component, text }: WithTextProps) => {
   return (
     <WithTextRoot direction={direction}>
       {component}
@@ -30,11 +37,11 @@ const WithText = ({ direction, component, text }) => {
   );
 };
 
-const handlePostDate = (time) => {
+const handlePostDate = (time: string) => {
   const now = new Date();
   const then = new Date(time);
 
-  const hours = Math.abs(now - then) / 36e5;
+  const hours = Math.abs(now.getTime() - then.getTime()) / 36e5;
 
   if (hours < 24) {
     if (hours < 1) {
@@ -57,9 +64,19 @@ const handlePostDate = (time) => {
   }
 };
 
-const DeleteDialog = (props) => {
-  const { board, threadNo, replyNo, closeAction } = props;
+interface DeleteDialogProps {
+  board: string;
+  threadNo: number;
+  replyNo?: number | null;
+  closeAction: () => any;
+}
 
+const DeleteDialog = ({
+  board,
+  threadNo,
+  replyNo,
+  closeAction,
+}: DeleteDialogProps) => {
   const { data: me } = useMeQuery();
 
   const [banUser, setBanUser] = useState(false);
@@ -83,8 +100,8 @@ const DeleteDialog = (props) => {
       await deleteThread(deleteReq).unwrap();
       // console.log(JSON.stringify(deleteReq, null, 2));
       toast.success(`Successfully deleted Post #${replyNo ?? threadNo}`);
-    } catch (e) {
-      toast.error(e.data);
+    } catch (e: any) {
+      if (e && "status" in e) toast.error(e.data);
     } finally {
       closeAction();
     }
@@ -127,7 +144,25 @@ const DeleteDialogRoot = styled.div`
   gap: 10px;
 `;
 
-export const Post = (props) => {
+interface PostProps {
+  post: Post;
+  handleRef?: Ref<any>;
+  preview: boolean;
+  replyCount: number;
+  opNo: number;
+  board: string;
+  highlight?: boolean;
+  lastPost?: boolean;
+}
+
+export const PostView = ({
+  post,
+  handleRef,
+  preview,
+  replyCount,
+  opNo,
+  board,
+}: PostProps) => {
   const [enlargePostImage, setEnlargePostImage] = useState(false);
 
   const dispatch = useDispatch();
@@ -150,13 +185,11 @@ export const Post = (props) => {
     setEnlargeAvatar(false);
   };
 
-  const { post, handleRef, preview, replyCount, opNo, board } = props;
-
   const { username, subject, id, comment, image, time, avatar } = post;
 
   const isOriginalPost = opNo === id;
 
-  const handleClick = (e) => {
+  const handleClick = (e: any) => {
     e.preventDefault();
     dispatch(insertPostLink(id));
   };
@@ -204,7 +237,6 @@ export const Post = (props) => {
         <DeleteDialog
           board={board}
           threadNo={opNo}
-          postId={id}
           replyNo={!isOriginalPost ? id : null}
           closeAction={closeDeleteDialog}
         />
@@ -263,7 +295,7 @@ export const Post = (props) => {
                 </ThreadLink>
               }
               direction="row"
-              text={replyCount}
+              text={JSON.stringify(replyCount)}
             />
           ) : null}
         </ActionsContainer>
@@ -272,7 +304,11 @@ export const Post = (props) => {
   );
 };
 
-const WithTextRoot = styled.div`
+interface WithTextRootProps {
+  direction?: string;
+}
+
+const WithTextRoot = styled.div<WithTextRootProps>`
   display: flex;
   flex-direction: ${(props) => props.direction ?? "row"};
   color: ${(props) => props.theme.colors.black};
@@ -289,7 +325,11 @@ const MessageDetail = styled(BiMessageDetail)`
   height: 24px;
 `;
 
-const OptionsDiv = styled.div`
+interface OptionsDivProps {
+  expand?: boolean;
+}
+
+const OptionsDiv = styled.div<OptionsDivProps>`
   display: flex;
   justify-content: flex-start;
   flex-direction: row;

@@ -7,15 +7,15 @@ export interface FetchThreads {
 
 export interface FetchThread {
   board: string;
-  threadNo: string;
+  threadNo: number;
 }
 
 export interface DeleteThread {
   board: string;
-  threadNo: string;
+  threadNo: number;
   params: {
     ban?: boolean;
-    postNo?: string;
+    postNo?: number;
   };
 }
 
@@ -26,7 +26,7 @@ export interface CreateThread {
 
 export interface UpdateThread {
   board: string;
-  threadNo: string;
+  threadNo: number;
   post: FormData;
 }
 
