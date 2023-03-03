@@ -1,5 +1,4 @@
-import React from "react";
-import styled, { ThemeProvider } from "styled-components";
+import styled, { DefaultTheme, ThemeProvider } from "styled-components";
 import {
   BrowserRouter as Router,
   Switch,
@@ -8,7 +7,6 @@ import {
 } from "react-router-dom";
 import Helmet from "react-helmet";
 import { ThreadPage } from "./pages/Thread";
-import { useSelector } from "react-redux";
 import { WithNavBar } from "./components/NavBar";
 import { AboutPage } from "./pages/About";
 import { BoardPage } from "./pages/Board";
@@ -16,7 +14,7 @@ import { Toaster } from "react-hot-toast";
 import chroma from "chroma-js";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
-export const theme = {
+export const theme: DefaultTheme = {
   colors: {
     primary: "#512B8F",
     accent: "#FFC75F",
@@ -35,8 +33,6 @@ const clientId =
   "602129467689-pe4l4im2nr62t14ae50quc1uj2dd5um1.apps.googleusercontent.com";
 
 function App() {
-  const thread = useSelector((state) => state.thread);
-
   return (
     <ThemeProvider theme={theme}>
       <GoogleOAuthProvider clientId={clientId}>
@@ -54,9 +50,7 @@ function App() {
                 <WithNavBar component={<BoardPage />} />
               </Route>
               <Route path="/boards/:board/thread/:id">
-                <WithNavBar
-                  component={<ThreadPage preview={true} thread={thread} />}
-                />
+                <WithNavBar component={<ThreadPage />} />
               </Route>
               <Route exact path="/about">
                 <AboutPage />

@@ -1,8 +1,17 @@
-import React from "react";
-import { Post } from "./Post";
+import { PostView } from "./Post";
 import styled from "styled-components";
+import { Thread } from "../types";
+import { RefObject } from "react";
 
-export function Thread(props) {
+interface ThreadProps {
+  preview: boolean;
+  thread: Thread;
+  threadRef?: RefObject<any>;
+  replyIndex?: number | undefined | null;
+  board: string;
+}
+
+export function ThreadView(props: ThreadProps) {
   const { preview, thread, threadRef, replyIndex, board } = props;
 
   const op = thread[0];
@@ -10,7 +19,7 @@ export function Thread(props) {
   if (preview) {
     return (
       <Root>
-        <Post
+        <PostView
           replyCount={thread.length - 1}
           preview={true}
           post={op}
@@ -22,20 +31,20 @@ export function Thread(props) {
     );
   }
 
-  const showHighlight = (index) =>
+  const showHighlight = (index: number) =>
     replyIndex === index && index < thread.length - 1;
 
   return (
     <Root>
       {thread && thread.length > 0 && threadRef && threadRef.current
         ? thread.map((post, index) => (
-            <Post
+            <PostView
               replyCount={thread.length - 1}
               preview={false}
               highlight={showHighlight(index)}
               opNo={op.id}
               lastPost={index === thread.length - 1}
-              handleRef={(el) => (threadRef.current[index] = el)}
+              handleRef={(el: HTMLElement) => (threadRef.current[index] = el)}
               key={post.id}
               post={post}
               board={board}

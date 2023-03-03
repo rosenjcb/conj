@@ -6,6 +6,7 @@
             [clojure.tools.logging :as log]
             [clojure.tools.logging.impl :as log-impl]
             [cognitect.aws.client.api :as aws]
+            [cognitect.aws.credentials :as credentials]
             [com.stuartsierra.component :as component]
             [compojure.core :refer :all]
             [environ.core :refer [env]]
@@ -36,6 +37,8 @@
    :redis-port (env :redis-port)
    :google-client-id (env :google-client-id)
    :google-client-secret (env :google-client-secret)
+   :aws-access-key (env :aws-access-key)
+   :aws-access-secret (env :aws-access-secret)
    :env (env :env)})
 
 (defn app-middleware [handler state]
@@ -106,8 +109,11 @@
 
 (defn system [config]
   (let [{:keys [db-host db-port db-name db-user db-pass port redis-host redis-port passphrase
-                google-client-id google-client-secret env]} config
-        s3-client (aws/client {:api :s3 :region :us-west-2})
+                google-client-id google-client-secret env
+                aws-access-key aws-access-secret]} config
+        s3-creds (when (every? some? [aws-access-key aws-access-secret])
+                  (credentials/basic-credentials-provider {:access-key-id aws-access-key :secret-access-key aws-access-secret}))
+        s3-client (aws/client {:api :s3 :region :us-west-2 :credentials-provider s3-creds})
         db-spec {:dbtype "postgresql" :host db-host :port db-port :dbname db-name :username db-user :password db-pass}
         redis-conn {:pool redis-conn-pool :spec {:uri (str "redis://" redis-host ":" redis-port)}}]
     (component/system-map

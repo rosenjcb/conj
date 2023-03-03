@@ -1,10 +1,17 @@
-import PropTypes from "prop-types";
 import styled from "styled-components";
 import chroma from "chroma-js";
 import { BsFillPersonFill } from "react-icons/bs";
 import { BiArrowBack } from "react-icons/bi";
-import { useState } from "react";
+import { InputHTMLAttributes, useState } from "react";
 import ReactModal from "react-modal";
+
+interface ModalBaseProps {
+  children?: any;
+  isOpen: boolean;
+  onRequestClose(): any;
+  className?: string;
+  title?: string;
+}
 
 const ModalBase = ({
   children,
@@ -12,8 +19,7 @@ const ModalBase = ({
   onRequestClose,
   className,
   title,
-  noExit,
-}) => {
+}: ModalBaseProps) => {
   const contentClassName = `${className}__content`;
   const overlayClassName = `${className}__overlay`;
 
@@ -42,13 +48,11 @@ const ModalBase = ({
   );
 };
 
-ModalBase.propTypes = {
-  isOpen: PropTypes.bool,
-  onRequestClose: PropTypes.func,
-  title: PropTypes.string,
-};
+interface OffsetProps {
+  distance: string;
+}
 
-const Offset = styled.div`
+const Offset = styled.div<OffsetProps>`
   margin-right: ${(props) => props.distance};
 `;
 
@@ -127,7 +131,11 @@ export const Modal = styled(ModalBase)`
   }
 `;
 
-export const HR = styled.hr`
+interface HRProps {
+  width?: string;
+}
+
+export const HR = styled.hr<HRProps>`
   width: ${(props) => props.width ?? "100%"};
   border: none;
   height: 2px;
@@ -135,29 +143,14 @@ export const HR = styled.hr`
   border-radius: 8px;
 `;
 
-export const BoldTitle = styled.span`
-  font-size: 10pt;
-  text-align: center;
-  color: ${(props) => props.theme.primary};
-  font-family: ${(props) => props.theme.fontFamily};
-  font-weight: 700;
-`;
+export enum Size {
+  Small,
+  Medium,
+  Large,
+  Xlarge,
+}
 
-const pickColor = (rarity) => {
-  const colorMap = {
-    common: "grey",
-    uncommon: "green",
-    rare: "blue",
-    epic: "purple",
-  };
-  return colorMap[rarity] ?? "white";
-};
-
-export const RarityImage = styled.img`
-  border: 6px ridge ${(props) => pickColor(props.rarity)};
-`;
-
-const sizeCompute = (tag, size) => {
+const sizeCompute = (tag: string, size: string) => {
   let res = "1rem";
   let multiplier = 1;
   switch (tag) {
@@ -193,24 +186,43 @@ const sizeCompute = (tag, size) => {
   return res;
 };
 
-const computeColor = (colors, selectedColor) => {
-  return colors[selectedColor] ?? colors["black"];
+// interface Color {
+//   black: string
+// }
+
+const computeColor = (colors: any, selectedColor: string | undefined) => {
+  return colors[selectedColor ?? "black"];
 };
 
-export const Text = styled.p`
+export interface TextProps {
+  bold?: boolean;
+  size?: string;
+  align?: string;
+  noOverflow?: boolean;
+  color?: string;
+  width?: string;
+}
+
+export const Text = styled.p<TextProps>`
   font-weight: ${(props) => (props.bold ? 700 : 500)};
   font-size: ${(props) =>
     props.size ? sizeCompute("p", props.size) : sizeCompute("p", "medium")};
   text-align: ${(props) => props.align ?? "left"};
   font-family: "Inter", arial, sans-serif;
   color: ${(props) => computeColor(props.theme.colors, props.color)};
-  width: 100%;
+  width: ${(props) => props.width ?? "100%"};
   padding: 0;
   margin: 0;
   overflow-wrap: ${(props) => (props.noOverflow ? "initial" : "break-word")};
 `;
 
-export const SpanText = styled.span`
+interface SpanTextProps {
+  bold?: boolean;
+  size?: string;
+  align?: string;
+}
+
+export const SpanText = styled.span<SpanTextProps>`
   font-weight: ${(props) => (props.bold ? 700 : 500)};
   font-size: ${(props) =>
     props.size
@@ -221,7 +233,14 @@ export const SpanText = styled.span`
   color: ${(props) => computeColor(props.theme.colors, props.color)};
 `;
 
-export const Header = styled.h1`
+interface HeaderProps {
+  bold?: boolean;
+  align?: string;
+  color?: string;
+  size?: string;
+}
+
+export const Header = styled.h1<HeaderProps>`
   font-weight: ${(props) => (props.bold ? 700 : 500)};
   text-align: ${(props) => props.align ?? "center"};
   font-family: "Inter", arial, sans-serif;
@@ -232,10 +251,15 @@ export const Header = styled.h1`
     props.size ? sizeCompute("h1", props.size) : sizeCompute("h1", "medium")};
 `;
 
-export const RoundButton = styled.button`
-  color: ${(props) => chroma(props.theme.colors.white)};
+interface RoundButtonProps {
+  size?: string;
+  color?: string;
+}
+
+export const RoundButton = styled.button<RoundButtonProps>`
+  color: ${(props) => props.theme.colors.white};
   background-color: ${(props) =>
-    props.theme.colors[props.color] ?? props.theme.colors.primary};
+    props.color ? props.theme.colors[props.color] : props.theme.colors.primary};
   border: none;
   border-radius: 9000px;
   font-size: ${(props) =>
@@ -295,7 +319,12 @@ const ExistingAvatar = styled.img`
   }
 `;
 
-export const Avatar = ({ avatar, onClick }) => {
+interface AvatarProps {
+  avatar?: string | null;
+  onClick?(): void;
+}
+
+export const Avatar = ({ avatar, onClick }: AvatarProps) => {
   if (avatar) {
     return <ExistingAvatar onClick={onClick} src={avatar} />;
   } else {
@@ -318,7 +347,19 @@ export const Link = styled.a`
   color: ${(props) => props.theme.colors.black};
 `;
 
-export const Checkbox = ({ label, onChange, checked, disabled }) => {
+interface CheckboxProps {
+  label?: string;
+  onChange(): void;
+  checked?: boolean;
+  disabled?: boolean;
+}
+
+export const Checkbox = ({
+  label,
+  onChange,
+  checked,
+  disabled,
+}: CheckboxProps) => {
   return (
     <CheckBoxContainer>
       <StyledCheckbox
@@ -335,14 +376,23 @@ export const Checkbox = ({ label, onChange, checked, disabled }) => {
   );
 };
 
-export const InputField = (props) => {
+interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  type?: string;
+  form?: any;
+  secret?: boolean;
+  autocomplete?: boolean;
+  field?: any;
+}
+
+export const InputField = (props: InputFieldProps) => {
   const { label, field, form, secret } = props;
 
   const type = props.type ?? "text";
 
   const autocomplete = props.autocomplete ?? "false";
 
-  const handleChange = (e) => {
+  const handleChange = (e: any) => {
     e.preventDefault();
     form.setFieldValue(field.name, e.target.value);
   };
@@ -363,10 +413,16 @@ export const InputField = (props) => {
   );
 };
 
-export const InputFile = ({ field, form, placeholder }) => {
+interface InputFileProps {
+  field: any;
+  form: any;
+  placeholder: string;
+}
+
+export const InputFile = ({ field, form, placeholder }: InputFileProps) => {
   const [avatar, setAvatar] = useState(placeholder);
 
-  const handleClick = (e) => {
+  const handleClick = (e: any) => {
     e.preventDefault();
     form.setFieldValue(field.name, e.target.files[0]);
     setAvatar(URL.createObjectURL(e.target.files[0]));
@@ -398,7 +454,11 @@ const Label = styled.label`
   color: ${(props) => props.theme.colors.black};
 `;
 
-const TextField = styled.input`
+interface TextFieldProps {
+  secret?: boolean;
+}
+
+const TextField = styled.input<TextFieldProps>`
   -webkit-text-security: ${(props) => (props.secret ? "circle" : "none")};
   border-radius: 5px;
   background-color: ${(props) => props.theme.colors.white};

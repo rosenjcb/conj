@@ -1,13 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+export interface PostState {
+  subject?: string;
+  comment: string;
+  image: Blob | null;
+  threadNo: number | null;
+  is_anonymous: boolean;
+}
+
 const initialState = {
-  subject: "",
   comment: "",
   image: null,
-  hidden: true,
   threadNo: null,
-  is_anonymous: false,
-};
+  is_anonymous: true,
+} as PostState;
 
 export const postSlice = createSlice({
   name: "post",

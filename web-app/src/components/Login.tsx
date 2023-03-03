@@ -1,36 +1,46 @@
-import React from "react";
 import styled from "styled-components";
 import { useLoginMutation } from "../api/account";
-import chroma from "chroma-js";
 import { Header } from "./index";
 import toast from "react-hot-toast";
-import PropTypes from "prop-types";
 import { useGoogleLogin } from "@react-oauth/google";
 import { GoogleLoginButton } from "react-social-login-buttons";
 
-export function Login({ completeAction }) {
+interface LoginProps {
+  completeAction: () => any;
+}
+
+interface OauthResponse {
+  code: string;
+}
+
+export function Login({ completeAction }: LoginProps) {
   const [login] = useLoginMutation();
 
-  const handleOauth = async (res) => {
-    const { code } = res;
-
+  const handleSuccess = async ({ code }: OauthResponse) => {
     try {
       const account = await login({
         provider: "google",
         code,
         redirectUri: "postmessage",
       }).unwrap();
-      if (account?.is_onboarding === false) toast.success("Welcome Back!");
-    } catch (e) {
-      toast.error(e.data);
+      // if (account?.is_onboarding === false) toast.success("Welcome Back!");
+      toast.success("Welcome to Conj!");
+    } catch (e: any) {
+      if (e && "status" in e) {
+        toast.error(e.data);
+      }
     } finally {
       completeAction();
     }
   };
 
+  const handleFailure = () => {
+    toast.error("Couldn't login for some reason");
+  };
+
   const googleLogin = useGoogleLogin({
-    onSuccess: handleOauth,
-    onFailure: handleOauth,
+    onSuccess: handleSuccess,
+    onError: handleFailure,
     flow: "auth-code",
   });
 
@@ -46,10 +56,6 @@ export function Login({ completeAction }) {
   );
 }
 
-Login.propTypes = {
-  completeAction: PropTypes.func,
-};
-
 const SubmitOptions = styled.div`
   display: flex;
   flex-direction: row;
@@ -63,7 +69,7 @@ const SubmitOptions = styled.div`
 
 const Root = styled.div`
   margin: 0 auto;
-  background-color: ${(props) => chroma(props.theme.colors.white)};
+  background-color: ${(props) => props.theme.colors.white};
   text-align: center;
   padding: 1.25em;
   border-radius: 8px;

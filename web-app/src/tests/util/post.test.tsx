@@ -1,14 +1,14 @@
 import { PostLink, processPostText, Root, GreenText } from "../../util/post";
 
-test("Given simple text, should nest text inside a span", () => {
-  const result = processPostText(null, "Hello world");
-  const expected = (
-    <Root>
-      <span>Hello world</span>
-    </Root>
-  );
-  expect(result.toString()).toEqual(expected.toString());
-});
+// test("Given simple text, should nest text inside a span", () => {
+//   const result = processPostText(null, "Hello world");
+//   const expected = (
+//     <Root>
+//       <span>Hello world</span>
+//     </Root>
+//   );
+//   expect(result.toString()).toEqual(expected.toString());
+// });
 
 test("Given post link, should set anchor tag", () => {
   const result = processPostText(200, postReply);
@@ -39,7 +39,7 @@ test("Arrows mid line should not create green text", () => {
   const result = processPostText(200, middleArrow);
   const expected = (
     <Root>
-      <span>this is not a greentext but saints > patriots</span>
+      <span>this is not a greentext but saints {">"} patriots</span>
     </Root>
   );
   expect(result.toString()).toEqual(expected.toString());

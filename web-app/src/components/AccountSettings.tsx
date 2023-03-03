@@ -1,4 +1,3 @@
-import React from "react";
 import styled from "styled-components";
 import { Formik, Field } from "formik";
 import { RoundButton, InputField, InputFile } from "./index";
@@ -8,22 +7,28 @@ import {
   useFinishOnboardingMutation,
 } from "../api/account";
 import toast from "react-hot-toast";
-import chroma from "chroma-js";
 
-export function AccountSettings({ onFinish }) {
+export interface AccountSettingsProps {
+  onFinish(): any;
+}
+
+interface FormValues {
+  username: string | null;
+  avatar: Blob | null;
+}
+
+export function AccountSettings({ onFinish }: AccountSettingsProps) {
   const [updateMe] = useUpdateMeMutation();
 
   const { data: me, error } = useMeQuery();
 
-  if (error) {
-    if (error.data) {
-      toast.error(error.data);
-    } else {
-      toast.error("Something unexpected went wrong");
-    }
+  const safeError = error as any;
+
+  if (error && "status" in safeError) {
+    toast.error(safeError.data);
   }
 
-  const handleUpdate = async (values, actions) => {
+  const handleUpdate = async (values: any, actions: any) => {
     try {
       actions.setSubmitting(false);
       var formData = new FormData();
@@ -34,21 +39,20 @@ export function AccountSettings({ onFinish }) {
       }
       await updateMe(formData).unwrap();
       onFinish();
-    } catch (e) {
+    } catch (e: any) {
       if (e.data) toast.error(e.data);
     }
+  };
+
+  const initialValues: FormValues = {
+    username: null,
+    avatar: null,
   };
 
   return (
     <Root>
       {me ? (
-        <Formik
-          initialValues={{
-            username: null,
-            avatar: null,
-          }}
-          onSubmit={handleUpdate}
-        >
+        <Formik initialValues={initialValues} onSubmit={handleUpdate}>
           {(props) => (
             <StyledForm onSubmit={props.handleSubmit}>
               <ContentDetails>
@@ -79,15 +83,13 @@ export function CompleteOnboarding() {
 
   const { data: me, error } = useMeQuery();
 
-  if (error) {
-    if (error.data) {
-      toast.error(error.data);
-    } else {
-      toast.error("Something unexpected went wrong");
-    }
+  const safeError = error as any;
+
+  if (error && "status" in safeError) {
+    toast.error(safeError.data);
   }
 
-  const handleSubmit = async (values, actions) => {
+  const handleSubmit = async (values: any, actions: any) => {
     try {
       actions.setSubmitting(false);
       var formData = new FormData();
@@ -98,7 +100,7 @@ export function CompleteOnboarding() {
       }
       await finishOnboarding(formData).unwrap();
       toast.success("Welcome to Conj!");
-    } catch (e) {
+    } catch (e: any) {
       if (e.data) toast.error(e.data);
     }
   };
@@ -184,7 +186,7 @@ const SquareButton = styled.button`
 
 const Root = styled.div`
   margin: 0 auto;
-  background-color: ${(props) => chroma(props.theme.colors.white)};
+  background-color: ${(props) => props.theme.colors.white};
   text-align: center;
   border-radius: 8px;
   width: 400px;
