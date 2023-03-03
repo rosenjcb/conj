@@ -35,7 +35,7 @@ export interface Post {
   id: number;
   image: Image | null;
   is_anonymous?: boolean;
-  subject: string | null;
+  subject?: string;
   comment: string;
   time: string;
   username: string;

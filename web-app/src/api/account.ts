@@ -27,7 +27,7 @@ export const meApi = createApi({
       }),
       providesTags: ["Me"],
     }),
-    logout: builder.mutation({
+    logout: builder.mutation<void, void>({
       query: () => ({
         method: "GET",
         url: "logout",

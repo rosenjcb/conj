@@ -10,10 +10,19 @@ import { Thread } from "../types";
 export const BoardPage = () => {
   const { board } = useThread();
 
-  const { data: threads, error, isLoading } = useFetchThreadsQuery(board ?? "");
+  const {
+    data: threads,
+    error,
+    isError,
+    isLoading,
+  } = useFetchThreadsQuery(board ?? "");
+
+  if (!board) {
+    return <div />;
+  }
 
   if (error && "status" in error) {
-    toast.error(JSON.stringify(error.data));
+    toast.error(error.data as any);
   }
 
   if (isLoading || !threads) {
@@ -22,7 +31,7 @@ export const BoardPage = () => {
 
   return (
     <BoardRoot>
-      <ThreadPreview threads={threads} board={board ?? ""} />
+      <ThreadPreview threads={threads} board={board} />
     </BoardRoot>
   );
 };

@@ -37,6 +37,8 @@
    :redis-port (env :redis-port)
    :google-client-id (env :google-client-id)
    :google-client-secret (env :google-client-secret)
+   :aws-access-key (env :aws-access-key)
+   :aws-access-secret (env :aws-access-secret)
    :env (env :env)})
 
 (defn app-middleware [handler state]
@@ -109,7 +111,7 @@
   (let [{:keys [db-host db-port db-name db-user db-pass port redis-host redis-port passphrase
                 google-client-id google-client-secret env
                 aws-access-key aws-access-secret]} config
-        s3-creds (when (every? some? [aws-access-key aws-access-key])
+        s3-creds (when (every? some? [aws-access-key aws-access-secret])
                   (credentials/basic-credentials-provider {:access-key-id aws-access-key :secret-access-key aws-access-secret}))
         s3-client (aws/client {:api :s3 :region :us-west-2 :credentials-provider s3-creds})
         db-spec {:dbtype "postgresql" :host db-host :port db-port :dbname db-name :username db-user :password db-pass}

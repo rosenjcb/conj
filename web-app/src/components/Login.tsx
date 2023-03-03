@@ -23,10 +23,11 @@ export function Login({ completeAction }: LoginProps) {
         code,
         redirectUri: "postmessage",
       }).unwrap();
-      if (account?.is_onboarding === false) toast.success("Welcome Back!");
+      // if (account?.is_onboarding === false) toast.success("Welcome Back!");
+      toast.success("Welcome to Conj!");
     } catch (e: any) {
       if (e && "status" in e) {
-        toast.error(JSON.stringify(e.data));
+        toast.error(e.data);
       }
     } finally {
       completeAction();

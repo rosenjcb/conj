@@ -27,7 +27,7 @@ import { useAppSelector } from "../store";
 
 interface FullReplyProps {
   className?: string;
-  isNewThread?: boolean;
+  isNewThread: boolean;
   handleClose: () => void;
 }
 
@@ -73,7 +73,10 @@ const FullReply = (props: FullReplyProps) => {
       );
       var formData = new FormData();
       for (let [key, val] of Object.entries(req)) {
-        const stringified = val instanceof Blob ? val : JSON.stringify(val);
+        const stringified =
+          val instanceof Blob || typeof val === "string"
+            ? val
+            : JSON.stringify(val);
         if (val !== null) formData.append(key, stringified);
       }
       if (threadNo !== null && board !== null) {
@@ -92,9 +95,8 @@ const FullReply = (props: FullReplyProps) => {
       }
       dispatch(resetPost());
     } catch (e: any) {
-      // console.log("uh woops");
       if (e && "status" in e) {
-        toast.error(JSON.stringify(e.data));
+        toast.error(e.data);
       }
     } finally {
       handleClose();
@@ -219,10 +221,10 @@ const FakeReplyRoot = styled.div`
 
 interface ReplyProps {
   className?: string;
+  isNewThread: boolean;
 }
 
-export const Reply = (props: ReplyProps) => {
-  const { className } = props;
+export const Reply = ({ className, isNewThread }: ReplyProps) => {
   const [open, setOpen] = useState(false);
 
   const toggleModal = () => {
@@ -236,7 +238,7 @@ export const Reply = (props: ReplyProps) => {
   return (
     <ReplyRoot>
       <Modal onRequestClose={closeModal} isOpen={open}>
-        <FullReply handleClose={closeModal} />
+        <FullReply handleClose={closeModal} isNewThread={isNewThread} />
       </Modal>
       <FakeReply className={className} onClick={toggleModal} />
     </ReplyRoot>

@@ -1,4 +1,3 @@
-import PropTypes from "prop-types";
 import styled from "styled-components";
 import chroma from "chroma-js";
 import { BsFillPersonFill } from "react-icons/bs";
@@ -47,12 +46,6 @@ const ModalBase = ({
       </ModalRoot>
     </ReactModal>
   );
-};
-
-ModalBase.propTypes = {
-  isOpen: PropTypes.bool,
-  onRequestClose: PropTypes.func,
-  title: PropTypes.string,
 };
 
 interface OffsetProps {

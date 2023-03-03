@@ -53,7 +53,6 @@
 (defn full-wrap-auth [handler]
   (-> handler
       wrap-auth
-      wrap-onboarding
       wrap-status))
 
 (defn wrap-admin [handler]

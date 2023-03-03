@@ -25,7 +25,7 @@ export function AccountSettings({ onFinish }: AccountSettingsProps) {
   const safeError = error as any;
 
   if (error && "status" in safeError) {
-    toast.error(JSON.stringify(safeError.data));
+    toast.error(safeError.data);
   }
 
   const handleUpdate = async (values: any, actions: any) => {
@@ -86,7 +86,7 @@ export function CompleteOnboarding() {
   const safeError = error as any;
 
   if (error && "status" in safeError) {
-    toast.error(JSON.stringify(safeError.data));
+    toast.error(safeError.data);
   }
 
   const handleSubmit = async (values: any, actions: any) => {
