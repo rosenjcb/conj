@@ -169,6 +169,7 @@ interface FixedWidthProps {
 
 const FixedWidth = styled.div<FixedWidthProps>`
   margin: 0 auto;
+  overflow-y: hidden;
   height: calc(
     100vh - 40px - 8px - 2px - ${(props) => (props.mobile ? "54px" : "0px")}
   ); //full height - fixed navbar height - fixed navbar padding - border - fixed reply height)
@@ -255,6 +256,8 @@ const NavItemsContainer = styled.div`
 
 const Page = styled.div`
   display: flex;
+  padding-top: 48px;
+  margin-top: -48px;
   justify-content: flex-start;
   flex-direction: row;
   margin: 0 auto;
@@ -360,6 +363,8 @@ const BoardRoot = styled.div`
 
 const HomeNavBar = styled.div`
   display: flex;
+  position: fixed;
+  z-index: 1;
   top: 0;
   justify-content: space-between;
   gap: 10px;

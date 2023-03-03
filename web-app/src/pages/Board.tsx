@@ -81,14 +81,14 @@ const ThreadPreviewRoot = styled.div`
   flex-direction: column;
   width: 100%;
   margin: 0 auto;
-  height: 100vh;
+  height: 100%;
 `;
 
 const BoardRoot = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  height: inherit;
+  height: 100%;
   /* overflow-y: scroll; */
   scrollbar-width: none;
 
