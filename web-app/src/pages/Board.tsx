@@ -10,12 +10,7 @@ import { Thread } from "../types";
 export const BoardPage = () => {
   const { board } = useThread();
 
-  const {
-    data: threads,
-    error,
-    isError,
-    isLoading,
-  } = useFetchThreadsQuery(board ?? "");
+  const { data: threads, error, isLoading } = useFetchThreadsQuery(board ?? "");
 
   if (!board) {
     return <div />;
