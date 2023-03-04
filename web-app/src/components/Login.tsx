@@ -18,7 +18,7 @@ export function Login({ completeAction }: LoginProps) {
 
   const handleSuccess = async ({ code }: OauthResponse) => {
     try {
-      const account = await login({
+      await login({
         provider: "google",
         code,
         redirectUri: "postmessage",
