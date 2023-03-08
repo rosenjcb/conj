@@ -1,4 +1,4 @@
-import { useState, useRef, ReactNode, Ref } from "react";
+import { useState, useRef, ReactNode, Ref, RefObject } from "react";
 import styled from "styled-components";
 import {
   Text,
@@ -20,7 +20,7 @@ import { useDeleteThreadMutation } from "../api/thread";
 import { toast } from "react-hot-toast";
 import * as _ from "lodash";
 import { useMeQuery } from "../api/account";
-import { Post } from "../types";
+import { ImageMap, Post } from "../types";
 
 interface WithTextProps {
   direction: string;
@@ -51,14 +51,12 @@ const handlePostDate = (time: string) => {
         if (seconds < 1) {
           return "Just now";
         } else {
-          return `${seconds} ${seconds === 1 ? "second" : "seconds"} ago`;
+          return `${seconds} ${seconds === 1 ? "second" : "seconds"}`;
         }
       }
-      return `${Math.round(minutes)} ${
-        minutes === 1 ? "minute" : "minutes"
-      } ago`;
+      return `${Math.round(minutes)} ${"min"}`;
     }
-    return `${Math.round(hours)} ${hours === 1 ? "hr" : "hrs"} ago`;
+    return `${Math.round(hours)} ${hours === 1 ? "hr" : "hrs"}`;
   } else {
     return then.toLocaleDateString();
   }
@@ -203,7 +201,7 @@ export const PostView = ({
   const formattedTime = handlePostDate(time);
 
   //I wonder if there is a way to make this cleaner.
-  const optionsRef = useRef(null);
+  const optionsRef = useRef<HTMLDivElement>(null);
   const [expandOptions, setExpandOptions] = useState(false);
   const closeOptions = () => setExpandOptions(false);
   const openOptions = () => setExpandOptions(true);
@@ -241,66 +239,212 @@ export const PostView = ({
           closeAction={closeDeleteDialog}
         />
       </Modal>
-      <PostRoot key={id} ref={handleRef}>
-        <UserInfo>
-          <Avatar onClick={openAvatar} avatar={avatar} />
-          <TextContainer>
-            <Text bold size="medium">
-              <span>{username ?? "Anonymous"}</span>
-            </Text>
-            <PostLink to={postHref} onClick={handleClick}>
-              #{id}
-            </PostLink>
-          </TextContainer>
-          <Text size="medium" color="darkGrey" align="right">
-            {formattedTime}
+      {isOriginalPost ? (
+        <OriginalPost
+          id={id}
+          handleRef={handleRef}
+          openAvatar={openAvatar}
+          avatar={avatar}
+          username={username}
+          postHref={postHref}
+          handleClick={handleClick}
+          formattedTime={formattedTime}
+          image={image}
+          openPostImage={openPostImage}
+          subject={subject}
+          opNo={opNo}
+          comment={comment}
+          optionsRef={optionsRef}
+          expandOptions={expandOptions}
+          openOptions={openOptions}
+          postUrl={postUrl}
+          openDeleteDialog={openDeleteDialog}
+          preview={preview}
+          replyCount={replyCount}
+        />
+      ) : (
+        <ReplyPost
+          id={id}
+          handleRef={handleRef}
+          openAvatar={openAvatar}
+          avatar={avatar}
+          username={username}
+          postHref={postHref}
+          handleClick={handleClick}
+          formattedTime={formattedTime}
+          image={image}
+          openPostImage={openPostImage}
+          subject={subject}
+          opNo={opNo}
+          comment={comment}
+          optionsRef={optionsRef}
+          expandOptions={expandOptions}
+          openOptions={openOptions}
+          postUrl={postUrl}
+          openDeleteDialog={openDeleteDialog}
+          preview={preview}
+          replyCount={replyCount}
+        />
+      )}
+    </div>
+  );
+};
+
+interface SharedPostProps {
+  id: number;
+  handleRef?: Ref<any>;
+  openAvatar: () => void;
+  avatar: string | null;
+  username: string;
+  postHref: string;
+  handleClick: (e: any) => void;
+  formattedTime: string;
+  image: ImageMap | null;
+  openPostImage: () => void;
+  subject?: string;
+  opNo: number;
+  comment: string;
+  optionsRef: RefObject<HTMLDivElement>;
+  expandOptions: boolean;
+  openOptions: () => void;
+  postUrl: string;
+  openDeleteDialog: () => void;
+  preview: boolean;
+  replyCount: number;
+}
+
+const OriginalPost = (props: SharedPostProps) => {
+  return (
+    <PostRoot key={props.id} ref={props.handleRef}>
+      <UserInfo>
+        <Avatar onClick={props.openAvatar} avatar={props.avatar} />
+        <TextContainer>
+          <Text bold size="medium">
+            <span>{props.username ?? "Anonymous"}</span>
           </Text>
-        </UserInfo>
-        {image && image.location ? (
-          <FullWidth>
-            <CenteredImage
-              onClick={() => openPostImage()}
-              src={image.location}
-            />
-          </FullWidth>
+          <PostLink to={props.postHref} onClick={props.handleClick}>
+            #{props.id}
+          </PostLink>
+        </TextContainer>
+        <Text size="medium" color="darkGrey" align="right">
+          {props.formattedTime}
+        </Text>
+      </UserInfo>
+      {props.image && props.image.location ? (
+        <FullWidth>
+          <CenteredImage
+            onClick={() => props.openPostImage()}
+            src={props.image.location}
+          />
+        </FullWidth>
+      ) : null}
+      <OriginalContentRoot>
+        {props.subject ? (
+          <Text align="left" width="100%" size="x-large" color="black">
+            {props.subject}
+          </Text>
         ) : null}
+        {processPostText(props.opNo, props.comment)}
+      </OriginalContentRoot>
+      <ActionsContainer>
+        {" "}
+        <OptionsDiv
+          ref={props.optionsRef}
+          expand={props.expandOptions}
+          onClick={props.openOptions}
+        >
+          {!props.expandOptions ? <EllipsisButton /> : null}
+          <ShareMessageButton
+            onClick={() => navigator.clipboard.writeText(props.postUrl)}
+          />
+          <DeletePostButton onClick={props.openDeleteDialog} />
+        </OptionsDiv>
+        {props.preview ? (
+          <WithText
+            component={
+              <ThreadLink
+                to={(location) => `${location.pathname}/thread/${props.opNo}`}
+              >
+                <MessageDetail />
+              </ThreadLink>
+            }
+            direction="row"
+            text={JSON.stringify(props.replyCount)}
+          />
+        ) : null}
+      </ActionsContainer>
+    </PostRoot>
+  );
+};
+
+const ReplyPost = (props: SharedPostProps) => {
+  return (
+    <ReplyRoot key={props.id} ref={props.handleRef}>
+      <Avatar onClick={props.openAvatar} avatar={props.avatar} />
+      <ReplyContainer>
+        <ReplyUserInfo>
+          <ReplyTextContainer>
+            <Text bold size="medium">
+              <span>{props.username ?? "Anonymous"}</span>
+            </Text>
+            <PostLink to={props.postHref} onClick={props.handleClick}>
+              #{props.id}
+            </PostLink>
+          </ReplyTextContainer>
+
+          <Text size="medium" color="darkGrey" align="right">
+            {props.formattedTime}
+          </Text>
+        </ReplyUserInfo>
+        {props.image && props.image.location ? (
+          //<FullWidth>
+          <ReplyImage
+            onClick={() => props.openPostImage()}
+            src={props.image.location}
+          />
+        ) : // <CenteredImage
+        //   onClick={() => props.openPostImage()}
+        //   src={props.image.location}
+        // />
+        //</FullWidth>
+        null}
         <OriginalContentRoot>
-          {subject ? (
+          {props.subject ? (
             <Text align="left" width="100%" size="x-large" color="black">
-              {subject}
+              {props.subject}
             </Text>
           ) : null}
-          {processPostText(opNo, comment)}
+          {processPostText(props.opNo, props.comment)}
         </OriginalContentRoot>
         <ActionsContainer>
           {" "}
           <OptionsDiv
-            ref={optionsRef}
-            expand={expandOptions}
-            onClick={openOptions}
+            ref={props.optionsRef}
+            expand={props.expandOptions}
+            onClick={props.openOptions}
           >
-            {!expandOptions ? <EllipsisButton /> : null}
+            {!props.expandOptions ? <EllipsisButton /> : null}
             <ShareMessageButton
-              onClick={() => navigator.clipboard.writeText(postUrl)}
+              onClick={() => navigator.clipboard.writeText(props.postUrl)}
             />
-            <DeletePostButton onClick={openDeleteDialog} />
+            <DeletePostButton onClick={props.openDeleteDialog} />
           </OptionsDiv>
-          {preview ? (
+          {props.preview ? (
             <WithText
               component={
                 <ThreadLink
-                  to={(location) => `${location.pathname}/thread/${opNo}`}
+                  to={(location) => `${location.pathname}/thread/${props.opNo}`}
                 >
                   <MessageDetail />
                 </ThreadLink>
               }
               direction="row"
-              text={JSON.stringify(replyCount)}
+              text={JSON.stringify(props.replyCount)}
             />
           ) : null}
         </ActionsContainer>
-      </PostRoot>
-    </div>
+      </ReplyContainer>
+    </ReplyRoot>
   );
 };
 
@@ -379,7 +523,6 @@ const TextContainer = styled.div`
   justify-content: flex-start;
   flex-direction: column;
   width: 100%;
-  gap: 0.5rem;
 `;
 
 const UserInfo = styled.div`
@@ -419,6 +562,21 @@ const CenteredImage = styled(Image)`
   /* aspect-ratio: 1/1; */
   max-height: 400px;
   border-radius: 0px;
+`;
+
+interface ReplyImageProps {
+  src: string;
+}
+
+const ReplyImage = styled.div<ReplyImageProps>`
+  float: none;
+  aspect-ratio: 16/9;
+  width: 100%;
+  border-radius: 4px;
+  background-image: url("${(props) => props.src}");
+  background-size: cover;
+  background-position: center, center;
+  background-repeat: no-repeat;
 `;
 
 const ModalImage = styled(Image)`
@@ -510,4 +668,44 @@ const ActionsContainer = styled.div`
 
 const ThreadLink = styled(Link)`
   color: inherit;
+`;
+
+const ReplyRoot = styled.div`
+  scroll-behavior: smooth;
+  display: flex;
+  width: 100%;
+  margin: 0 auto !important;
+  background-color: ${(props) => props.theme.colors.white};
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  gap: 10px;
+  text-align: left;
+  flex-direction: row;
+  box-sizing: border-box;
+  align-items: flex-start;
+  justify-content: flex-start;
+`;
+
+const ReplyContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+`;
+
+const ReplyUserInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+`;
+
+const ReplyTextContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  gap: 0.5rem;
 `;

@@ -26,14 +26,14 @@ export interface Account {
   is_onboarding: boolean;
 }
 
-export interface Image {
+export interface ImageMap {
   filename: string;
   location: string;
 }
 
 export interface Post {
   id: number;
-  image: Image | null;
+  image: ImageMap | null;
   is_anonymous?: boolean;
   subject?: string;
   comment: string;
