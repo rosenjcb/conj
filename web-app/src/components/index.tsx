@@ -312,7 +312,7 @@ const ExistingAvatar = styled.img`
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  align-self: center;
+  align-self: flex-start;
 
   &:hover {
     cursor: pointer;
@@ -336,7 +336,7 @@ export const AnonymousAvatar = styled(BsFillPersonFill)`
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  align-self: center;
+  align-self: flex-start;
 
   &:hover {
     cursor: pointer;

@@ -51,14 +51,12 @@ const handlePostDate = (time: string) => {
         if (seconds < 1) {
           return "Just now";
         } else {
-          return `${seconds} ${seconds === 1 ? "second" : "seconds"} ago`;
+          return `${seconds} ${seconds === 1 ? "second" : "seconds"}`;
         }
       }
-      return `${Math.round(minutes)} ${
-        minutes === 1 ? "minute" : "minutes"
-      } ago`;
+      return `${Math.round(minutes)} ${"min"}`;
     }
-    return `${Math.round(hours)} ${hours === 1 ? "hr" : "hrs"} ago`;
+    return `${Math.round(hours)} ${hours === 1 ? "hr" : "hrs"}`;
   } else {
     return then.toLocaleDateString();
   }
@@ -381,65 +379,72 @@ const OriginalPost = (props: SharedPostProps) => {
 
 const ReplyPost = (props: SharedPostProps) => {
   return (
-    <PostRoot key={props.id} ref={props.handleRef}>
-      <UserInfo>
-        <Avatar onClick={props.openAvatar} avatar={props.avatar} />
-        <TextContainer>
-          <Text bold size="medium">
-            <span>{props.username ?? "Anonymous"}</span>
+    <ReplyRoot key={props.id} ref={props.handleRef}>
+      <Avatar onClick={props.openAvatar} avatar={props.avatar} />
+      <ReplyContainer>
+        <ReplyUserInfo>
+          <ReplyTextContainer>
+            <Text bold size="medium">
+              <span>{props.username ?? "Anonymous"}</span>
+            </Text>
+            <PostLink to={props.postHref} onClick={props.handleClick}>
+              #{props.id}
+            </PostLink>
+          </ReplyTextContainer>
+
+          <Text size="medium" color="darkGrey" align="right">
+            {props.formattedTime}
           </Text>
-          <PostLink to={props.postHref} onClick={props.handleClick}>
-            #{props.id}
-          </PostLink>
-        </TextContainer>
-        <Text size="medium" color="darkGrey" align="right">
-          {props.formattedTime}
-        </Text>
-      </UserInfo>
-      {props.image && props.image.location ? (
-        <FullWidth>
-          <CenteredImage
+        </ReplyUserInfo>
+        {props.image && props.image.location ? (
+          //<FullWidth>
+          <ReplyImage
             onClick={() => props.openPostImage()}
             src={props.image.location}
           />
-        </FullWidth>
-      ) : null}
-      <OriginalContentRoot>
-        {props.subject ? (
-          <Text align="left" width="100%" size="x-large" color="black">
-            {props.subject}
-          </Text>
-        ) : null}
-        {processPostText(props.opNo, props.comment)}
-      </OriginalContentRoot>
-      <ActionsContainer>
-        {" "}
-        <OptionsDiv
-          ref={props.optionsRef}
-          expand={props.expandOptions}
-          onClick={props.openOptions}
-        >
-          {!props.expandOptions ? <EllipsisButton /> : null}
-          <ShareMessageButton
-            onClick={() => navigator.clipboard.writeText(props.postUrl)}
-          />
-          <DeletePostButton onClick={props.openDeleteDialog} />
-        </OptionsDiv>
-        {props.preview ? (
-          <WithText
-            component={
-              <ThreadLink
-                to={(location) => `${location.pathname}/thread/${props.opNo}`}
-              >
-                <MessageDetail />
-              </ThreadLink>
-            }
-            direction="row"
-            text={JSON.stringify(props.replyCount)}
-          />
-        ) : null}
-      </ActionsContainer>
-    </PostRoot>
+        ) : // <CenteredImage
+        //   onClick={() => props.openPostImage()}
+        //   src={props.image.location}
+        // />
+        //</FullWidth>
+        null}
+        <OriginalContentRoot>
+          {props.subject ? (
+            <Text align="left" width="100%" size="x-large" color="black">
+              {props.subject}
+            </Text>
+          ) : null}
+          {processPostText(props.opNo, props.comment)}
+        </OriginalContentRoot>
+        <ActionsContainer>
+          {" "}
+          <OptionsDiv
+            ref={props.optionsRef}
+            expand={props.expandOptions}
+            onClick={props.openOptions}
+          >
+            {!props.expandOptions ? <EllipsisButton /> : null}
+            <ShareMessageButton
+              onClick={() => navigator.clipboard.writeText(props.postUrl)}
+            />
+            <DeletePostButton onClick={props.openDeleteDialog} />
+          </OptionsDiv>
+          {props.preview ? (
+            <WithText
+              component={
+                <ThreadLink
+                  to={(location) => `${location.pathname}/thread/${props.opNo}`}
+                >
+                  <MessageDetail />
+                </ThreadLink>
+              }
+              direction="row"
+              text={JSON.stringify(props.replyCount)}
+            />
+          ) : null}
+        </ActionsContainer>
+      </ReplyContainer>
+    </ReplyRoot>
   );
 };
 
@@ -518,7 +523,6 @@ const TextContainer = styled.div`
   justify-content: flex-start;
   flex-direction: column;
   width: 100%;
-  gap: 0.5rem;
 `;
 
 const UserInfo = styled.div`
@@ -558,6 +562,21 @@ const CenteredImage = styled(Image)`
   /* aspect-ratio: 1/1; */
   max-height: 400px;
   border-radius: 0px;
+`;
+
+interface ReplyImageProps {
+  src: string;
+}
+
+const ReplyImage = styled.div<ReplyImageProps>`
+  float: none;
+  aspect-ratio: 16/9;
+  width: 100%;
+  border-radius: 4px;
+  background-image: url("${(props) => props.src}");
+  background-size: cover;
+  background-position: center, center;
+  background-repeat: no-repeat;
 `;
 
 const ModalImage = styled(Image)`
@@ -649,4 +668,44 @@ const ActionsContainer = styled.div`
 
 const ThreadLink = styled(Link)`
   color: inherit;
+`;
+
+const ReplyRoot = styled.div`
+  scroll-behavior: smooth;
+  display: flex;
+  width: 100%;
+  margin: 0 auto !important;
+  background-color: ${(props) => props.theme.colors.white};
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  gap: 10px;
+  text-align: left;
+  flex-direction: row;
+  box-sizing: border-box;
+  align-items: flex-start;
+  justify-content: flex-start;
+`;
+
+const ReplyContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+`;
+
+const ReplyUserInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+`;
+
+const ReplyTextContainer = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  gap: 0.5rem;
 `;

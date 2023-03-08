@@ -140,7 +140,7 @@ export const WithNavBar = ({ component }: WithNavBarProps) => {
           </Modal>
         )}
         <PageWrapper>
-          <FixedWidth>
+          <FixedWidth mobile={isMobile}>
             {!isMobile && board ? <Reply isNewThread={isNewThread} /> : null}
             {component}
           </FixedWidth>
@@ -164,7 +164,7 @@ const StyledReply = styled(Reply)`
 `;
 
 interface FixedWidthProps {
-  mobile?: boolean;
+  mobile: boolean;
 }
 
 const FixedWidth = styled.div<FixedWidthProps>`
@@ -184,11 +184,11 @@ const FixedWidth = styled.div<FixedWidthProps>`
   }
 
   @media all and (min-width: 1024px) {
-    width: 900px;
+    width: 600px;
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
-    width: 100%;
+    width: 600px;
   }
 
   @media all and (min-width: 480px) and (max-width: 768px) {
