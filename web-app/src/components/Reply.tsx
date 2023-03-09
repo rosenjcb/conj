@@ -57,37 +57,39 @@ const FullReply = (props: FullReplyProps) => {
 
   const history = useHistory();
 
+  const makePostRequest = (post: PostState, isReply: boolean) => {
+    const baseKeys = ["name", "image", "comment", "is_anonymous"];
+    const finalKeys = isReply ? baseKeys : [...baseKeys, "subject"];
+    const req = _.pick(post, ...finalKeys);
+    var formData = new FormData();
+    for (let [key, val] of Object.entries(req)) {
+      const stringified =
+        val instanceof Blob || typeof val === "string"
+          ? val
+          : JSON.stringify(val);
+      if (val !== null) formData.append(key, stringified);
+    }
+    return formData;
+  };
+
   const submitPost = async (
     values: PostState,
     actions: FormikHelpers<PostState>
   ) => {
     try {
       setLoading(true);
-      const req = _.pick(
-        post,
-        "name",
-        "image",
-        "subject",
-        "comment",
-        "is_anonymous"
-      );
-      var formData = new FormData();
-      for (let [key, val] of Object.entries(req)) {
-        const stringified =
-          val instanceof Blob || typeof val === "string"
-            ? val
-            : JSON.stringify(val);
-        if (val !== null) formData.append(key, stringified);
-      }
       if (threadNo !== null && board !== null) {
         await updateThread({
           board,
           threadNo,
-          post: formData,
+          post: makePostRequest(post, true),
         }).unwrap();
       } else {
         if (board !== null) {
-          const res = await createThread({ board, post: formData }).unwrap();
+          const res = await createThread({
+            board,
+            post: makePostRequest(post, false),
+          }).unwrap();
           const op = res[0];
           const newPost = res[res.length - 1];
           history.push(`/boards/${board}/thread/${op.id}#${newPost.id}`);

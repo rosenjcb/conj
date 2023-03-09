@@ -274,7 +274,6 @@ export const PostView = ({
           formattedTime={formattedTime}
           image={image}
           openPostImage={openPostImage}
-          subject={subject}
           opNo={opNo}
           comment={comment}
           optionsRef={optionsRef}
@@ -282,15 +281,13 @@ export const PostView = ({
           openOptions={openOptions}
           postUrl={postUrl}
           openDeleteDialog={openDeleteDialog}
-          preview={preview}
-          replyCount={replyCount}
         />
       )}
     </div>
   );
 };
 
-interface SharedPostProps {
+interface OriginalPostProps {
   id: number;
   handleRef?: Ref<any>;
   openAvatar: () => void;
@@ -313,7 +310,7 @@ interface SharedPostProps {
   replyCount: number;
 }
 
-const OriginalPost = (props: SharedPostProps) => {
+const OriginalPost = (props: OriginalPostProps) => {
   return (
     <PostRoot key={props.id} ref={props.handleRef}>
       <UserInfo>
@@ -377,7 +374,27 @@ const OriginalPost = (props: SharedPostProps) => {
   );
 };
 
-const ReplyPost = (props: SharedPostProps) => {
+interface ReplyPostProps {
+  id: number;
+  handleRef?: Ref<any>;
+  openAvatar: () => void;
+  avatar: string | null;
+  username: string;
+  postHref: string;
+  handleClick: (e: any) => void;
+  formattedTime: string;
+  image: ImageMap | null;
+  openPostImage: () => void;
+  opNo: number;
+  comment: string;
+  optionsRef: RefObject<HTMLDivElement>;
+  expandOptions: boolean;
+  openOptions: () => void;
+  postUrl: string;
+  openDeleteDialog: () => void;
+}
+
+const ReplyPost = (props: ReplyPostProps) => {
   return (
     <ReplyRoot key={props.id} ref={props.handleRef}>
       <Avatar onClick={props.openAvatar} avatar={props.avatar} />
@@ -391,29 +408,17 @@ const ReplyPost = (props: SharedPostProps) => {
               #{props.id}
             </PostLink>
           </ReplyTextContainer>
-
           <Text size="medium" color="darkGrey" align="right">
             {props.formattedTime}
           </Text>
         </ReplyUserInfo>
         {props.image && props.image.location ? (
-          //<FullWidth>
           <ReplyImage
             onClick={() => props.openPostImage()}
             src={props.image.location}
           />
-        ) : // <CenteredImage
-        //   onClick={() => props.openPostImage()}
-        //   src={props.image.location}
-        // />
-        //</FullWidth>
-        null}
+        ) : null}
         <OriginalContentRoot>
-          {props.subject ? (
-            <Text align="left" width="100%" size="x-large" color="black">
-              {props.subject}
-            </Text>
-          ) : null}
           {processPostText(props.opNo, props.comment)}
         </OriginalContentRoot>
         <ActionsContainer>
@@ -429,19 +434,6 @@ const ReplyPost = (props: SharedPostProps) => {
             />
             <DeletePostButton onClick={props.openDeleteDialog} />
           </OptionsDiv>
-          {props.preview ? (
-            <WithText
-              component={
-                <ThreadLink
-                  to={(location) => `${location.pathname}/thread/${props.opNo}`}
-                >
-                  <MessageDetail />
-                </ThreadLink>
-              }
-              direction="row"
-              text={JSON.stringify(props.replyCount)}
-            />
-          ) : null}
         </ActionsContainer>
       </ReplyContainer>
     </ReplyRoot>
