@@ -38,7 +38,7 @@ function App() {
       <GoogleOAuthProvider clientId={clientId}>
         <AppRoot>
           <Helmet>
-            <title>Conj - A Social Media Reboot</title>
+            <title>Conj - Anonymous Discussions</title>
           </Helmet>
           <Router forceRefresh>
             <Switch>

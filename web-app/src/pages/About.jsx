@@ -34,7 +34,7 @@ export function AboutPage() {
         Welcome to Conj
       </Header>
       <Header bold size="large">
-        A Social Media Reboot
+        Anonymous Discussions
       </Header>
       <DetailsContainer>
         <Info
