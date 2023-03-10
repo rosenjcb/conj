@@ -67,7 +67,7 @@
             too-many-chars (assoc base-request :image image :comment too-long)
             no-image-provided (assoc base-request :image nil :comment valid-comment)
             too-early (update test-account :last_thread (partial subtract-minutes 3))]
-        (is (thrown-with-msg? java.lang.Exception #"Comment is below 15 characters." (#'q.thread/validate-create-thread not-enough-chars)))
+        (is (thrown-with-msg? java.lang.Exception #"Comment is below 5 characters." (#'q.thread/validate-create-thread not-enough-chars)))
         (is (thrown-with-msg? java.lang.Exception #"Comment is above character limit 5001/5000." (#'q.thread/validate-create-thread too-many-chars)))
         (is (thrown-with-msg? java.lang.Exception #"An image is required for posting threads." (#'q.thread/validate-create-thread no-image-provided)))
         (is (thrown-with-msg? java.lang.Exception #"Only 3 minutes have passed since your last thread. You must wait 5 minutes between creating new threads." (#'q.thread/validate-thread-time too-early))))))

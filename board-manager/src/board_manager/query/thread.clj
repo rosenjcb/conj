@@ -12,7 +12,7 @@
             [clojure.tools.logging :as log]
             [java-time :as t]))
 
-(def ^:const min-character-count 15)
+(def ^:const min-character-count 5)
 (def ^:const max-character-count 5000)
 (def ^:const max-name-count 30)
 (def ^:const max-subject-count 50)
