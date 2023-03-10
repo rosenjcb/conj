@@ -313,20 +313,22 @@ interface OriginalPostProps {
 const OriginalPost = (props: OriginalPostProps) => {
   return (
     <PostRoot key={props.id} ref={props.handleRef}>
-      <UserInfo>
-        <Avatar onClick={props.openAvatar} avatar={props.avatar} />
-        <TextContainer>
-          <Text bold size="medium">
-            <span>{props.username ?? "Anonymous"}</span>
-          </Text>
-          <PostLink to={props.postHref} onClick={props.handleClick}>
-            #{props.id}
-          </PostLink>
-        </TextContainer>
+      <OriginalPostHeader>
+        <UserInfo>
+          <Avatar onClick={props.openAvatar} avatar={props.avatar} />
+          <TextContainer>
+            <Text bold size="medium">
+              <span>{props.username ?? "Anonymous"}</span>
+            </Text>
+            <PostLink to={props.postHref} onClick={props.handleClick}>
+              #{props.id}
+            </PostLink>
+          </TextContainer>
+        </UserInfo>
         <Text size="medium" color="darkGrey" align="right">
           {props.formattedTime}
         </Text>
-      </UserInfo>
+      </OriginalPostHeader>
       {props.image && props.image.location ? (
         <FullWidth>
           <CenteredImage
@@ -399,7 +401,7 @@ const ReplyPost = (props: ReplyPostProps) => {
     <ReplyRoot key={props.id} ref={props.handleRef}>
       <Avatar onClick={props.openAvatar} avatar={props.avatar} />
       <ReplyContainer>
-        <ReplyUserInfo>
+        <ReplyPostHeader>
           <ReplyTextContainer>
             <Text bold size="medium">
               <span>{props.username ?? "Anonymous"}</span>
@@ -411,7 +413,7 @@ const ReplyPost = (props: ReplyPostProps) => {
           <Text size="medium" color="darkGrey" align="right">
             {props.formattedTime}
           </Text>
-        </ReplyUserInfo>
+        </ReplyPostHeader>
         {props.image && props.image.location ? (
           <ReplyImage
             onClick={() => props.openPostImage()}
@@ -421,7 +423,7 @@ const ReplyPost = (props: ReplyPostProps) => {
         <OriginalContentRoot>
           {processPostText(props.opNo, props.comment)}
         </OriginalContentRoot>
-        <ActionsContainer>
+        <ActionsContainer noMargins>
           {" "}
           <OptionsDiv
             ref={props.optionsRef}
@@ -439,6 +441,14 @@ const ReplyPost = (props: ReplyPostProps) => {
     </ReplyRoot>
   );
 };
+
+const UserInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+  gap: 10px;
+`;
 
 interface WithTextRootProps {
   direction?: string;
@@ -514,13 +524,12 @@ const TextContainer = styled.div`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  width: 100%;
 `;
 
-const UserInfo = styled.div`
+const OriginalPostHeader = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   gap: 20px;
   width: 100%;
@@ -648,14 +657,17 @@ const PostLink = styled(Link)`
   margin: 0;
 `;
 
-const ActionsContainer = styled.div`
+interface ActionsContainerProps {
+  noMargins?: boolean;
+}
+
+const ActionsContainer = styled.div<ActionsContainerProps>`
   display: flex;
   justify-content: space-between;
   width: 100%;
   flex-direction: row;
   align-items: center;
-  margin-left: 4px;
-  margin-right: 4px;
+  margin-left: ${(props) => (props.noMargins ? "0px" : "4px")};
 `;
 
 const ThreadLink = styled(Link)`
@@ -687,10 +699,10 @@ const ReplyContainer = styled.div`
   gap: 10px;
 `;
 
-const ReplyUserInfo = styled.div`
+const ReplyPostHeader = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
 `;

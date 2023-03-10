@@ -210,7 +210,7 @@ export const Text = styled.p<TextProps>`
   text-align: ${(props) => props.align ?? "left"};
   font-family: "Inter", arial, sans-serif;
   color: ${(props) => computeColor(props.theme.colors, props.color)};
-  width: ${(props) => props.width ?? "100%"};
+  width: ${(props) => props.width ?? "auto"};
   padding: 0;
   margin: 0;
   overflow-wrap: ${(props) => (props.noOverflow ? "initial" : "break-word")};
@@ -328,7 +328,7 @@ export const Avatar = ({ avatar, onClick }: AvatarProps) => {
   if (avatar) {
     return <ExistingAvatar onClick={onClick} src={avatar} />;
   } else {
-    return <AnonymousAvatar onClick={onClick} />;
+    return <AnonymousAvatar />;
   }
 };
 
