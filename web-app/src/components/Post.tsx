@@ -447,7 +447,7 @@ const UserInfo = styled.div`
   flex-direction: row;
   align-items: center;
   height: 100%;
-  gap: 10px;
+  gap: 4px;
 `;
 
 interface WithTextRootProps {
@@ -531,7 +531,6 @@ const OriginalPostHeader = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
   width: 100%;
   margin-left: 4px;
   margin-right: 4px;
@@ -552,16 +551,16 @@ const Image = styled.img`
 const FullWidth = styled.div`
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   flex-direction: row;
-  background-color: ${(props) => props.theme.colors.grey};
+  background-color: ${(props) => props.theme.colors.darkGrey};
 `;
 
 const CenteredImage = styled(Image)`
   float: none;
   margin: 0 auto;
   /* aspect-ratio: 1/1; */
-  max-height: 400px;
+  max-height: 200px;
   border-radius: 0px;
 `;
 
@@ -570,14 +569,16 @@ interface ReplyImageProps {
 }
 
 const ReplyImage = styled.div<ReplyImageProps>`
-  float: none;
   aspect-ratio: 16/9;
-  width: 100%;
+  /* width: 100%; */
+  margin: 0;
   border-radius: 4px;
+  max-height: 200px;
   background-image: url("${(props) => props.src}");
-  background-size: cover;
+  background-size: contain;
   background-position: center, center;
   background-repeat: no-repeat;
+  background-color: ${(props) => props.theme.colors.darkGrey};
 `;
 
 const ModalImage = styled(Image)`
@@ -616,7 +617,6 @@ const ContentRoot = styled.div`
   width: 100%;
   margin-left: 4px;
   margin-right: 4px;
-  /* gap: 1rem; */
 `;
 
 const OriginalContentRoot = styled(ContentRoot)`
@@ -624,7 +624,7 @@ const OriginalContentRoot = styled(ContentRoot)`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  gap: 10px;
+  gap: 2px;
 `;
 
 const PostRoot = styled.div`
