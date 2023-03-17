@@ -16,6 +16,7 @@ import { Login } from "./Login";
 import { useMeQuery } from "../api/account";
 import toast from "react-hot-toast";
 import { Reply } from "./Reply";
+import { CgClapperBoard } from "react-icons/cg";
 
 interface WithNavBarProps {
   component: JSX.Element;
@@ -232,9 +233,8 @@ const BoardDrawer = ({ boards, fill, isMobile }: BoardDrawerProps) => {
               selected={b === board}
               key={b}
             >
-              <BoardItem align={isMobile ? "center" : "inherit"}>
-                /{b}/
-              </BoardItem>
+              <BoardIcon />
+              <BoardItem mobile={isMobile}>/{b}/</BoardItem>
             </HighlightBoardRow>
           ))
         ) : (
@@ -284,22 +284,23 @@ const BoardList = styled.ul`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 15px;
   margin: 0;
-  padding-left: 10px;
+  padding: 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
   padding-right: 10px;
 `;
 
-const BoardRow = styled.div`
+const BoardRow = styled.li`
+  list-style-type: none;
   display: flex;
-  justify-content: space-between;
-  width: 100%;
+  justify-content: flex-start;
   align-items: center;
   flex-direction: row;
-  margin-left: 1rem;
-  margin-right: 1rem;
   border-radius: 4px;
+  padding-left: 10px;
 `;
 
 interface HighlightBoardRowProps {
@@ -308,7 +309,7 @@ interface HighlightBoardRowProps {
 
 const HighlightBoardRow = styled(BoardRow)<HighlightBoardRowProps>`
   background-color: ${(props) =>
-    props.selected ? props.theme.colors.white : "inherit"};
+    props.selected ? props.theme.colors.lightGrey : "inherit"};
   &:hover {
     background-color: ${(props) => props.theme.colors.white};
     cursor: pointer;
@@ -316,9 +317,19 @@ const HighlightBoardRow = styled(BoardRow)<HighlightBoardRowProps>`
   min-width: 250px;
 `;
 
-const BoardItem = styled(Text).attrs((props) => ({ bold: true }))`
+interface BoardItemProps {
+  mobile?: boolean;
+}
+
+const BoardItem = styled(Text).attrs((props) => ({
+  bold: true,
+}))<BoardItemProps>`
   color: ${(props) => props.theme.colors.black};
-  border-radius: 12px;
+  /* background-color: ${(props) =>
+    props.mobile ? props.theme.colors.grey : "inherit"}; */
+  width: ${(props) => (props.mobile ? "80%" : "auto")};
+  border-radius: 4px;
+  text-align: "left";
   padding: 8px;
   user-select: none;
 `;
@@ -332,13 +343,12 @@ const BoardDrawerRoot = styled.div<BoardDrawerRootProps>`
   justify-content: flex-start;
   flex-direction: column;
   background-color: ${(props) =>
-    props.fill ? props.theme.colors.grey : "inherit"};
+    !props.fill ? props.theme.colors.darkGrey : "inherit"};
   gap: 2rem;
   height: fit-content;
   /* border-radius: 8px; */
   min-width: 300px;
   border-right: 2px solid ${(props) => props.theme.colors.grey};
-  background-color: ${(props) => props.theme.colors.grey};
   min-height: 100%;
   height: auto;
 
@@ -434,4 +444,14 @@ const SettingText = styled(Text)`
     background-color: ${(props) =>
       chroma(props.theme.colors.grey).brighten(0.6).hex()};
   }
+`;
+
+const BoardIcon = styled(CgClapperBoard)`
+  width: 32px;
+  height: 32px;
+  color: ${(props) => props.theme.colors.black};
+`;
+
+const ListItem = styled.li`
+  list-style-type: none;
 `;

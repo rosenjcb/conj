@@ -25,7 +25,7 @@ export const theme: DefaultTheme = {
     black: "black",
     white: "white",
     grey: "#EDEDED",
-    darkGrey: "#536471",
+    darkGrey: "#d5d5d5",
   },
 };
 
