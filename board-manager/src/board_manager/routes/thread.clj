@@ -144,9 +144,10 @@
   [:map
    [:subject {:optional true} string?]
    [:comment {:optional true} string?]
-   [:image [:map
-            [:filename string?]
-            [:tempfile any?]]]
+   [:image {:optional true} 
+              [:map
+                [:filename string?]
+                [:tempfile any?]]]
    [:is_anonymous boolean?]])
 
 (def thread-routes

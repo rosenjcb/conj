@@ -100,15 +100,9 @@
   (when (> (count subject) max-subject-count)
     (throw (Exception. (format "Subject is above character limit %s/%s." (count subject) max-subject-count)))))
 
-(defn- validate-name
-  [name]
-  (when (> (count name) max-name-count)
-    (throw (Exception. (format "Name is above character limit %s/%s." (count name) max-name-count)))))
-
 (defn ^:private ^:test validate-add-post 
   [post]
-  (let [_ (validate-name (m.post/name post))
-        _ (validate-subject (m.post/subject post))
+  (let [_ (validate-subject (m.post/subject post))
         comment (m.post/comment post)
         image (m.post/image post)]
     (cond
@@ -122,19 +116,14 @@
 
 (defn ^:private ^:test validate-create-thread 
   [post]
-  (let [_ (validate-name (m.post/name post))
-        _ (validate-subject (m.post/subject post))
-        comment (m.post/comment post)
-        image (m.post/image post)]
+  (let [_ (validate-subject (m.post/subject post))
+        comment (m.post/comment post)]
     (cond
       (> (count comment) max-character-count)
       (throw (Exception. (format "Comment is above character limit %s/%s." (count comment) max-character-count)))
 
       (< (count comment) min-character-count)
       (throw (Exception. (format "Comment is below %s characters." min-character-count)))
-
-      ((complement some?) image)
-      (throw (Exception. "An image is required for posting threads."))
 
       :else nil)))
 
@@ -202,7 +191,7 @@
         _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         image (m.post/image op)
-        uploaded-image (upload-image s3-client env board (m.post/id op) image)
+        uploaded-image (when image (upload-image s3-client env board (m.post/id op) image))
         updated-op (assoc op :image uploaded-image :time (t/zoned-date-time) :is_anonymous anonymous?)
         final-thread (vector updated-op)]
     (add-thread-to-board! db-conn redis-conn s3-client env board final-thread)
@@ -216,10 +205,6 @@
         new-threads (mapv #(if (= (m.post/id (first %)) thread-id) final-thread %) old-threads)]
     (db.redis/set redis-conn board new-threads)
     final-thread))
-
-;; Useful later but not in this PR (72-add-post-delete-on-thread-delete-route)
-;; (defn- purge-post [post]
-;;   (assoc post m.post/comment "DELETED POST" m.post/image nil m.post/is-anonymous true))
 
 (defn delete-post-by-id! [db-conn redis-conn s3-client env board thread-id reply-id]
   (let [thread (find-thread-by-id! db-conn redis-conn board thread-id)

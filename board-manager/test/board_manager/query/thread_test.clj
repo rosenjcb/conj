@@ -6,7 +6,7 @@
             [clojure.test :refer [deftest is testing]]
             [java-time :as t]))
 
-(def example-account {:id 19 :email "test@test.com"})
+;; (def example-account {:id 19 :email "test@test.com"})
 
 (def base-request {:id 1 :username "Anonymous" :subject "" :comment "" :image nil})
 
@@ -16,9 +16,9 @@
 
 (def bob-account (assoc test-account :id 3 :username "bobbyhill94" :email "bobby.hill@strickland.com"))
 
-(def example-image {:id 19 :name "snot-pepe" :location "" :rarity "common"})
+;; (def example-image {:id 19 :name "snot-pepe" :location "" :rarity "common"})
 
-(def unenriched-post {:id 100 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false})
+;; (def unenriched-post {:id 100 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false})
 
 (def basic-post {:id 100 :account_id 1 :username "test.mctest" :subject "" :image nil :comment "" :is_anonymous false})
 
@@ -48,11 +48,8 @@
       (is (= nil (#'q.thread/validate-create-thread valid-thread-post)))))
   (testing "Invalid subjects and names throw errors"
     (let [invalid-subject (apply str (repeat 51 "a"))
-          invalid-name (apply str (repeat 31 "a"))
-          subject-too-long (assoc base-request :subject invalid-subject)
-          name-too-long (assoc base-request :name invalid-name)]
-      (is (thrown-with-msg? java.lang.Exception #"Subject is above character limit 51/50" (#'q.thread/validate-create-thread subject-too-long)))
-      (is (thrown-with-msg? java.lang.Exception #"Name is above character limit 31/30." (#'q.thread/validate-create-thread name-too-long)))))
+          subject-too-long (assoc base-request :subject invalid-subject)]
+      (is (thrown-with-msg? java.lang.Exception #"Subject is above character limit 51/50" (#'q.thread/validate-create-thread subject-too-long)))))
   (testing "Valid original posts return nil (do not throw)"
     (let [post-comment "Lorem ipsum facto 15 char."
           image {:filename "snot-pepe" :tempfile nil}
@@ -61,15 +58,13 @@
     (testing "Invalid original posts throw errors"
       (let [too-short "spam"
             too-long (apply str (repeat 5001 "a"))
-            valid-comment "Lorem ipsum facto 15 char."
             image {:filename "snot-pepe" :tempfile nil}
             not-enough-chars (assoc base-request :image image :comment too-short)
             too-many-chars (assoc base-request :image image :comment too-long)
-            no-image-provided (assoc base-request :image nil :comment valid-comment)
             too-early (update test-account :last_thread (partial subtract-minutes 3))]
         (is (thrown-with-msg? java.lang.Exception #"Comment is below 5 characters." (#'q.thread/validate-create-thread not-enough-chars)))
         (is (thrown-with-msg? java.lang.Exception #"Comment is above character limit 5001/5000." (#'q.thread/validate-create-thread too-many-chars)))
-        (is (thrown-with-msg? java.lang.Exception #"An image is required for posting threads." (#'q.thread/validate-create-thread no-image-provided)))
+        ;; (is (thrown-with-msg? java.lang.Exception #"An image is required for posting threads." (#'q.thread/validate-create-thread no-image-provided)))
         (is (thrown-with-msg? java.lang.Exception #"Only 3 minutes have passed since your last thread. You must wait 5 minutes between creating new threads." (#'q.thread/validate-thread-time too-early))))))
   (testing "Valid original posts return nil (do not throw)"
     (let [post-comment "Lorem ipsum facto 15 char."
@@ -98,8 +93,8 @@
     (let [actual-sorted-threads (m.thread/sort unsorted-threads)]
       (is (= actual-sorted-threads sorted-threads)))))
 
-(defn- change-account-id [ids idx val]
-  (assoc val :account_id (get ids idx)))
+;; (defn- change-account-id [ids idx val]
+;;   (assoc val :account_id (get ids idx)))
 
 (deftest enrich-threads
   (testing "enrich? flag is respected"

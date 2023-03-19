@@ -330,12 +330,10 @@ const OriginalPost = (props: OriginalPostProps) => {
         </Text>
       </OriginalPostHeader>
       {props.image && props.image.location ? (
-        <FullWidth>
-          <CenteredImage
-            onClick={() => props.openPostImage()}
-            src={props.image.location}
-          />
-        </FullWidth>
+        <CenteredImage
+          onClick={() => props.openPostImage()}
+          src={props.image.location}
+        />
       ) : null}
       <OriginalContentRoot>
         {props.subject ? (
@@ -548,37 +546,15 @@ const Image = styled.img`
   }
 `;
 
-const FullWidth = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: row;
-  background-color: ${(props) => props.theme.colors.darkGrey};
-`;
-
 const CenteredImage = styled(Image)`
   float: none;
   margin: 0 auto;
-  /* aspect-ratio: 1/1; */
-  max-height: 200px;
-  border-radius: 0px;
+  max-width: 100%;
+  border-radius: 4px;
 `;
 
-interface ReplyImageProps {
-  src: string;
-}
-
-const ReplyImage = styled.div<ReplyImageProps>`
-  aspect-ratio: 16/9;
-  /* width: 100%; */
-  margin: 0;
+const ReplyImage = styled(CenteredImage)`
   border-radius: 4px;
-  max-height: 200px;
-  background-image: url("${(props) => props.src}");
-  background-size: contain;
-  background-position: center, center;
-  background-repeat: no-repeat;
-  background-color: ${(props) => props.theme.colors.darkGrey};
 `;
 
 const ModalImage = styled(Image)`
