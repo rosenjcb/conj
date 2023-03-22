@@ -451,7 +451,3 @@ const BoardIcon = styled(CgClapperBoard)`
   height: 32px;
   color: ${(props) => props.theme.colors.black};
 `;
-
-const ListItem = styled.li`
-  list-style-type: none;
-`;

@@ -2,12 +2,12 @@ import { ChangeEvent, SyntheticEvent, useState } from "react";
 import styled from "styled-components";
 import { Formik, Form, Field, FormikHelpers } from "formik";
 import {
-  Checkbox,
   RoundButton,
   RoundImage,
   Modal,
   Avatar,
   InputField,
+  Switch,
 } from "./index";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -124,6 +124,7 @@ const FullReply = (props: FullReplyProps) => {
 
   const toggleCheck = () => {
     setChecked(!check);
+    console.log("changing check");
     dispatch(updateEntry({ key: "is_anonymous", value: !check }));
   };
 
@@ -167,13 +168,19 @@ const FullReply = (props: FullReplyProps) => {
                 <OptionsContainer>
                   <UploadImage disabled={me === null} />
                   {threadNo === null ? (
-                    <Checkbox
+                    <Switch
                       disabled={me === null}
                       checked={check}
-                      onChange={toggleCheck}
-                      label="Anonymous?"
+                      label="Anonymous"
+                      onCheckedChange={toggleCheck}
                     />
-                  ) : null}
+                  ) : // <Checkbox
+                  //   disabled={me === null}
+                  //   checked={check}
+                  //   onChange={toggleCheck}
+                  //   label="Anonymous?"
+                  // />
+                  null}
                 </OptionsContainer>
                 <RoundButton disabled={me === null || loading} type="submit">
                   Conj
@@ -402,11 +409,11 @@ const IconContainer = styled.div`
 const DeleteIcon = styled(AiFillDelete)`
   width: 24px;
   height: 24px;
-  color: ${(props) => props.theme.colors.primary};
+  color: ${(props) => props.theme.colors.black};
 `;
 
 const UploadImageIcon = styled(BiImageAdd)`
-  color: ${(props) => props.theme.colors.primary};
+  color: ${(props) => props.theme.colors.black};
   width: 3rem;
   height: 3rem;
 

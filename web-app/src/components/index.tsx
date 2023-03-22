@@ -4,6 +4,7 @@ import { BsFillPersonFill } from "react-icons/bs";
 import { BiArrowBack } from "react-icons/bi";
 import { InputHTMLAttributes, useState } from "react";
 import ReactModal from "react-modal";
+import * as RadixSwitch from "@radix-ui/react-switch";
 
 interface ModalBaseProps {
   children?: any;
@@ -259,7 +260,7 @@ interface RoundButtonProps {
 export const RoundButton = styled.button<RoundButtonProps>`
   color: ${(props) => props.theme.colors.white};
   background-color: ${(props) =>
-    props.color ? props.theme.colors[props.color] : props.theme.colors.primary};
+    props.color ? props.theme.colors[props.color] : props.theme.colors.black};
   border: none;
   border-radius: 9000px;
   font-size: ${(props) =>
@@ -375,6 +376,68 @@ export const Checkbox = ({
     </CheckBoxContainer>
   );
 };
+
+interface SwitchProps {
+  disabled?: boolean;
+  checked: boolean;
+  onCheckedChange: () => void;
+  label?: string;
+}
+
+export const Switch = (props: SwitchProps) => {
+  return (
+    <SwitchRoot>
+      {props.label ? <Label>{props.label}</Label> : null}
+      <SwitchBody {...props}>
+        <SwitchThumb />
+      </SwitchBody>
+    </SwitchRoot>
+  );
+};
+
+const SwitchRoot = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+`;
+
+const SwitchBody = styled(RadixSwitch.Root)`
+  all: unset;
+  width: 38px;
+  height: 20px;
+  background-color: grey;
+  border-radius: 9999px;
+  position: relative;
+  /* box-shadow: 0 2px 10px ${(props) => props.theme.colors.black}; */
+  box-shadow: 0 0 0 2px ${(props) => props.theme.colors.black};
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+  &:focus {
+    /* box-shadow: 0 0 0 2px ${(props) => props.theme.colors.black}; */
+  }
+
+  &[data-state="checked"] {
+    background-color: ${(props) => props.theme.colors.black};
+  }
+`;
+
+const SwitchThumb = styled(RadixSwitch.Thumb)`
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: ${(props) => props.theme.colors.white};
+  border-radius: 9999px;
+  box-shadow: 0 2px 2px ${(props) => props.theme.colors.black};
+  transition: transform 100ms;
+  transform: translateX(1px);
+  will-change: transform;
+
+  &[data-state="checked"] {
+    transform: translateX(19px);
+  }
+`;
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
