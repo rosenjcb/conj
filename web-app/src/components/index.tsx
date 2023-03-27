@@ -2,135 +2,111 @@ import styled from "styled-components";
 import chroma from "chroma-js";
 import { BsFillPersonFill } from "react-icons/bs";
 import { BiArrowBack } from "react-icons/bi";
-import { InputHTMLAttributes, useState } from "react";
-import ReactModal from "react-modal";
+import { RxCross2 } from "react-icons/rx";
+import { InputHTMLAttributes, ReactNode, useState } from "react";
 import * as RadixSwitch from "@radix-ui/react-switch";
+import * as RadixDialog from "@radix-ui/react-dialog";
 
-interface ModalBaseProps {
+interface RadixModalProps {
   children?: any;
-  isOpen: boolean;
-  onRequestClose(): any;
   className?: string;
-  title?: string;
+  trigger?: ReactNode;
+  open?: any;
+  onOpenChange?: any;
 }
 
-const ModalBase = ({
-  children,
-  isOpen,
-  onRequestClose,
-  className,
-  title,
-}: ModalBaseProps) => {
-  const contentClassName = `${className}__content`;
-  const overlayClassName = `${className}__overlay`;
-
+export const RadixModal = (props: RadixModalProps) => {
   return (
-    <ReactModal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      ariaHideApp={false}
-      portalClassName={className}
-      overlayClassName={overlayClassName}
-      className={contentClassName}
-    >
-      <ModalRoot>
-        <TitleBar>
-          <Back onClick={onRequestClose} />
-          <Offset distance={"28px"}>
-            <Header size="medium" bold>
-              {title}
-            </Header>
-          </Offset>
-          <span />
-        </TitleBar>
-        {children}
-      </ModalRoot>
-    </ReactModal>
+    <RadixDialog.Root open={props.open} onOpenChange={props.onOpenChange}>
+      {props.trigger ? <RadixTrigger>{props.trigger}</RadixTrigger> : null}
+      <RadixDialog.Portal>
+        <RadixOverlay />
+        <RadixContent>
+          <RadixClose>
+            <CloseButton />
+          </RadixClose>
+          {props.children}
+        </RadixContent>
+      </RadixDialog.Portal>
+    </RadixDialog.Root>
   );
 };
 
-interface OffsetProps {
-  distance: string;
-}
-
-const Offset = styled.div<OffsetProps>`
-  margin-right: ${(props) => props.distance};
+const RadixTrigger = styled(RadixDialog.Trigger)`
+  all: unset;
+  width: inherit;
 `;
 
-const ModalRoot = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
+const RadixOverlay = styled(RadixDialog.Overlay)`
+  background-color: black;
+  opacity: 0.5;
+  position: fixed;
+  inset: 0;
+  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
 `;
 
-const TitleBar = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  justify-content: space-between;
+const CloseButton = styled(RxCross2)`
+  all: unset;
+  border-radius: 100%;
+  height: 25px;
+  width: 25px;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  color: ${(props) => props.theme.colors.black};
+  position: absolute;
+  top: 10px;
+  right: 10px;
 
-  /* @media all and (min-width: 1024px) and (max-width: 1280px) {
-    justify-content: center;
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const RadixContent = styled(RadixDialog.Content)`
+  background-color: ${(props) => props.theme.colors.white};
+  border-radius: 6px;
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px,
+    hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: fit-content;
+  max-width: 90vw;
+  max-height: 85vh;
+  padding: 25px;
+  animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  @media all and (min-width: 1024px) and (max-width: 1280px) {
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
-    justify-content: center;
   }
 
   @media all and (min-width: 480px) and (max-width: 768px) {
-    justify-content: center;
+    width: 80%;
   }
 
   @media all and (max-width: 480px) {
-    justify-content: space-between;
-  } */
-`;
-
-export const Modal = styled(ModalBase)`
-  &__content {
-    z-index: 99999;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-    margin-right: -50%;
-    transform: translate(-50%, -50%);
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    background-color: ${(props) => props.theme.colors.white};
-    width: fit-content;
-
-    @media all and (min-width: 1024px) and (max-width: 1280px) {
-      border-radius: 4px;
-    }
-
-    @media all and (min-width: 768px) and (max-width: 1024px) {
-      border-radius: 4px;
-    }
-
-    @media all and (min-width: 480px) and (max-width: 768px) {
-      border-radius: 4px;
-    }
-
-    @media all and (max-width: 480px) {
-      border-radius: 0px;
-      padding: 0px;
-      width: 100%;
-    }
-  }
-
-  &__overlay {
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    bottom: 0px;
-    background-color: rgba(0, 0, 0, 0.3);
+    width: 80%;
   }
 `;
+
+export const RadixClose = styled(RadixDialog.Close)`
+  all: unset;
+  display: block;
+  /* width: 0;
+  height: 0; */
+`;
+
+// interface OffsetProps {
+//   distance: string;
+// }
+
+// const Offset = styled.div<OffsetProps>`
+//   margin-right: ${(props) => props.distance};
+// `;
 
 interface HRProps {
   width?: string;
@@ -231,6 +207,7 @@ export const SpanText = styled.span<SpanTextProps>`
       : sizeCompute("span", "medium")};
   text-align: ${(props) => props.align ?? "left"};
   font-family: "Inter", arial, sans-serif;
+  word-wrap: break-word;
   color: ${(props) => computeColor(props.theme.colors, props.color)};
 `;
 
@@ -246,10 +223,15 @@ export const Header = styled.h1<HeaderProps>`
   text-align: ${(props) => props.align ?? "center"};
   font-family: "Inter", arial, sans-serif;
   color: ${(props) => computeColor(props.theme.colors, props.color)};
-  padding: 0;
+  padding: 5px;
   margin: 0;
+  border-radius: 4px;
   font-size: ${(props) =>
     props.size ? sizeCompute("h1", props.size) : sizeCompute("h1", "medium")};
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 interface RoundButtonProps {
@@ -278,8 +260,10 @@ export const RoundButton = styled.button<RoundButtonProps>`
       : null}
 
   &:hover {
-    background-color: ${(props) =>
-      chroma(props.theme.colors.primary).darken().hex()};
+    /* background-color: ${(props) =>
+      chroma(props.color ?? props.theme.colors.black)
+        .darken()
+        .hex()}; */
     cursor: pointer;
   }
 `;

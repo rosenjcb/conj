@@ -3,15 +3,16 @@ import styled from "styled-components";
 import {
   Text,
   Avatar,
-  Modal,
-  Checkbox,
   RoundButton,
   AnonymousAvatar,
+  RadixModal,
+  Header,
+  Switch,
 } from "./index";
 import { processPostText } from "../util/post";
 import { useDispatch } from "react-redux";
 import { insertPostLink } from "../slices/postSlice";
-import { Link } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { BiMessageDetail, BiShareAlt } from "react-icons/bi";
 import { VscEllipsis } from "react-icons/vsc";
 import { RiDeleteBin2Fill } from "react-icons/ri";
@@ -107,11 +108,16 @@ const DeleteDialog = ({
 
   return (
     <DeleteDialogRoot>
+      <Header>Delete Post</Header>
       {me?.role === "admin" ? (
-        <Checkbox label="Ban User?" onChange={toggleBanUser} />
+        <Switch
+          checked={banUser}
+          label="Ban User?"
+          onCheckedChange={toggleBanUser}
+        />
       ) : null}
       <SubmitOptions>
-        <RoundButton color="darkGrey" size="small" onClick={closeAction}>
+        <RoundButton size="small" onClick={closeAction}>
           Cancel
         </RoundButton>
         <RoundButton size="small" onClick={handleSubmit}>
@@ -216,29 +222,21 @@ export const PostView = ({
   return (
     <div>
       {image ? (
-        <Modal
-          isOpen={enlargePostImage}
-          onRequestClose={closePostImage}
-          title={image.filename}
-        >
+        <RadixModal open={enlargePostImage} onOpenChange={closePostImage}>
           <ModalImage src={image.location} />
-        </Modal>
+        </RadixModal>
       ) : null}
-      <Modal isOpen={enlargeAvatar} onRequestClose={closeAvatar}>
+      <RadixModal open={enlargeAvatar} onOpenChange={closeAvatar}>
         {avatar ? <ModalImage src={avatar} /> : <AnonymousAvatar />}
-      </Modal>
-      <Modal
-        isOpen={expandDeleteDialog}
-        onRequestClose={closeDeleteDialog}
-        title="Delete Post"
-      >
+      </RadixModal>
+      <RadixModal open={expandDeleteDialog} onOpenChange={closeDeleteDialog}>
         <DeleteDialog
           board={board}
           threadNo={opNo}
           replyNo={!isOriginalPost ? id : null}
           closeAction={closeDeleteDialog}
         />
-      </Modal>
+      </RadixModal>
       {isOriginalPost ? (
         <OriginalPost
           id={id}
@@ -311,11 +309,30 @@ interface OriginalPostProps {
 }
 
 const OriginalPost = (props: OriginalPostProps) => {
+  const location = useLocation();
+
+  const history = useHistory();
+
+  const threadLoc = `${location.pathname}/thread/${props.opNo}`;
+
+  const gotoThread = () => {
+    if (props.preview) {
+      history.push(threadLoc);
+    }
+  };
+
   return (
-    <PostRoot key={props.id} ref={props.handleRef}>
+    <PostRoot
+      key={props.id}
+      ref={props.handleRef}
+      onClick={gotoThread}
+      preview={props.preview}
+    >
       <OriginalPostHeader>
         <UserInfo>
-          <Avatar onClick={props.openAvatar} avatar={props.avatar} />
+          <div>
+            <Avatar onClick={props.openAvatar} avatar={props.avatar} />
+          </div>
           <TextContainer>
             <Text bold size="medium">
               <span>{props.username ?? "Anonymous"}</span>
@@ -359,9 +376,7 @@ const OriginalPost = (props: OriginalPostProps) => {
         {props.preview ? (
           <WithText
             component={
-              <ThreadLink
-                to={(location) => `${location.pathname}/thread/${props.opNo}`}
-              >
+              <ThreadLink to={threadLoc}>
                 <MessageDetail />
               </ThreadLink>
             }
@@ -397,7 +412,9 @@ interface ReplyPostProps {
 const ReplyPost = (props: ReplyPostProps) => {
   return (
     <ReplyRoot key={props.id} ref={props.handleRef}>
-      <Avatar onClick={props.openAvatar} avatar={props.avatar} />
+      <div>
+        <Avatar onClick={props.openAvatar} avatar={props.avatar} />
+      </div>
       <ReplyContainer>
         <ReplyPostHeader>
           <ReplyTextContainer>
@@ -558,9 +575,11 @@ const ReplyImage = styled(CenteredImage)`
 `;
 
 const ModalImage = styled(Image)`
-  max-width: 50vw;
-  max-height: 50vh;
-
+  width: 100%;
+  max-width: 100%;
+  /* max-width: 50vw;
+  max-height: 50vh; */
+  /* 
   @media all and (min-width: 1024px) and (max-width: 1280px) {
     max-width: 50vw;
   }
@@ -574,7 +593,7 @@ const ModalImage = styled(Image)`
   @media all and (max-width: 480px) {
     width: 100vw;
     max-width: 100vw;
-  }
+  } */
 `;
 
 const IconText = styled.p`
@@ -585,14 +604,11 @@ const IconText = styled.p`
 `;
 
 const ContentRoot = styled.div`
-  background-color: ${(props) => props.theme.colors.white};
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-left: 4px;
-  margin-right: 4px;
 `;
 
 const OriginalContentRoot = styled(ContentRoot)`
@@ -601,9 +617,15 @@ const OriginalContentRoot = styled(ContentRoot)`
   justify-content: flex-start;
   flex-direction: column;
   gap: 2px;
+  margin-left: 4px;
+  margin-right: 4px;
 `;
 
-const PostRoot = styled.div`
+interface PostRootProps {
+  preview?: boolean;
+}
+
+const PostRoot = styled.div<PostRootProps>`
   scroll-behavior: smooth;
   display: flex;
   position: relative;
@@ -620,6 +642,11 @@ const PostRoot = styled.div`
   padding-bottom: 10px;
   gap: 10px;
   text-align: left;
+
+  &:hover {
+    background-color: ${(props) =>
+      props.preview ? props.theme.colors.grey : "inherit"};
+  }
 `;
 
 const PostLink = styled(Link)`
@@ -666,6 +693,7 @@ const ReplyRoot = styled.div`
   box-sizing: border-box;
   align-items: flex-start;
   justify-content: flex-start;
+  border-bottom: 2px solid ${(props) => props.theme.colors.grey};
 `;
 
 const ReplyContainer = styled.div`
@@ -673,6 +701,7 @@ const ReplyContainer = styled.div`
   flex-direction: column;
   width: 100%;
   gap: 10px;
+  overflow: hidden;
 `;
 
 const ReplyPostHeader = styled.div`
@@ -680,7 +709,7 @@ const ReplyPostHeader = styled.div`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
+  /* width: 100%; */
 `;
 
 const ReplyTextContainer = styled.div`

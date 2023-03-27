@@ -4,10 +4,11 @@ import { Formik, Form, Field, FormikHelpers } from "formik";
 import {
   RoundButton,
   RoundImage,
-  Modal,
   Avatar,
   InputField,
   Switch,
+  RadixModal,
+  RadixClose,
 } from "./index";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -116,6 +117,12 @@ const FullReply = (props: FullReplyProps) => {
     }
   };
 
+  const handleSubmit = async (e: any, submitForm: any) => {
+    e.preventDefault();
+    await submitForm();
+    handleClose();
+  };
+
   const [loginOpen, setLoginOpen] = useState(false);
 
   const closeLogin = () => setLoginOpen(false);
@@ -134,9 +141,9 @@ const FullReply = (props: FullReplyProps) => {
     return (
       <FullReplyRoot>
         {me === null ? (
-          <Modal isOpen={loginOpen} onRequestClose={closeLogin} title="Login">
+          <RadixModal open={loginOpen} onOpenChange={closeLogin}>
             <Login completeAction={closeLogin} />
-          </Modal>
+          </RadixModal>
         ) : null}
         <Formik initialValues={post} onSubmit={submitPost}>
           {(props) => (
@@ -146,7 +153,7 @@ const FullReply = (props: FullReplyProps) => {
                   disabled={me === null}
                   name="subject"
                   as="input"
-                  placeholder="Title"
+                  placeholder="Subject"
                   value={post.subject ?? ""}
                   onChange={(e) => {
                     handleChange(props.handleChange, e, "subject");
@@ -174,17 +181,17 @@ const FullReply = (props: FullReplyProps) => {
                       label="Anonymous"
                       onCheckedChange={toggleCheck}
                     />
-                  ) : // <Checkbox
-                  //   disabled={me === null}
-                  //   checked={check}
-                  //   onChange={toggleCheck}
-                  //   label="Anonymous?"
-                  // />
-                  null}
+                  ) : null}
                 </OptionsContainer>
-                <RoundButton disabled={me === null || loading} type="submit">
-                  Conj
-                </RoundButton>
+                <RadixClose asChild>
+                  <RoundButton
+                    disabled={me === null || loading}
+                    type="submit"
+                    onClick={(e: any) => handleSubmit(e, props.submitForm)}
+                  >
+                    Conj
+                  </RoundButton>
+                </RadixClose>
               </ActionsContainer>
             </StyledForm>
           )}
@@ -246,10 +253,13 @@ export const Reply = ({ className, isNewThread }: ReplyProps) => {
 
   return (
     <ReplyRoot>
-      <Modal onRequestClose={closeModal} isOpen={open}>
+      <RadixModal
+        open={open}
+        onOpenChange={toggleModal}
+        trigger={<FakeReply className={className} onClick={toggleModal} />}
+      >
         <FullReply handleClose={closeModal} isNewThread={isNewThread} />
-      </Modal>
-      <FakeReply className={className} onClick={toggleModal} />
+      </RadixModal>
     </ReplyRoot>
   );
 };
@@ -351,6 +361,7 @@ const UploadImageInput = styled.input.attrs((props) => ({ type: "file" }))`
 `;
 
 const ActionsContainer = styled.div`
+  gap: 6px;
   display: flex;
   justify-content: space-between;
   flex-direction: row;
@@ -410,6 +421,10 @@ const DeleteIcon = styled(AiFillDelete)`
   width: 24px;
   height: 24px;
   color: ${(props) => props.theme.colors.black};
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const UploadImageIcon = styled(BiImageAdd)`

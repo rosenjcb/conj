@@ -5,7 +5,7 @@ import { useLogoutMutation } from "../api/account";
 import { useFetchBoardsQuery } from "../api/board";
 import chroma from "chroma-js";
 import { FiMenu } from "react-icons/fi";
-import { Text, Modal } from "./index";
+import { Text, RadixModal } from "./index";
 import { useThread } from "../hooks/useThread";
 import { detectMobile } from "../util/window";
 import { Header } from "./index";
@@ -87,16 +87,12 @@ export const WithNavBar = ({ component }: WithNavBarProps) => {
 
   return (
     <BoardRoot>
-      <Modal
-        isOpen={accountIsOpen}
-        onRequestClose={closeAccount}
-        title="Account Info"
-      >
+      <RadixModal open={accountIsOpen} onOpenChange={closeAccount}>
         <AccountSettings onFinish={closeAccount} />
-      </Modal>
-      <Modal isOpen={loginOpen} onRequestClose={closeLogin} title="Login">
+      </RadixModal>
+      <RadixModal open={loginOpen} onOpenChange={closeLogin}>
         <Login completeAction={closeLogin} />
-      </Modal>
+      </RadixModal>
       <HomeNavBar>
         <Header bold onClick={redirectHome}>
           Conj
@@ -132,13 +128,11 @@ export const WithNavBar = ({ component }: WithNavBarProps) => {
         {!isMobile ? (
           <BoardDrawer boards={boards} />
         ) : (
-          <Modal
-            isOpen={drawerOpen}
-            onRequestClose={closeDrawer}
-            title="Most Popular Boards"
-          >
-            <BoardDrawer isMobile={isMobile} fill={true} boards={boards} />
-          </Modal>
+          <RadixModal open={drawerOpen} onOpenChange={closeDrawer}>
+            {boards ? (
+              <BoardDrawer isMobile={isMobile} fill={true} boards={boards} />
+            ) : null}
+          </RadixModal>
         )}
         <PageWrapper>
           <FixedWidth mobile={isMobile}>
@@ -220,11 +214,9 @@ const BoardDrawer = ({ boards, fill, isMobile }: BoardDrawerProps) => {
     <BoardDrawerRoot fill={fill}>
       <BoardList>
         <BoardRow>
-          {!isMobile ? (
-            <Text size={"large"} align="center" bold>
-              Most Popular Boards
-            </Text>
-          ) : null}
+          <Text size={"large"} align="center" bold>
+            Most Popular Boards
+          </Text>
         </BoardRow>
         {boards !== undefined ? (
           boards.map((b) => (
@@ -239,7 +231,7 @@ const BoardDrawer = ({ boards, fill, isMobile }: BoardDrawerProps) => {
           ))
         ) : (
           <Text bold size={"medium"}>
-            No Boards Found
+            {/* No Boards Found */}
           </Text>
         )}
       </BoardList>
@@ -291,6 +283,20 @@ const BoardList = styled.ul`
   padding-top: 10px;
   padding-bottom: 10px;
   padding-right: 10px;
+
+  @media all and (min-width: 1024px) {
+  }
+
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+  }
+
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    padding: 0;
+  }
+
+  @media all and (max-width: 480px) {
+    padding: 0;
+  }
 `;
 
 const BoardRow = styled.li`
@@ -309,12 +315,13 @@ interface HighlightBoardRowProps {
 
 const HighlightBoardRow = styled(BoardRow)<HighlightBoardRowProps>`
   background-color: ${(props) =>
-    props.selected ? props.theme.colors.lightGrey : "inherit"};
+    props.selected ? props.theme.colors.grey : "inherit"};
   &:hover {
-    background-color: ${(props) => props.theme.colors.white};
+    background-color: ${(props) => props.theme.colors.grey};
     cursor: pointer;
   }
-  min-width: 250px;
+  width: 90%;
+  margin-left: 10px;
 `;
 
 interface BoardItemProps {
@@ -325,8 +332,6 @@ const BoardItem = styled(Text).attrs((props) => ({
   bold: true,
 }))<BoardItemProps>`
   color: ${(props) => props.theme.colors.black};
-  /* background-color: ${(props) =>
-    props.mobile ? props.theme.colors.grey : "inherit"}; */
   width: ${(props) => (props.mobile ? "80%" : "auto")};
   border-radius: 4px;
   text-align: "left";
@@ -342,8 +347,7 @@ const BoardDrawerRoot = styled.div<BoardDrawerRootProps>`
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
-  background-color: ${(props) =>
-    !props.fill ? props.theme.colors.darkGrey : "inherit"};
+  background-color: ${(props) => props.theme.colors.white};
   gap: 2rem;
   height: fit-content;
   /* border-radius: 8px; */
@@ -352,11 +356,12 @@ const BoardDrawerRoot = styled.div<BoardDrawerRootProps>`
   min-height: 100%;
   height: auto;
 
-  @media all and (max-width: 480px) {
+  @media all and (max-width: 768px) {
     width: 100%;
     height: 100%;
     padding: 0;
     border-radius: 0px;
+    border-right: none;
   }
 `;
 
@@ -426,7 +431,26 @@ const IconContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: ${(props) => props.theme.colors.grey};
+
+  @media all and (min-width: 1024px) {
+    background-color: ${(props) => props.theme.colors.white};
+  }
+
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    background-color: ${(props) => props.theme.colors.white};
+  }
+
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    background-color: ${(props) => props.theme.colors.grey};
+  }
+
+  @media all and (max-width: 480px) {
+    background-color: ${(props) => props.theme.colors.grey};
+  }
+
+  &:hover {
+    background-color: ${(props) => props.theme.colors.grey};
+  }
 `;
 
 const Link = styled.div`
