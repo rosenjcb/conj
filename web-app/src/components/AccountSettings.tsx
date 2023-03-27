@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Formik, Field } from "formik";
-import { RoundButton, InputField, InputFile } from "./index";
+import { RoundButton, InputField, InputFile, Header } from "./index";
 import {
   useMeQuery,
   useUpdateMeMutation,
@@ -55,6 +55,7 @@ export function AccountSettings({ onFinish }: AccountSettingsProps) {
         <Formik initialValues={initialValues} onSubmit={handleUpdate}>
           {(props) => (
             <StyledForm onSubmit={props.handleSubmit}>
+              <Header>Update Account Info</Header>
               <ContentDetails>
                 <Field
                   label="AVATAR"
