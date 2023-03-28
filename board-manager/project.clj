@@ -11,6 +11,7 @@
                  [ring/ring-core "1.9.4"]
                  [com.taoensso/carmine "3.2.0"]
                  [metosin/reitit "0.5.15"]
+                 [metosin/reitit-swagger "0.5.5"]
                  [com.taoensso/carmine "3.2.0"]
                  [com.github.seancorfield/next.jdbc "1.2.737"]
                  [environ "1.2.0"]

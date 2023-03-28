@@ -2,7 +2,9 @@
   (:require [clojure.pprint :as pprint]
             [clojure.tools.logging :as log]
             [environ.core :refer [env]]
-            [wkok.openai-clojure.api :as api])
+            [wkok.openai-clojure.api :as api]
+            [martian.core :as martian]
+            [martian.clj-http :as martian-http])
   (:gen-class))
 
 (def default-model "text-davinci-003")
@@ -38,5 +40,9 @@
 (comment
   (require '[environ.core :refer env])
   (env :openai-key)
+  (def swag (slurp "swagger.json"))
+  (def m (martian-http/bootstrap-swagger "http://localhost:8080/swagger.json"))
+  (pprint/pprint m)
+  (print m)
   (-main "profiles.edn"))
 

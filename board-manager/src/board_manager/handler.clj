@@ -16,6 +16,7 @@
             [reitit.ring :as ring]
             [reitit.ring.coercion :as coercion]
             [reitit.ring.middleware.muuntaja :as muuntaja]
+            [reitit.swagger :as swagger]
             [ring.adapter.jetty :as jetty]
             [ring.middleware.cookies :as cookies]
             [ring.middleware.multipart-params :as multipart]
@@ -57,9 +58,11 @@
 (def api-config
   (ring/ring-handler
    (ring/router
-    ["/api"
-     thread/thread-routes 
-     account/account-routes]
+    [["/api"
+      thread/thread-routes 
+      account/account-routes]
+     ["" {:no-doc true}
+      ["/swagger.json" {:get (swagger/create-swagger-handler)}]]]
     {:data {:muuntaja m/instance
             :coercion spec/coercion
             :middleware

@@ -10,7 +10,8 @@
             [board-manager.query.thread :as query.thread]
             [clojure.tools.logging :as log]
             [reitit.coercion.malli :as malli.coercion]
-            [ring.util.response :as response]))
+            [ring.util.response :as response]
+            [ring.middleware.params :as params]))
 
 (defn peek-threads! [req]
   (let [db-conn (get-in req [:components :db-conn])
@@ -124,6 +125,10 @@
     (db.s3/delete-directory s3-client "conj-images" boards-path)
     (response/response "Boards have been purged and redis cache is clear!")))
 
+(def board-path
+  [:map
+   [:board string?]])
+
 (def thread-path
   [:map
    [:board string?]
@@ -157,14 +162,18 @@
               :middleware [[middleware/wrap-admin]]
               :handler flush-all!}}]
    ["/boards/:board"
-   {:get peek-threads! 
+   {:get {:summary "Fetches all threads from board"
+          :parameters {:path board-path}
+          :handler peek-threads!}
     :post {:summary "Create a Thread" 
            :middleware [[middleware/full-wrap-auth]]
            :coercion malli.coercion/coercion
-           :parameters {:multipart-params thread-body}
+           :parameters {:multipart-params thread-body
+                        :path board-path}
            :handler create-thread!}
     :delete {:summary "Nukes the entire board"
              :middleware [[middleware/wrap-admin]]
+             :parameters {:path board-path}
              :handler nuke-threads!}}]
     ["/boards/:board/threads/:id"
      {:get {:summary "Get a thread by id"
