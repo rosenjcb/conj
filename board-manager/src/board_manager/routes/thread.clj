@@ -127,7 +127,7 @@
 
 (def board-path
   [:map
-   [:board string?]])
+    [:board string?]])
 
 (def thread-path
   [:map
@@ -158,35 +158,47 @@
 (def thread-routes
   [["/boards"
     {:get list-boards!
-     :delete {:summary "Purges all boards from cache"
+     :delete {:name :purge-boards
+              :operationId "purgeBoards"
+              :summary "Purges all boards from cache"
+              :coercion malli.coercion/coercion
               :middleware [[middleware/wrap-admin]]
               :handler flush-all!}}]
    ["/boards/:board"
-   {:get {:summary "Fetches all threads from board"
-          :parameters {:path board-path}
-          :handler peek-threads!}
-    :post {:summary "Create a Thread" 
-           :middleware [[middleware/full-wrap-auth]]
+    {:get {:name :get-board
+           :operationId "getBoard"
+           :summary "Fetches all threads from board"
+           :parameters {:path board-path}
            :coercion malli.coercion/coercion
-           :parameters {:multipart-params thread-body
-                        :path board-path}
-           :handler create-thread!}
-    :delete {:summary "Nukes the entire board"
+           :handler peek-threads!}
+     :post {:name :create-thread
+            :summary "Create a Thread" 
+            :middleware [[middleware/full-wrap-auth]]
+            :coercion malli.coercion/coercion
+            :parameters {:multipart-params thread-body
+                          :path board-path}
+            :handler create-thread!}
+     :delete {:name :delete-thread
+             :summary "Nukes the entire board"
              :middleware [[middleware/wrap-admin]]
+             :coercion malli.coercion/coercion
              :parameters {:path board-path}
              :handler nuke-threads!}}]
     ["/boards/:board/threads/:id"
-     {:get {:summary "Get a thread by id"
+     {:get {:name :get-thread
+            :summary "Get a thread by id"
             :parameters {:path thread-path}
             :coercion malli.coercion/coercion
             :handler get-thread!}
-      :put {:summary "Inserts a post into a thread by id"
+      :put {:name :update-thread
+            :summary "Inserts a post into a thread by id"
             :parameters {:path thread-path
                          :multipart-params post-body}
             :coercion malli.coercion/coercion
             :middleware [[middleware/full-wrap-auth]]
             :handler put-thread!}
-      :delete {:summary "Deletes a thread (or reply). Pass an optional parameter to ban the post author."
+      :delete {:name :delete-thread
+               :summary "Deletes a thread (or reply). Pass an optional parameter to ban the post author."
                :parameters {:path thread-path
                             :query thread-query}
                :coercion malli.coercion/coercion

@@ -8,7 +8,8 @@
                  [net.clojars.wkok/openai-clojure "0.5.0"]
                  [environ "1.2.0"]
                  [com.github.oliyh/martian "0.1.22"]                
-                 [com.github.oliyh/martian-clj-http "0.1.22"]]
+                 [com.github.oliyh/martian-clj-http "0.1.22"]
+                 [clj-http "3.12.3"]]
   :plugins [[lein-environ "1.2.0"]]
   :main ^:skip-aot conj-bot.core
   :target-path "target/%s"

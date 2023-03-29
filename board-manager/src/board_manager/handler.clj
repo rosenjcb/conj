@@ -12,11 +12,12 @@
             [environ.core :refer [env]]
             [muuntaja.core :as m]
             [next.jdbc.connection :as connection]
-            [reitit.coercion.spec :as spec]
+            [reitit.coercion.malli :as malli]
             [reitit.ring :as ring]
             [reitit.ring.coercion :as coercion]
             [reitit.ring.middleware.muuntaja :as muuntaja]
             [reitit.swagger :as swagger]
+            [reitit.swagger-ui :as swagger-ui]
             [ring.adapter.jetty :as jetty]
             [ring.middleware.cookies :as cookies]
             [ring.middleware.multipart-params :as multipart]
@@ -55,6 +56,14 @@
 (def web-app-routes
   [["/" (ring/create-resource-handler)]])
 
+(def custom-muuntaja 
+  (m/create
+   (-> m/default-options
+       (update
+        :formats
+        select-keys
+        ["application/json"]))))
+
 (def api-config
   (ring/ring-handler
    (ring/router
@@ -62,9 +71,12 @@
       thread/thread-routes 
       account/account-routes]
      ["" {:no-doc true}
-      ["/swagger.json" {:get (swagger/create-swagger-handler)}]]]
-    {:data {:muuntaja m/instance
-            :coercion spec/coercion
+      ["/swag.json" {:get {:swagger {:info {:title "Conj API"
+                                            :description "The internal api for Conj"
+                                            :version "2.0"}}
+                           :handler (swagger/create-swagger-handler)}}]]]
+    {:data {:muuntaja custom-muuntaja
+            :coercion malli/coercion
             :middleware
              [muuntaja/format-middleware
               cookies/wrap-cookies
@@ -75,6 +87,7 @@
               coercion/coerce-response-middleware]}
      :conflicts (constantly nil)})
    (ring/routes
+    (swagger-ui/create-swagger-ui-handler {:path "/swag-ui" :url "/swag.json"})
     (spa-fallback-handler)
     (ring/create-default-handler))))
 

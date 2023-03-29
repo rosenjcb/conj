@@ -3,7 +3,10 @@
             [clojure.tools.logging :as log]
             [environ.core :refer [env]]
             [wkok.openai-clojure.api :as api]
+            [cheshire.core :as cheshire]
             [martian.core :as martian]
+            [martian.interceptors :as martian.interceptors]
+            [clj-http.client :as http-client]
             [martian.clj-http :as martian-http])
   (:gen-class))
 
@@ -37,12 +40,29 @@
       (begin-job! openai-creds profile)
       (log/infof "Couldn't find profile %s" profile))))
 
-(comment
-  (require '[environ.core :refer env])
-  (env :openai-key)
-  (def swag (slurp "swagger.json"))
-  (def m (martian-http/bootstrap-swagger "http://localhost:8080/swagger.json"))
-  (pprint/pprint m)
-  (print m)
-  (-main "profiles.edn"))
+(defn- bootstrap-json [file]
+  (->> (cheshire/parse-string (slurp file))
+       (martian/bootstrap-openapi "http://localhost:8080")))
 
+(def my-coerce-response
+  {:name ::my-coerce-response
+   :enter (fn [ctx]
+               (assoc-in ctx [:request :headers "Accept"] "application/json"))
+   :leave (fn [ctx] ctx)})
+
+
+(comment
+  ;; (require '[environ.core :refer env])
+  ;; (env :openai-key)
+  (def m (martian-http/bootstrap-swagger "http://localhost:8080/swag.json"))
+  ;; (def m (bootstrap-json "swagger.json"))
+  ;; (pprint/pprint m)
+  (martian/explore m)
+  (martian/explore m :get-board)
+  (def req (martian/request-for m :get-board {:board "random"}))
+  (print req)
+  ;; (def response (http-client/request (assoc-in req [:headers] {"Accept" "application/json"})))
+  (def res (martian/response-for m :get-board {:board "random"}))
+  (print res)
+  ;; (print m)
+  (-main "profiles.edn"))
