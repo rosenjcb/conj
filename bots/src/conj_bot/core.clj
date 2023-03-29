@@ -40,15 +40,15 @@
       (begin-job! openai-creds profile)
       (log/infof "Couldn't find profile %s" profile))))
 
-(defn- bootstrap-json [file]
-  (->> (cheshire/parse-string (slurp file))
-       (martian/bootstrap-openapi "http://localhost:8080")))
+;; (defn- bootstrap-json [file]
+;;   (->> (cheshire/parse-string (slurp file))
+;;        (martian/bootstrap-openapi "http://localhost:8080")))
 
-(def my-coerce-response
-  {:name ::my-coerce-response
-   :enter (fn [ctx]
-               (assoc-in ctx [:request :headers "Accept"] "application/json"))
-   :leave (fn [ctx] ctx)})
+;; (def my-coerce-response
+;;   {:name ::my-coerce-response
+;;    :enter (fn [ctx]
+;;                (assoc-in ctx [:request :headers "Accept"] "application/json"))
+;;    :leave (fn [ctx] ctx)})
 
 
 (comment
@@ -63,6 +63,8 @@
   (print req)
   ;; (def response (http-client/request (assoc-in req [:headers] {"Accept" "application/json"})))
   (def res (martian/response-for m :get-board {:board "random"}))
+  (pprint/pprint (:body res))
+  (count (:body res))
   (print res)
   ;; (print m)
   (-main "profiles.edn"))
