@@ -435,9 +435,7 @@ const ReplyPost = (props: ReplyPostProps) => {
             src={props.image.location}
           />
         ) : null}
-        <OriginalContentRoot>
-          {processPostText(props.opNo, props.comment)}
-        </OriginalContentRoot>
+        <ContentRoot>{processPostText(props.opNo, props.comment)}</ContentRoot>
         <ActionsContainer noMargins>
           {" "}
           <OptionsDiv
