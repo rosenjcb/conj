@@ -172,25 +172,29 @@
            :coercion malli.coercion/coercion
            :handler peek-threads!}
      :post {:name :create-thread
-            :summary "Create a Thread" 
+            :operationId "createThread"
+            :summary "Create a Thread"
             :middleware [[middleware/full-wrap-auth]]
             :coercion malli.coercion/coercion
             :parameters {:multipart-params thread-body
-                          :path board-path}
+                         :path board-path}
             :handler create-thread!}
-     :delete {:name :delete-thread
-             :summary "Nukes the entire board"
-             :middleware [[middleware/wrap-admin]]
-             :coercion malli.coercion/coercion
-             :parameters {:path board-path}
-             :handler nuke-threads!}}]
+     :delete {:name :purge-board
+              :operationId "purgeBoard"
+              :summary "Purges the entire board"
+              :middleware [[middleware/wrap-admin]]
+              :coercion malli.coercion/coercion
+              :parameters {:path board-path}
+              :handler nuke-threads!}}]
     ["/boards/:board/threads/:id"
      {:get {:name :get-thread
+            :operationId "getThread"
             :summary "Get a thread by id"
             :parameters {:path thread-path}
             :coercion malli.coercion/coercion
             :handler get-thread!}
       :put {:name :update-thread
+            :operationId "replyThread"
             :summary "Inserts a post into a thread by id"
             :parameters {:path thread-path
                          :multipart-params post-body}
@@ -198,6 +202,7 @@
             :middleware [[middleware/full-wrap-auth]]
             :handler put-thread!}
       :delete {:name :delete-thread
+               :operationId "deleteThread"
                :summary "Deletes a thread (or reply). Pass an optional parameter to ban the post author."
                :parameters {:path thread-path
                             :query thread-query}

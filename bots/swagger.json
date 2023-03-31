@@ -9,13 +9,21 @@
   "paths": {
     "/api/boards": {
       "get": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": []
       },
       "delete": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [],
@@ -25,7 +33,11 @@
     },
     "/api/boards/{board}": {
       "get": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [
@@ -41,7 +53,11 @@
         "operationId": "getBoard"
       },
       "post": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [
@@ -53,10 +69,15 @@
             "required": true
           }
         ],
-        "summary": "Create a Thread"
+        "summary": "Create a Thread",
+        "operationId": "createThread"
       },
       "delete": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [
@@ -68,12 +89,17 @@
             "required": true
           }
         ],
-        "summary": "Nukes the entire board"
+        "summary": "Purges the entire board",
+        "operationId": "purgeBoard"
       }
     },
     "/api/boards/{board}/threads/{id}": {
       "get": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [
@@ -93,10 +119,15 @@
             "format": "int64"
           }
         ],
-        "summary": "Get a thread by id"
+        "summary": "Get a thread by id",
+        "operationId": "getThread"
       },
       "put": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [
@@ -116,10 +147,15 @@
             "format": "int64"
           }
         ],
-        "summary": "Inserts a post into a thread by id"
+        "summary": "Inserts a post into a thread by id",
+        "operationId": "replyThread"
       },
       "delete": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [
@@ -154,12 +190,17 @@
             "required": false
           }
         ],
-        "summary": "Deletes a thread (or reply). Pass an optional parameter to ban the post author."
+        "summary": "Deletes a thread (or reply). Pass an optional parameter to ban the post author.",
+        "operationId": "deleteThread"
       }
     },
     "/api/accounts": {
       "post": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [],
@@ -168,7 +209,11 @@
     },
     "/api/ping": {
       "get": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [],
@@ -177,14 +222,22 @@
     },
     "/api/me": {
       "get": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [],
         "summary": "Grab an account by id"
       },
       "put": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [],
@@ -193,7 +246,11 @@
     },
     "/api/authenticate": {
       "post": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [
@@ -204,13 +261,21 @@
             "required": true,
             "schema": {
               "type": "object",
-              "properties": { "email": {}, "pass": {}, "provider": {} },
+              "properties": {
+                "email": {},
+                "pass": {},
+                "provider": {}
+              },
               "required": ["email", "pass", "provider"],
               "additionalProperties": false,
               "x-anyOf": [
                 {
                   "type": "object",
-                  "properties": { "email": {}, "pass": {}, "provider": {} },
+                  "properties": {
+                    "email": {},
+                    "pass": {},
+                    "provider": {}
+                  },
                   "required": ["email", "pass", "provider"],
                   "additionalProperties": false
                 },
@@ -233,7 +298,11 @@
     },
     "/api/oauth": {
       "post": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [
@@ -244,7 +313,11 @@
             "required": true,
             "schema": {
               "type": "object",
-              "properties": { "provider": {}, "code": {}, "redirectUri": {} },
+              "properties": {
+                "provider": {},
+                "code": {},
+                "redirectUri": {}
+              },
               "required": ["provider", "code", "redirectUri"],
               "additionalProperties": false
             }
@@ -255,7 +328,11 @@
     },
     "/api/onboarding": {
       "post": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [],
@@ -264,7 +341,11 @@
     },
     "/api/logout": {
       "get": {
-        "responses": { "default": { "description": "" } },
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
         "produces": ["application/json"],
         "consumes": ["application/json"],
         "parameters": [],

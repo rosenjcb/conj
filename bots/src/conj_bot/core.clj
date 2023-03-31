@@ -21,24 +21,49 @@
    :prompt (str bot-desc reddit-context "\"" post "\"")
    :max_tokens 60})
 
-(defn begin-job! [openai-creds profile]
+(defn make-new-post! [openai-creds profile thread]
+  (try
+    (let [op (first thread)
+          comment (:comment op)
+          prompt (make-prompt (:description profile) comment)
+          response (api/create-completion prompt openai-creds)
+          reply (->> response :choices first :text)]
+      (log/infof "Here is your prompt %s" prompt)
+      (log/infof "Here's my response from openai %s" reply))
+    (catch Exception e
+      (log/errorf "Something went wrong %s" e))))
+
+(defn make-reply-post! [])
+
+(defn begin-job! [openai-creds conj-client profile]
   (log/infof "Loaded profile %s" (:name profile))
-  (let [prompt (make-prompt (:description profile) fake-post)
-        _ (pprint/pprint prompt)
-        reply (api/create-completion prompt openai-creds)]
-    (pprint/pprint reply)
-    (log/infof (->> (:choices reply) first :text))))
+  (let [history (:history profile)
+        board (first (:boards profile))]
+    (if (= (count history) 0)
+      (let [threads (->> (martian/response-for conj-client :get-board {:board board}) :body)
+            picked-threads (take 3 (shuffle threads))]
+        (doseq [thread picked-threads]
+          (make-new-post! openai-creds profile thread)))
+      (make-reply-post!))))
+
+
+;; prompt (make-prompt (:description profile) fake-post)
+;; _ (pprint/pprint prompt)
+;; reply (api/create-completion prompt openai-creds)]
+;; (pprint/pprint reply)
+;; (log/infof (->> (:choices reply) first :text))))
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
   (let [prof-loc (first args)
-        profile (->> (slurp prof-loc) read-string)
+        profiles (->> (slurp prof-loc) read-string)
         openai-key (env :openai-key)
-        openai-creds {:api-key openai-key}]
-    (if profile
-      (begin-job! openai-creds profile)
-      (log/infof "Couldn't find profile %s" profile))))
+        openai-creds {:api-key openai-key}
+        conj-client (martian-http/bootstrap-swagger "http://localhost:8080/swag.json" {:server-url "https://conj.app"})]
+    (if profiles
+      (begin-job! openai-creds conj-client (second profiles))
+      (log/infof "Couldn't find any profiles in %s" profiles))))
 
 ;; (defn- bootstrap-json [file]
 ;;   (->> (cheshire/parse-string (slurp file))
@@ -55,9 +80,12 @@
   ;; (require '[environ.core :refer env])
   ;; (env :openai-key)
   (def m (martian-http/bootstrap-swagger "http://localhost:8080/swag.json"))
+  (pprint/pprint (keys m))
+  (pprint/pprint (:api-root m))
+  (def m (assoc m :api-root "https://conj.app"))
   ;; (def m (bootstrap-json "swagger.json"))
   ;; (pprint/pprint m)
-  (martian/explore m)
+  (pprint/pprint (martian/explore m))
   (martian/explore m :get-board)
   (def req (martian/request-for m :get-board {:board "random"}))
   (print req)
@@ -67,4 +95,7 @@
   (count (:body res))
   (print res)
   ;; (print m)
+  (def profile (->> (slurp "profiles.edn") read-string second))
+  (def openai-key "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")
+  (begin-job! {:api-key openai-key} m profile)
   (-main "profiles.edn"))
