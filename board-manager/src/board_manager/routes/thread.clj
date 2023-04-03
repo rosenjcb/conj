@@ -8,10 +8,11 @@
             [board-manager.query.db.redis :as db.redis]
             [board-manager.query.db.s3 :as db.s3]
             [board-manager.query.thread :as query.thread]
+            [clojure.pprint :as pprint]
             [clojure.tools.logging :as log]
             [reitit.coercion.malli :as malli.coercion]
-            [ring.util.response :as response]
-            [ring.middleware.params :as params]))
+            [reitit.ring.malli :as malli.ring]
+            [ring.util.response :as response]))
 
 (defn peek-threads! [req]
   (let [db-conn (get-in req [:components :db-conn])
@@ -57,10 +58,12 @@
         env (get-in req [:components :env])
         db-conn (get-in req [:components :db-conn])
         multipart-params (:multipart-params req)
+        form-data (if (empty? multipart-params) (:form-params req) multipart-params)
         id (get-in req [:parameters :path :id])
-        board (get-in req [:parameters :path :board])]
+        board (get-in req [:parameters :path :board])
+        _ (pprint/pprint req)]
     (try
-      (->> multipart-params 
+      (->> form-data 
            (query.thread/add-post! db-conn s3-client redis-conn env account board id)
            response/response)
       (catch Exception e
@@ -139,20 +142,24 @@
    [:replyNo {:optional true} int?]
    [:ban {:optional true} boolean?]])
 
-(def post-body
+(def multipart-file-map
   [:map
-   [:subject string?]
-   [:comment string?]
-   [:image string?]])
+    [:filename string?]
+    [:content-type string?]
+    [:tempfile any?]
+    [:size number?]])
 
-(def thread-body
+(def reply-form-data
   [:map
    [:subject {:optional true} string?]
    [:comment {:optional true} string?]
-   [:image {:optional true} 
-              [:map
-                [:filename string?]
-                [:tempfile any?]]]
+   [:image {:optional true} malli.ring/temp-file-part]])
+
+(def thread-form-data
+  [:map
+   [:subject {:optional true} string?]
+   [:comment {:optional true} string?]
+  ;;  [:image [:maybe multipart-file]]
    [:is_anonymous boolean?]])
 
 (def thread-routes
@@ -176,7 +183,7 @@
             :summary "Create a Thread"
             :middleware [[middleware/full-wrap-auth]]
             :coercion malli.coercion/coercion
-            :parameters {:multipart-params thread-body
+            :parameters {:multipart thread-form-data
                          :path board-path}
             :handler create-thread!}
      :delete {:name :purge-board
@@ -197,7 +204,8 @@
             :operationId "replyThread"
             :summary "Inserts a post into a thread by id"
             :parameters {:path thread-path
-                         :multipart-params post-body}
+                         :multipart reply-form-data}
+            ;; :consumes ["multipart/form-data"]
             :coercion malli.coercion/coercion
             :middleware [[middleware/full-wrap-auth]]
             :handler put-thread!}

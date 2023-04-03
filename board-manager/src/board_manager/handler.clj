@@ -20,7 +20,8 @@
             [reitit.swagger-ui :as swagger-ui]
             [ring.adapter.jetty :as jetty]
             [ring.middleware.cookies :as cookies]
-            [ring.middleware.multipart-params :as multipart]
+            [ring.middleware.multipart-params :as multipart-params]
+            [reitit.ring.middleware.multipart :as multipart]
             [ring.middleware.params :as params]
             [ring.util.response :as response]
             [taoensso.carmine :as car])
@@ -80,7 +81,8 @@
             :middleware
              [muuntaja/format-middleware
               cookies/wrap-cookies
-              multipart/wrap-multipart-params
+              multipart-params/wrap-multipart-params
+              ;; multipart/multipart-middleware
               params/wrap-params
               coercion/coerce-exceptions-middleware
               coercion/coerce-request-middleware

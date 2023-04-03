@@ -12,6 +12,7 @@
                  [com.taoensso/carmine "3.2.0"]
                  [metosin/reitit "0.6.0"]
                  [metosin/reitit-swagger "0.6.0"]
+                 [metosin/reitit-http "0.6.0"]
                  [com.taoensso/carmine "3.2.0"]
                  [com.github.seancorfield/next.jdbc "1.2.737"]
                  [environ "1.2.0"]

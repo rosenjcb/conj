@@ -14,9 +14,8 @@
 
 (def ^:const min-character-count 5)
 (def ^:const max-character-count 5000)
-(def ^:const max-name-count 30)
 (def ^:const max-subject-count 50)
-(def ^:const max-thread-count 30)
+(def ^:const max-thread-count 300)
 (def ^:const max-post-count 30)
 
 (def ^:const s3-bucket "conj-images")
