@@ -150,6 +150,7 @@
            :parameters {:multipart-params api.account/update-me}}}]
    ["/authenticate"
     {:post {:name ::authenticate-account
+            :operationId "authenticate"
             :summary "Authenticates an existing account"
             :coercion malli/coercion
             :parameters {:body api.account/auth-account}

@@ -97,7 +97,6 @@ const DeleteDialog = ({
   const handleSubmit = async () => {
     try {
       await deleteThread(deleteReq).unwrap();
-      // console.log(JSON.stringify(deleteReq, null, 2));
       toast.success(`Successfully deleted Post #${replyNo ?? threadNo}`);
     } catch (e: any) {
       if (e && "status" in e) toast.error(e.data);
@@ -175,18 +174,10 @@ export const PostView = ({
     setEnlargePostImage(true);
   };
 
-  const closePostImage = () => {
-    setEnlargePostImage(false);
-  };
-
   const [enlargeAvatar, setEnlargeAvatar] = useState(false);
 
   const openAvatar = () => {
     setEnlargeAvatar(true);
-  };
-
-  const closeAvatar = () => {
-    setEnlargeAvatar(false);
   };
 
   const { username, subject, id, comment, image, time, avatar } = post;
@@ -222,14 +213,25 @@ export const PostView = ({
   return (
     <div>
       {image ? (
-        <RadixModal open={enlargePostImage} onOpenChange={closePostImage}>
+        <RadixModal
+          open={enlargePostImage}
+          onOpenChange={setEnlargePostImage}
+          disable={preview}
+        >
           <ModalImage src={image.location} />
         </RadixModal>
       ) : null}
-      <RadixModal open={enlargeAvatar} onOpenChange={closeAvatar}>
+      <RadixModal
+        open={enlargeAvatar}
+        onOpenChange={setEnlargeAvatar}
+        disable={preview}
+      >
         {avatar ? <ModalImage src={avatar} /> : <AnonymousAvatar />}
       </RadixModal>
-      <RadixModal open={expandDeleteDialog} onOpenChange={closeDeleteDialog}>
+      <RadixModal
+        open={expandDeleteDialog}
+        onOpenChange={setExpandDeleteDialog}
+      >
         <DeleteDialog
           board={board}
           threadNo={opNo}
@@ -334,7 +336,7 @@ const OriginalPost = (props: OriginalPostProps) => {
             <Avatar onClick={props.openAvatar} avatar={props.avatar} />
           </div>
           <TextContainer>
-            <Text bold size="medium">
+            <Text bold disableHighlight size="medium">
               <span>{props.username ?? "Anonymous"}</span>
             </Text>
             <PostLink to={props.postHref} onClick={props.handleClick}>
@@ -342,7 +344,7 @@ const OriginalPost = (props: OriginalPostProps) => {
             </PostLink>
           </TextContainer>
         </UserInfo>
-        <Text size="medium" color="darkGrey" align="right">
+        <Text size="medium" disableHighlight color="darkGrey" align="right">
           {props.formattedTime}
         </Text>
       </OriginalPostHeader>
@@ -354,11 +356,17 @@ const OriginalPost = (props: OriginalPostProps) => {
       ) : null}
       <OriginalContentRoot>
         {props.subject ? (
-          <Text align="left" width="100%" size="x-large" color="black">
+          <Text
+            align="left"
+            width="100%"
+            size="x-large"
+            color="black"
+            disableHighlight={props.preview}
+          >
             {props.subject}
           </Text>
         ) : null}
-        {processPostText(props.opNo, props.comment)}
+        {processPostText(props.opNo, props.comment, props.preview)}
       </OriginalContentRoot>
       <ActionsContainer>
         {" "}
@@ -373,17 +381,11 @@ const OriginalPost = (props: OriginalPostProps) => {
           />
           <DeletePostButton onClick={props.openDeleteDialog} />
         </OptionsDiv>
-        {props.preview ? (
-          <WithText
-            component={
-              <ThreadLink to={threadLoc}>
-                <MessageDetail />
-              </ThreadLink>
-            }
-            direction="row"
-            text={JSON.stringify(props.replyCount)}
-          />
-        ) : null}
+        <WithText
+          component={<MessageDetail />}
+          direction="row"
+          text={JSON.stringify(props.replyCount)}
+        />
       </ActionsContainer>
     </PostRoot>
   );
@@ -418,14 +420,14 @@ const ReplyPost = (props: ReplyPostProps) => {
       <ReplyContainer>
         <ReplyPostHeader>
           <ReplyTextContainer>
-            <Text bold size="medium">
+            <Text bold size="medium" disableHighlight>
               <span>{props.username ?? "Anonymous"}</span>
             </Text>
             <PostLink to={props.postHref} onClick={props.handleClick}>
               #{props.id}
             </PostLink>
           </ReplyTextContainer>
-          <Text size="medium" color="darkGrey" align="right">
+          <Text size="medium" disableHighlight color="darkGrey" align="right">
             {props.formattedTime}
           </Text>
         </ReplyPostHeader>
@@ -435,9 +437,9 @@ const ReplyPost = (props: ReplyPostProps) => {
             src={props.image.location}
           />
         ) : null}
-        <OriginalContentRoot>
-          {processPostText(props.opNo, props.comment)}
-        </OriginalContentRoot>
+        <ContentRoot>
+          {processPostText(props.opNo, props.comment, false)}
+        </ContentRoot>
         <ActionsContainer noMargins>
           {" "}
           <OptionsDiv
@@ -475,7 +477,7 @@ const WithTextRoot = styled.div<WithTextRootProps>`
   color: ${(props) => props.theme.colors.black};
 
   &:hover {
-    cursor: pointer;
+    /* cursor: pointer; */
     /* color: ${(props) => props.theme.colors.grey}; */
   }
 `;
@@ -598,6 +600,7 @@ const ModalImage = styled(Image)`
 
 const IconText = styled.p`
   /* font-size: 1.25rem; */
+  user-select: none;
   padding-bottom: 8px;
   align-self: center;
   margin: 0;
@@ -671,10 +674,7 @@ const ActionsContainer = styled.div<ActionsContainerProps>`
   flex-direction: row;
   align-items: center;
   margin-left: ${(props) => (props.noMargins ? "0px" : "4px")};
-`;
-
-const ThreadLink = styled(Link)`
-  color: inherit;
+  margin-right: ${(props) => (props.noMargins ? "0px" : "4px")};
 `;
 
 const ReplyRoot = styled.div`

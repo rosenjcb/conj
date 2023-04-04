@@ -11,7 +11,7 @@ import { PostLink, processPostText, Root, GreenText } from "../../util/post";
 // });
 
 test("Given post link, should set anchor tag", () => {
-  const result = processPostText(200, postReply);
+  const result = processPostText(200, postReply, false);
   const expected = (
     <Root>
       <PostLink href="200#202">#202</PostLink>
@@ -23,7 +23,7 @@ test("Given post link, should set anchor tag", () => {
 });
 
 test("Post should break new line", () => {
-  const result = processPostText(200, postReplyWithBreak);
+  const result = processPostText(200, postReplyWithBreak, false);
   const expected = (
     <Root>
       <span>hello world</span>
@@ -36,7 +36,7 @@ test("Post should break new line", () => {
 });
 
 test("Arrows mid line should not create green text", () => {
-  const result = processPostText(200, middleArrow);
+  const result = processPostText(200, middleArrow, false);
   const expected = (
     <Root>
       <span>this is not a greentext but saints {">"} patriots</span>
@@ -46,7 +46,7 @@ test("Arrows mid line should not create green text", () => {
 });
 
 test("Arrows beginning of line should create green text", () => {
-  const result = processPostText(200, beginningArrow);
+  const result = processPostText(200, beginningArrow, false);
   const expected = (
     <Root>
       <GreenText>{">"}this is a greentext</GreenText>

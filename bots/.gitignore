@@ -1,0 +1,16 @@
+/target
+/lib
+/classes
+/checkouts
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
+/.lsp
+/.clj-kondo
+/.calva
+/logs
+/resources/public
+/.calva/*

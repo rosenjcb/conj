@@ -8,8 +8,10 @@
             [board-manager.query.db.redis :as db.redis]
             [board-manager.query.db.s3 :as db.s3]
             [board-manager.query.thread :as query.thread]
+            [clojure.pprint :as pprint]
             [clojure.tools.logging :as log]
             [reitit.coercion.malli :as malli.coercion]
+            [reitit.ring.malli :as malli.ring]
             [ring.util.response :as response]))
 
 (defn peek-threads! [req]
@@ -56,10 +58,12 @@
         env (get-in req [:components :env])
         db-conn (get-in req [:components :db-conn])
         multipart-params (:multipart-params req)
+        form-data (if (empty? multipart-params) (:form-params req) multipart-params)
         id (get-in req [:parameters :path :id])
-        board (get-in req [:parameters :path :board])]
+        board (get-in req [:parameters :path :board])
+        _ (pprint/pprint req)]
     (try
-      (->> multipart-params 
+      (->> form-data 
            (query.thread/add-post! db-conn s3-client redis-conn env account board id)
            response/response)
       (catch Exception e
@@ -124,6 +128,10 @@
     (db.s3/delete-directory s3-client "conj-images" boards-path)
     (response/response "Boards have been purged and redis cache is clear!")))
 
+(def board-path
+  [:map
+    [:board string?]])
+
 (def thread-path
   [:map
    [:board string?]
@@ -134,50 +142,76 @@
    [:replyNo {:optional true} int?]
    [:ban {:optional true} boolean?]])
 
-(def post-body
+(def multipart-file-map
   [:map
-   [:subject string?]
-   [:comment string?]
-   [:image string?]])
+    [:filename string?]
+    [:content-type string?]
+    [:tempfile any?]
+    [:size number?]])
 
-(def thread-body
+(def reply-form-data
   [:map
    [:subject {:optional true} string?]
    [:comment {:optional true} string?]
-   [:image {:optional true} 
-              [:map
-                [:filename string?]
-                [:tempfile any?]]]
+   [:image {:optional true} malli.ring/temp-file-part]])
+
+(def thread-form-data
+  [:map
+   [:subject {:optional true} string?]
+   [:comment {:optional true} string?]
+  ;;  [:image [:maybe multipart-file]]
    [:is_anonymous boolean?]])
 
 (def thread-routes
   [["/boards"
     {:get list-boards!
-     :delete {:summary "Purges all boards from cache"
+     :delete {:name :purge-boards
+              :operationId "purgeBoards"
+              :summary "Purges all boards from cache"
+              :coercion malli.coercion/coercion
               :middleware [[middleware/wrap-admin]]
               :handler flush-all!}}]
    ["/boards/:board"
-   {:get peek-threads! 
-    :post {:summary "Create a Thread" 
-           :middleware [[middleware/full-wrap-auth]]
+    {:get {:name :get-board
+           :operationId "getBoard"
+           :summary "Fetches all threads from board"
+           :parameters {:path board-path}
            :coercion malli.coercion/coercion
-           :parameters {:multipart-params thread-body}
-           :handler create-thread!}
-    :delete {:summary "Nukes the entire board"
-             :middleware [[middleware/wrap-admin]]
-             :handler nuke-threads!}}]
+           :handler peek-threads!}
+     :post {:name :create-thread
+            :operationId "createThread"
+            :summary "Create a Thread"
+            :middleware [[middleware/full-wrap-auth]]
+            :coercion malli.coercion/coercion
+            :parameters {:multipart thread-form-data
+                         :path board-path}
+            :handler create-thread!}
+     :delete {:name :purge-board
+              :operationId "purgeBoard"
+              :summary "Purges the entire board"
+              :middleware [[middleware/wrap-admin]]
+              :coercion malli.coercion/coercion
+              :parameters {:path board-path}
+              :handler nuke-threads!}}]
     ["/boards/:board/threads/:id"
-     {:get {:summary "Get a thread by id"
+     {:get {:name :get-thread
+            :operationId "getThread"
+            :summary "Get a thread by id"
             :parameters {:path thread-path}
             :coercion malli.coercion/coercion
             :handler get-thread!}
-      :put {:summary "Inserts a post into a thread by id"
+      :put {:name :update-thread
+            :operationId "replyThread"
+            :summary "Inserts a post into a thread by id"
             :parameters {:path thread-path
-                         :multipart-params post-body}
+                         :multipart reply-form-data}
+            ;; :consumes ["multipart/form-data"]
             :coercion malli.coercion/coercion
             :middleware [[middleware/full-wrap-auth]]
             :handler put-thread!}
-      :delete {:summary "Deletes a thread (or reply). Pass an optional parameter to ban the post author."
+      :delete {:name :delete-thread
+               :operationId "deleteThread"
+               :summary "Deletes a thread (or reply). Pass an optional parameter to ban the post author."
                :parameters {:path thread-path
                             :query thread-query}
                :coercion malli.coercion/coercion

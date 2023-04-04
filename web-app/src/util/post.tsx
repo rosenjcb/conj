@@ -26,24 +26,33 @@ const processLine = (opNo: number, line: string) => {
   return res;
 };
 
-export const processPostText = (opNo: number, text: string) => {
+export const processPostText = (
+  opNo: number,
+  text: string,
+  disableHighlight: boolean
+) => {
   const textTrim = text.trim();
   const lines = textTrim.split(reNewLine);
 
   const processedLines = lines.map((line) => processLine(opNo, line));
 
-  return <Root>{processedLines}</Root>;
+  return <Root disableHighlight={disableHighlight}>{processedLines}</Root>;
 };
 
 export const PostLink = styled.a`
   color: ${(props) => props.theme.colors.primary};
 `;
 
-export const Root = styled.div`
+interface RootProps {
+  disableHighlight?: boolean;
+}
+
+export const Root = styled.div<RootProps>`
   width: 100%;
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
+  user-select: ${(props) => (props.disableHighlight ? "none" : "inherit")};
 `;
 
 export const GreenText = styled(SpanText)`
