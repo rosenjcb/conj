@@ -87,14 +87,14 @@ export const WithNavBar = ({ component }: WithNavBarProps) => {
 
   return (
     <BoardRoot>
-      <RadixModal open={accountIsOpen} onOpenChange={closeAccount}>
+      <RadixModal open={accountIsOpen} onOpenChange={setAccountIsOpen}>
         <AccountSettings onFinish={closeAccount} />
       </RadixModal>
-      <RadixModal open={loginOpen} onOpenChange={closeLogin}>
+      <RadixModal open={loginOpen} onOpenChange={setLoginOpen}>
         <Login completeAction={closeLogin} />
       </RadixModal>
       <HomeNavBar>
-        <Header bold onClick={redirectHome}>
+        <Header bold disableHighlight onClick={redirectHome}>
           Conj
         </Header>
         <NavItemsContainer>
@@ -214,7 +214,7 @@ const BoardDrawer = ({ boards, fill, isMobile }: BoardDrawerProps) => {
     <BoardDrawerRoot fill={fill}>
       <BoardList>
         <BoardRow>
-          <Text size={"large"} align="center" bold>
+          <Text size={"large"} align="center" bold disableHighlight>
             Most Popular Boards
           </Text>
         </BoardRow>
@@ -458,11 +458,13 @@ const Link = styled.div`
   align-self: center;
   cursor: pointer;
   width: 100%;
+  justify-content: center;
 `;
 
 const SettingText = styled(Text)`
   padding: 12px 16px;
   border-radius: 8px;
+  user-select: none;
 
   &:hover {
     background-color: ${(props) =>

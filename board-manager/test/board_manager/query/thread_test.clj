@@ -6,8 +6,6 @@
             [clojure.test :refer [deftest is testing]]
             [java-time :as t]))
 
-;; (def example-account {:id 19 :email "test@test.com"})
-
 (def base-request {:id 1 :username "Anonymous" :subject "" :comment "" :image nil})
 
 (def test-account {:id 1 :email "test@test.com" :username "test.mctest" :last_reply (t/sql-timestamp) :last_thread (t/sql-timestamp)})
@@ -15,10 +13,6 @@
 (def jane-account (assoc test-account :id 2 :username "jane1992" :email "jane@gmail.com"))
 
 (def bob-account (assoc test-account :id 3 :username "bobbyhill94" :email "bobby.hill@strickland.com"))
-
-;; (def example-image {:id 19 :name "snot-pepe" :location "" :rarity "common"})
-
-;; (def unenriched-post {:id 100 :account_id 1 :subject "" :image nil :comment "" :is_anonymous false})
 
 (def basic-post {:id 100 :account_id 1 :username "test.mctest" :subject "" :image nil :comment "" :is_anonymous false})
 
@@ -64,7 +58,6 @@
             too-early (update test-account :last_thread (partial subtract-minutes 3))]
         (is (thrown-with-msg? java.lang.Exception #"Comment is below 5 characters." (#'q.thread/validate-create-thread not-enough-chars)))
         (is (thrown-with-msg? java.lang.Exception #"Comment is above character limit 5001/5000." (#'q.thread/validate-create-thread too-many-chars)))
-        ;; (is (thrown-with-msg? java.lang.Exception #"An image is required for posting threads." (#'q.thread/validate-create-thread no-image-provided)))
         (is (thrown-with-msg? java.lang.Exception #"Only 3 minutes have passed since your last thread. You must wait 5 minutes between creating new threads." (#'q.thread/validate-thread-time too-early))))))
   (testing "Valid original posts return nil (do not throw)"
     (let [post-comment "Lorem ipsum facto 15 char."
@@ -92,9 +85,6 @@
   (testing "Unsorted threads sorts to sorted threads"
     (let [actual-sorted-threads (m.thread/sort unsorted-threads)]
       (is (= actual-sorted-threads sorted-threads)))))
-
-;; (defn- change-account-id [ids idx val]
-;;   (assoc val :account_id (get ids idx)))
 
 (deftest enrich-threads
   (testing "enrich? flag is respected"

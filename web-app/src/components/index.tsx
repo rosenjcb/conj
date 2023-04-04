@@ -13,9 +13,14 @@ interface RadixModalProps {
   trigger?: ReactNode;
   open?: any;
   onOpenChange?: any;
+  disable?: boolean;
 }
 
 export const RadixModal = (props: RadixModalProps) => {
+  if (props.disable) {
+    return <div />;
+  }
+
   return (
     <RadixDialog.Root open={props.open} onOpenChange={props.onOpenChange}>
       {props.trigger ? <RadixTrigger>{props.trigger}</RadixTrigger> : null}
@@ -178,6 +183,7 @@ export interface TextProps {
   noOverflow?: boolean;
   color?: string;
   width?: string;
+  disableHighlight?: boolean;
 }
 
 export const Text = styled.p<TextProps>`
@@ -190,6 +196,7 @@ export const Text = styled.p<TextProps>`
   width: ${(props) => props.width ?? "auto"};
   padding: 0;
   margin: 0;
+  user-select: ${(props) => (props.disableHighlight ? "none" : "inherit")};
   overflow-wrap: ${(props) => (props.noOverflow ? "initial" : "break-word")};
 `;
 
@@ -216,6 +223,7 @@ interface HeaderProps {
   align?: string;
   color?: string;
   size?: string;
+  disableHighlight?: boolean;
 }
 
 export const Header = styled.h1<HeaderProps>`
@@ -226,6 +234,7 @@ export const Header = styled.h1<HeaderProps>`
   padding: 5px;
   margin: 0;
   border-radius: 4px;
+  user-select: ${(props) => (props.disableHighlight ? "none" : "inherit")};
   font-size: ${(props) =>
     props.size ? sizeCompute("h1", props.size) : sizeCompute("h1", "medium")};
 
