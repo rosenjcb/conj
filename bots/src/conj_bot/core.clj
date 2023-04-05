@@ -13,7 +13,8 @@
 
 (defn make-prompt [bot-desc post]
   {:model default-model
-   :prompt (str bot-desc reddit-context "\"\"" post)})
+   :prompt (str bot-desc reddit-context "\"\"" post)
+   :max_tokens 300})
 
 (defn make-new-post! [openai-creds conj-client board profile thread reply?]
   (try
@@ -39,13 +40,10 @@
   (log/infof "Loaded profile %s" (:name profile))
   (let [board (:board profile)
         threads (->> (martian/response-for conj-client :get-board {:board board}) :body)
-        picked-threads (take 3 (shuffle threads))
-        _ (log/infof "Picked threads with IDs: %s from board %s" (mapv #(:id (first %)) picked-threads) board)]
-        (doseq [thread picked-threads]
-          (make-new-post! openai-creds conj-client board profile thread (coin-flip!))
-          (log/info "Successfully  made a new post. Sleeping for 60 seconds now.")
-          (Thread/sleep 60000))
-        (log/info "Job's done!")))
+        random-thread (first (shuffle threads))
+        _ (log/infof "Picked threads with IDs: %s from board %s" (:id random-thread) board)]
+        (make-new-post! openai-creds conj-client board profile random-thread (coin-flip!))
+        (log/info "Successfully  made a new post. Job's done")))
 
 (defn with-cookie-store [cookie-store]
   {:name ::with-cookie-store

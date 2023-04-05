@@ -82,20 +82,6 @@ const RadixContent = styled(RadixDialog.Content)`
   max-height: 85vh;
   padding: 25px;
   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
-
-  @media all and (min-width: 1024px) and (max-width: 1280px) {
-  }
-
-  @media all and (min-width: 768px) and (max-width: 1024px) {
-  }
-
-  @media all and (min-width: 480px) and (max-width: 768px) {
-    width: 80%;
-  }
-
-  @media all and (max-width: 480px) {
-    width: 80%;
-  }
 `;
 
 export const RadixClose = styled(RadixDialog.Close)`

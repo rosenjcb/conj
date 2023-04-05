@@ -148,6 +148,8 @@ const ContentDetails = styled.div`
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
   padding: 10px;
   gap: 20px;
 `;
@@ -190,7 +192,6 @@ const Root = styled.div`
   background-color: ${(props) => props.theme.colors.white};
   text-align: center;
   border-radius: 8px;
-  width: 400px;
 
   // @media all and (min-width: 1024px) and (max-width: 1280px) {
   //   width: 20vw;

@@ -131,7 +131,6 @@ const FullReply = (props: FullReplyProps) => {
 
   const toggleCheck = () => {
     setChecked(!check);
-    console.log("changing check");
     dispatch(updateEntry({ key: "is_anonymous", value: !check }));
   };
 
@@ -209,10 +208,12 @@ interface FakeReplyProps {
 const FakeReply = ({ onClick, className }: FakeReplyProps) => {
   const { data: me } = useMeQuery();
 
+  const post = useAppSelector((state) => state.post);
+
   return (
     <FakeReplyRoot onClick={onClick} className={className}>
       <Avatar avatar={me?.avatar} />
-      <InputField disabled placeholder="Comment here..." />
+      <InputField disabled placeholder="Comment here..." value={post.comment} />
     </FakeReplyRoot>
   );
 };
@@ -382,6 +383,22 @@ const CommentBody = styled(Field)`
   outline: none;
   border: none;
   height: 5rem;
+
+  @media all and (min-width: 1024px) {
+    min-width: 500px;
+  }
+
+  @media all and (min-width: 768px) and (max-width: 1024px) {
+    min-width: 500px;
+  }
+
+  @media all and (min-width: 480px) and (max-width: 768px) {
+    width: 70vw;
+  }
+
+  @media all and (max-width: 480px) {
+    width: 70vw;
+  }
 `;
 
 const SubjectInput = styled(Field).attrs((props) => ({ type: "text" }))`

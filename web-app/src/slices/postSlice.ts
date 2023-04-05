@@ -20,7 +20,8 @@ export const postSlice = createSlice({
   initialState,
   reducers: {
     insertPostLink: (state, action) => {
-      return { ...state, comment: `${state.comment} #${action.payload}` };
+      const newComment = `${state.comment} #${action.payload}`.trim();
+      return { ...state, comment: newComment };
     },
     updateEntry: (state, action) => {
       const { key, value } = action.payload;

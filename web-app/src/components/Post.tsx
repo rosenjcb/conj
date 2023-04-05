@@ -141,9 +141,8 @@ const DeleteDialogRoot = styled.div`
   flex-direction: column;
   align-items: center;
   align-self: center;
-  width: fit-content;
+  width: 100%;
   max-width: 400px;
-  padding: 10px;
   gap: 10px;
 `;
 
@@ -323,6 +322,18 @@ const OriginalPost = (props: OriginalPostProps) => {
     }
   };
 
+  const handleOpenOptions = () => {
+    if (!props.preview) {
+      props.openOptions();
+    }
+  };
+
+  const handlePostIdClick = (e: any) => {
+    if (!props.preview) {
+      props.handleClick(e);
+    }
+  };
+
   return (
     <PostRoot
       key={props.id}
@@ -339,7 +350,7 @@ const OriginalPost = (props: OriginalPostProps) => {
             <Text bold disableHighlight size="medium">
               <span>{props.username ?? "Anonymous"}</span>
             </Text>
-            <PostLink to={props.postHref} onClick={props.handleClick}>
+            <PostLink to={props.postHref} onClick={handlePostIdClick}>
               #{props.id}
             </PostLink>
           </TextContainer>
@@ -373,7 +384,7 @@ const OriginalPost = (props: OriginalPostProps) => {
         <OptionsDiv
           ref={props.optionsRef}
           expand={props.expandOptions}
-          onClick={props.openOptions}
+          onClick={handleOpenOptions}
         >
           {!props.expandOptions ? <EllipsisButton /> : null}
           <ShareMessageButton
@@ -577,29 +588,11 @@ const ReplyImage = styled(CenteredImage)`
 `;
 
 const ModalImage = styled(Image)`
-  width: 100%;
-  max-width: 100%;
-  /* max-width: 50vw;
-  max-height: 50vh; */
-  /* 
-  @media all and (min-width: 1024px) and (max-width: 1280px) {
-    max-width: 50vw;
-  }
-
-  @media all and (min-width: 768px) and (max-width: 1024px) {
-  }
-
-  @media all and (min-width: 480px) and (max-width: 768px) {
-  }
-
-  @media all and (max-width: 480px) {
-    width: 100vw;
-    max-width: 100vw;
-  } */
+  max-width: 70vw;
+  margin: 0 auto;
 `;
 
 const IconText = styled.p`
-  /* font-size: 1.25rem; */
   user-select: none;
   padding-bottom: 8px;
   align-self: center;
