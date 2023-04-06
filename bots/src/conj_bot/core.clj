@@ -27,7 +27,6 @@
           reply (->> response :choices first :text)
           final-reply (when reply? (str "#" (:id random-reply) " " reply))]
       (log/infof "Here is your prompt %s" prompt)
-      (log/infof "Making an reply to another user in the thread (not OP)? %s" reply?)
       (log/infof "Here's my response from openai %s" response)
       (martian/response-for conj-client :reply-thread {:board board :id (:id op) :comment (or final-reply reply)}))
     (catch Exception e 
@@ -41,7 +40,7 @@
   (let [board (:board profile)
         threads (->> (martian/response-for conj-client :get-board {:board board}) :body)
         random-thread (first (shuffle threads))
-        _ (log/infof "Picked threads with IDs: %s from board %s" (:id random-thread) board)]
+        _ (log/infof "Picked threads with IDs: %s from board %s" (:id (first random-thread)) board)]
         (make-new-post! openai-creds conj-client board profile random-thread (coin-flip!))
         (log/info "Successfully  made a new post. Job's done")))
 

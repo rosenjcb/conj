@@ -589,6 +589,7 @@ const ReplyImage = styled(CenteredImage)`
 
 const ModalImage = styled(Image)`
   max-width: 70vw;
+  max-height: inherit;
   margin: 0 auto;
 `;
 
