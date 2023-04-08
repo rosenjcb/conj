@@ -81,23 +81,14 @@ const RadixContent = styled(RadixDialog.Content)`
   max-width: 90vw;
   max-height: 85vh;
   padding: 25px;
+  z-index: 3;
   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
 `;
 
 export const RadixClose = styled(RadixDialog.Close)`
   all: unset;
   display: block;
-  /* width: 0;
-  height: 0; */
 `;
-
-// interface OffsetProps {
-//   distance: string;
-// }
-
-// const Offset = styled.div<OffsetProps>`
-//   margin-right: ${(props) => props.distance};
-// `;
 
 interface HRProps {
   width?: string;
@@ -284,7 +275,7 @@ export const AccentButton = styled(RoundButton)`
 export const RoundImage = styled.img`
   max-width: 100%;
   margin: 0 auto;
-  max-height: inherit;
+  max-height: 50vh;
   border-radius: 8px;
 `;
 

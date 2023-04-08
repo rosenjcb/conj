@@ -11,7 +11,6 @@ import { WithNavBar } from "./components/NavBar";
 import { AboutPage } from "./pages/About";
 import { BoardPage } from "./pages/Board";
 import { Toaster } from "react-hot-toast";
-import chroma from "chroma-js";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const theme: DefaultTheme = {
@@ -69,16 +68,7 @@ const AppRoot = styled.div`
   flex-direction: column;
   justify-content: center;
   height: 100vh;
-  /* background: linear-gradient(
-    112deg,
-    transparent 0,
-    transparent 20%,
-    ${(props) => chroma(props.theme.colors.primary).alpha(0.1).hex()} 30%,
-    ${(props) => chroma(props.theme.colors.primary).alpha(0.1).hex()} 70%,
-    transparent 80%,
-    transparent 100%
-  ); */
-  background-color: white;
+  background-color: ${(props) => props.theme.colors.white};
   overflow-x: hidden;
 `;
 

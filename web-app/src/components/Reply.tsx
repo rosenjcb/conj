@@ -375,14 +375,14 @@ const CommentBody = styled(Field)`
   font-size: 1.25rem;
   word-break: break-word;
   background-color: inherit;
-  resize: vertical;
+  resize: none;
   scrollbar-width: none;
   margin: 0;
   width: 100%;
   padding: 0;
   outline: none;
   border: none;
-  height: 5rem;
+  height: 4rem;
 
   @media all and (min-width: 1024px) {
     min-width: 450px;
