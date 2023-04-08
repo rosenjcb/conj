@@ -18,6 +18,8 @@
 (def ^:const max-thread-count 30)
 (def ^:const max-post-count 300)
 
+(def ^:const image-size-limit 5)
+
 (def ^:const s3-bucket "conj-images")
 
 (defn- s3-image-path [env board-name thread-id]
@@ -142,9 +144,12 @@
     (when (< lapsed-time 60)
       (throw (Exception. (format "Only %s seconds have passed since your last reply. You must wait 60 seconds between replies." lapsed-time))))))
 
+(defn- bytes->mb [byte-len]
+  (/ byte-len 1048576))
 
 (defn- upload-image
   [s3-client env board-name thread-id {:keys [filename tempfile]}]
+  (when (>= (bytes->mb (.length tempfile)) image-size-limit) (throw (ex-info (format "Image is over the size limit of %s MB." image-size-limit) {:type :image-size-limit})))
   (db.s3/upload-object s3-client s3-bucket (s3-image-path env board-name thread-id) filename (io/input-stream tempfile)))
 
 (defn find-thread-by-id!

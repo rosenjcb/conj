@@ -280,17 +280,17 @@ const FullReplyRoot = styled.div`
 
   @media all and (min-width: 1024px) {
     border-radius: 8px;
-    width: 500px;
+    width: 450px;
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
     border-radius: 8px;
-    width: 500px;
+    width: 450px;
   }
 
   @media all and (min-width: 480px) and (max-width: 768px) {
     border-radius: 8px;
-    width: 500px;
+    width: 450px;
   }
 
   @media all and (max-width: 480px) {
@@ -385,15 +385,15 @@ const CommentBody = styled(Field)`
   height: 5rem;
 
   @media all and (min-width: 1024px) {
-    min-width: 500px;
+    min-width: 450px;
   }
 
   @media all and (min-width: 768px) and (max-width: 1024px) {
-    min-width: 500px;
+    min-width: 450px;
   }
 
   @media all and (min-width: 480px) and (max-width: 768px) {
-    width: 70vw;
+    width: 450px;
   }
 
   @media all and (max-width: 480px) {
