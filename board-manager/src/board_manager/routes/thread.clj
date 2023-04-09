@@ -8,7 +8,6 @@
             [board-manager.query.db.redis :as db.redis]
             [board-manager.query.db.s3 :as db.s3]
             [board-manager.query.thread :as query.thread]
-            [clojure.pprint :as pprint]
             [clojure.tools.logging :as log]
             [reitit.coercion.malli :as malli.coercion]
             [reitit.ring.malli :as malli.ring]
@@ -60,8 +59,7 @@
         multipart-params (:multipart-params req)
         form-data (if (empty? multipart-params) (:form-params req) multipart-params)
         id (get-in req [:parameters :path :id])
-        board (get-in req [:parameters :path :board])
-        _ (pprint/pprint req)]
+        board (get-in req [:parameters :path :board])]
     (try
       (->> form-data 
            (query.thread/add-post! db-conn s3-client redis-conn env account board id)
@@ -151,9 +149,9 @@
 
 (def reply-form-data
   [:map
-   [:subject {:optional true} string?]
    [:comment {:optional true} string?]
-   [:image {:optional true} malli.ring/temp-file-part]])
+   [:image {:optional true} malli.ring/temp-file-part]
+   [:is_anonymous boolean?]])
 
 (def thread-form-data
   [:map

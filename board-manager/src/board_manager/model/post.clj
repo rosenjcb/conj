@@ -3,18 +3,17 @@
 (def schema
   [:map
    [:name {:optional true} string?]
-   [:subject {:optional true} string?]
    [:image {:optional true} map?]
    [:comment string?]
    [:time inst?]
-   [:is_anonymous {:optional true} boolean?]
+   [:is_anonymous boolean?]
    [:account_id {:optional true} int?]])
 
 (defn ->post
   "Takes a given API request and generates a new thread"
   [req account-id id]
-  (let [{:strs [subject comment image]} req]
-    {:id id :account_id account-id :subject subject :comment comment :image image}))
+  (let [{:strs [comment image is_anonymous]} req]
+    {:id id :account_id account-id :comment comment :image image :is_anonymous (Boolean/valueOf is_anonymous)}))
 
 (def id :id)
 
@@ -31,6 +30,3 @@
 (def is-anonymous :is_anonymous)
 
 (def account-id :account_id)
-
-(defn op? [post]
-  (some? (is-anonymous post)))

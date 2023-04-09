@@ -173,14 +173,12 @@ const FullReply = (props: FullReplyProps) => {
               <ActionsContainer>
                 <OptionsContainer>
                   <UploadImage disabled={me === null} />
-                  {threadNo === null ? (
-                    <Switch
-                      disabled={me === null}
-                      checked={check}
-                      label="Anonymous"
-                      onCheckedChange={toggleCheck}
-                    />
-                  ) : null}
+                  <Switch
+                    disabled={me === null}
+                    checked={check}
+                    label="Anonymous"
+                    onCheckedChange={toggleCheck}
+                  />
                 </OptionsContainer>
                 <RadixClose asChild>
                   <RoundButton
