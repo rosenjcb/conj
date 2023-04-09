@@ -117,8 +117,8 @@
                                      {:id 104, :account_id 2, :subject "", :image nil, :comment ""} 
                                      {:id 105, :account_id 3, :subject "", :image nil, :comment ""}]]
             multiple-unknown-threads (list thread-with-unknown-ids thread-with-unknown-ids)]
-        (is (= (list enriched-thread) (#'q.thread/enrich-threads nil true thread-with-known-ids)))
-        (is (= (list thread-with-unknown-ids) (#'q.thread/enrich-threads nil true thread-with-unknown-ids)))
+        (is (= (vector enriched-thread) (#'q.thread/enrich-threads nil true (vector thread-with-known-ids))))
+        (is (= (vector thread-with-unknown-ids) (#'q.thread/enrich-threads nil true (vector thread-with-unknown-ids))))
         (is (= multiple-enriched-threads (#'q.thread/enrich-threads nil true multiple-known-threads)))
         (is (= multiple-unknown-threads (#'q.thread/enrich-threads nil true multiple-unknown-threads)))))))
 
@@ -127,5 +127,5 @@
     (with-redefs [db.redis/set (constantly nil)
                   q.thread/fetch-threads! (constantly nil)]
       (let [expected-thread (assoc-in max-thread [0 :locked] true)]
-        (is (= expected-thread (#'q.thread/update-thread! nil nil nil max-thread)))
-        (is (= basic-thread (#'q.thread/update-thread! nil nil nil basic-thread)))))))
+        (is (= expected-thread (#'q.thread/update-thread! nil nil nil nil max-thread)))
+        (is (= basic-thread (#'q.thread/update-thread! nil nil nil nil basic-thread)))))))

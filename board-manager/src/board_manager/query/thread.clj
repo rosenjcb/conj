@@ -57,24 +57,30 @@
 (defn ^:private ^:test stitch-threads
   ([posts] (stitch-threads posts []))
   ([posts state]
-  (let [post (first posts)
-        anonymous? (if-some [val (m.post/is-anonymous post)] val (m.thread/anonymous? (last state)))
-        trimmed-post (maybe-trim-post anonymous? post)
-        rest (into [] (rest posts))
-        thread (or (last state) [])
-        index (max 0 (dec (count state)))]
-    (if (empty? posts)
-      state
-      (if (m.post/op? trimmed-post)
-        (->> (conj state [trimmed-post])
-             (stitch-threads rest))
-        (->> (conj thread trimmed-post)
-             (assoc state index)
-             (stitch-threads rest)))))))
+    (let [post (first posts)
+          anonymous? (m.post/is-anonymous post)
+          op? (:op post)
+          trimmed-post (maybe-trim-post anonymous? post)
+          trimmed-post (dissoc trimmed-post :op) ;; maybe actually keep this? Probably a good idea to always mark the OP even though threads are sequential
+          rest (into [] (rest posts))
+          thread (or (last state) [])
+          index (max 0 (dec (count state)))]
+      (if (empty? posts)
+        state
+        (if op? 
+          (->> (conj state [trimmed-post])
+               (stitch-threads rest))
+          (->> (conj thread trimmed-post)
+              (assoc state index)
+              (stitch-threads rest)))))))
+
+(defn- mark-op [thread]
+  (assoc-in thread [0 :op] true))
 
 (defn ^:private ^:test enrich-threads [db-conn enrich? threads]
   (if (and enrich? (seq threads))
-    (let [posts (flatten threads)
+    (let [threads (mapv mark-op threads)
+          posts (flatten threads)
           account-ids (set (mapv m.post/account-id posts))
           accounts (q.account/find-accounts-by-ids! db-conn account-ids)
           posts&accounts (mapv (partial post&account accounts) posts)
@@ -190,21 +196,20 @@
         account-id (m.account/id db-account)
         post-count (q.board/get-count! db-conn board)
         thread (m.thread/->thread req account-id post-count)
-        anonymous? (m.thread/anonymous? thread)
         op (first thread)
         _ (validate-thread-time db-account)
         _ (validate-create-thread op)
         image (m.post/image op)
         uploaded-image (when image (upload-image s3-client env board (m.post/id op) image))
-        updated-op (assoc op :image uploaded-image :time (t/zoned-date-time) :is_anonymous anonymous?)
+        updated-op (assoc op :image uploaded-image :time (t/zoned-date-time))
         final-thread (vector updated-op)]
     (add-thread-to-board! db-conn redis-conn s3-client env board final-thread)
     (q.board/increment-counter! db-conn board)
     (q.account/update-last-thread! db-conn account-id)
     final-thread))
 
-(defn ^:private ^:test update-thread! [redis-conn board thread-id updated-thread]
-  (let [old-threads (fetch-threads! nil redis-conn board)
+(defn ^:private ^:test update-thread! [db-conn redis-conn board thread-id updated-thread]
+  (let [old-threads (fetch-threads! db-conn redis-conn board)
         final-thread (if (> (count updated-thread) max-post-count) (assoc-in updated-thread [0 :locked] true) updated-thread)
         new-threads (mapv #(if (= (m.post/id (first %)) thread-id) final-thread %) old-threads)]
     (db.redis/set redis-conn board new-threads)
@@ -228,7 +233,7 @@
       (if thread
         (do
           (purge-image-by-post s3-client env board thread-id post)
-          (update-thread! redis-conn board thread-id trimmed-thread))
+          (update-thread! db-conn redis-conn board thread-id trimmed-thread))
         (throw (Exception. (format "Thread No. %s not found" thread-id)))))))
 
 (defn ^:private ^:test validate-thread-lock 
@@ -257,7 +262,7 @@
         uploaded-image (when image (upload-image s3-client env board thread-id image))
         enriched-post (assoc post :image uploaded-image :time (t/zoned-date-time))
         updated-thread (m.thread/add-post enriched-post old-thread)] 
-    (update-thread! redis-conn board thread-id updated-thread)
+    (update-thread! db-conn redis-conn board thread-id updated-thread)
     (q.board/increment-counter! db-conn board)
     (q.account/update-last-reply! db-conn account-id)
     updated-thread))
