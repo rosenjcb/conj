@@ -7,7 +7,7 @@
    [:map m.post/schema]])
 
 (defn ->thread [{:strs [subject] :as req} account-id post]
-  (assoc (m.post/->post req account-id post) :subject subject))
+  (vector (assoc (m.post/->post req account-id post) :subject subject)))
 
 #_{:clj-kondo/ignore [:redefined-var]}
 (defn sort [threads] 
