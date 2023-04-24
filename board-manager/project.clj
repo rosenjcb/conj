@@ -66,8 +66,8 @@
                  :port 8080
                  :google-client-id "602129467689-pe4l4im2nr62t14ae50quc1uj2dd5um1.apps.googleusercontent.com"
                  :google-client-secret "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"
-                 :aws-access-key "AKIAT4X5HGH7UKG3PAWF"
-                 :aws-access-secret "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"}}
+                 :aws-access-key "BLANK"
+                 :aws-access-secret "BLANK"}}
    :dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring/ring-mock "0.3.2"]]
          :migratus {:store :database
